@@ -1,0 +1,3 @@
+include ':PosLib'
+include ':app'
+rootProject.name = "PosLib Impl"
