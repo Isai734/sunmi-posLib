@@ -1,9 +1,9 @@
 package com.pagatodo.sunmi.poslib.util
 
 object Constants {
-    const val track1 = "Track1"
-    const val track2 = "Track2"
-    const val track3 = "Track3"
+    const val track1 = "TRACK1"
+    const val track2 = "TRACK2"
+    const val track3 = "TRACK3"
     const val maskedPan = "maskedPan"
     const val encTrack1 = "encTrack1"
     const val encTrack2 = "encTrack2"

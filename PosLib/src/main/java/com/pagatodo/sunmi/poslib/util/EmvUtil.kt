@@ -1,6 +1,7 @@
 package com.pagatodo.sunmi.poslib.util
 
 import android.util.Log
+import com.pagatodo.sunmi.poslib.PosLib
 import com.pagatodo.sunmi.poslib.SunmiTransaction
 import com.pagatodo.sunmi.poslib.model.DataCard
 import com.pagatodo.sunmi.poslib.posInstance
@@ -94,9 +95,9 @@ object EmvUtil {
 
     fun initKey(mSecurityOptV2: SecurityOptV2) { //Initialize keys
         try {
-            val cvByte = ByteUtilJava.hexStr2Bytes("82E13665B4624DF5")
+            val cvByte = ByteUtil.hexStr2Bytes("82E13665B4624DF5")
             // save TMK
-            val dataByte = ByteUtilJava.hexStr2Bytes("F40379AB9E0EC533F40379AB9E0EC533")
+            val dataByte = ByteUtil.hexStr2Bytes("F40379AB9E0EC533F40379AB9E0EC533")
             val security = posInstance().posConfig.security
             var result = mSecurityOptV2.savePlaintextKey(AidlConstants.Security.KEY_TYPE_TDK, dataByte, cvByte, AidlConstants.Security.KEY_ALG_TYPE_3DES, 10)
             if (result != 0) {
@@ -162,10 +163,7 @@ object EmvUtil {
         if (mTrack2.length > index + 8) {
             serviceCode = mTrack2.substring(index + 5, index + 8)
         }
-        PosLogger.i(
-            SunmiTransaction.TAG,
-            "cardNumber: $cardNumber expireDate: $expiryDate serviceCode: $serviceCode"
-        )
+        PosLogger.i(PosLib.TAG, "cardNumber: $cardNumber expireDate: $expiryDate serviceCode: $serviceCode")
         cardInfo.cardNo = cardNumber
         cardInfo.expireDate = expiryDate
         cardInfo.serviceCode = serviceCode

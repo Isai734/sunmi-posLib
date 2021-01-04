@@ -21,11 +21,11 @@ open class SunmiServiceWrapper {
         mSMPayKernel = SunmiPayKernel.getInstance()
         mSMPayKernel?.initPaySDK(context, object : SunmiPayKernel.ConnectCallback {
             override fun onConnectPaySDK() {
-                PosLogger.i(SunmiTransaction.TAG, "Pay Sdk connect")
+                PosLogger.i(PosLib.TAG, "Pay Sdk connect")
             }
 
             override fun onDisconnectPaySDK() {
-                PosLogger.w(SunmiTransaction.TAG, "Pay Sdk disconnect")
+                PosLogger.w(PosLib.TAG, "Pay Sdk disconnect")
             }
         })
     }
@@ -35,7 +35,7 @@ open class SunmiServiceWrapper {
         try {
             mBasicOptV2?.setScreenMode(uid)
         } catch (e: Exception) {
-            PosLogger.w(SunmiTransaction.TAG, e.message)
+            PosLogger.w(PosLib.TAG, e.message)
         }
     }
 
@@ -43,7 +43,7 @@ open class SunmiServiceWrapper {
         try {
             mBasicOptV2?.setScreenMode(-1)
         } catch (e: Exception) {
-            PosLogger.w(SunmiTransaction.TAG, e.message)
+            PosLogger.w(PosLib.TAG, e.message)
         }
     }
 

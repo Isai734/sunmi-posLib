@@ -1,6 +1,7 @@
 package com.pagatodo.sunmi.poslibimpl
 
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Observer
@@ -16,21 +17,28 @@ import com.pagatodo.sunmi.poslib.util.PosResult
 import com.sunmi.pay.hardware.aidl.AidlConstants
 import com.sunmi.pay.hardware.aidlv2.bean.PinPadConfigV2
 import com.sunmi.pay.hardware.aidlv2.pinpad.PinPadListenerV2
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 class SunmiTransactionManager(private val activity: AppCompatActivity) : SunmiTransaction(),
     Observer<Results<String>> {
 
-    var dialogProgress: DialogProgress? = null
+    private val dialogProgress: DialogProgress? by lazy {
+        DialogProgress().apply {
+            isCancelable = false
+        }
+    }
+    private val mTransactionData = TransactionData()
+
+    private val askForCard: AlertDialog? by lazy {
+        val builder: AlertDialog.Builder = AlertDialog.Builder(activity)
+        builder.setMessage("Por favor inserta, desliza o acerca la tarjeta.")
+        builder.create()
+    }
 
     private val viewModelPci: ViewModelPci by lazy {
         ViewModelProvider(activity)[ViewModelPci::class.java].apply {
             purchaseMlData.observe(activity, this@SunmiTransactionManager)
         }
     }
-    private val mTransactionData = TransactionData()
 
     fun initTransaction(tAmount: String) {
         with(mTransactionData) {
@@ -46,22 +54,27 @@ class SunmiTransactionManager(private val activity: AppCompatActivity) : SunmiTr
             sigmaOperation = "V"
             tagsEmv = EmvUtil.tagsDefault.toList()
         }
-        showDialog()
+        showDialogCard()
         super.startPayProcess()
     }
 
     private fun showDialog() {
-        dialogProgress = DialogProgress()
-        dialogProgress?.isCancelable = false
         dialogProgress?.show(activity.supportFragmentManager, dialogProgress?.tag)
     }
 
+    private fun showDialogCard() {
+        askForCard?.show()
+    }
+
     override fun goOnlineProcess(dataCard: DataCard) {
+        askForCard?.dismiss()
+        showDialog()
         viewModelPci.purchase()
     }
 
     override fun onFailureTrx(result: PosResult) {
-        dialogProgress?.dismiss()
+        askForCard?.dismiss()
+        if (dialogProgress!!.isVisible) dialogProgress?.dismiss()
         Toast.makeText(activity, "${result.code} ${result.message}", Toast.LENGTH_LONG).show()
     }
 
@@ -71,7 +84,7 @@ class SunmiTransactionManager(private val activity: AppCompatActivity) : SunmiTr
     }
 
     override fun getCheckCardType(): Int {
-        return AidlConstants.CardType.MAGNETIC.value// or AidlConstants.CardType.IC.value or AidlConstants.CardType.NFC.value
+        return AidlConstants.CardType.MAGNETIC.value or AidlConstants.CardType.IC.value or AidlConstants.CardType.NFC.value
     }
 
     override fun pinMustBeForced(): Boolean {
@@ -79,6 +92,7 @@ class SunmiTransactionManager(private val activity: AppCompatActivity) : SunmiTr
     }
 
     override fun onShowPinPad(pinPadListener: PinPadListenerV2.Stub, pinPadConfig: PinPadConfigV2) {
+        askForCard?.dismiss()
         val pinPadDialog = PinPadDialog.createInstance(pinPadConfig)
         pinPadDialog.setPasswordLength(6)
         pinPadDialog.setTextAccept("Aceptar")

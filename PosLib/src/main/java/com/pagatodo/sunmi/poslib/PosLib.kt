@@ -14,13 +14,16 @@ class PosLib private constructor(val activity: Activity) : SunmiServiceWrapper()
 
     private fun setGlobalConfig() {
         mSecurityOptV2?.apply { EmvUtil.initKey(this) }
-        /*mEMVOptV2?.apply {
+        mEMVOptV2?.apply {
             EmvUtil.setAids(this)
             EmvUtil.setCapks(this)
-        }*/
+        }
     }
 
     companion object {
+
+        val TAG: String = PosLib::class.java.simpleName
+
         @Volatile
         private var INSTANCE: PosLib? = null
 
@@ -36,8 +39,7 @@ class PosLib private constructor(val activity: Activity) : SunmiServiceWrapper()
         }
 
         fun getInstance(): PosLib {
-            return INSTANCE
-                ?: throw IllegalStateException("You need to create Instance PosLib.")
+            return INSTANCE ?: throw IllegalStateException("You need to create Instance PosLib.")
         }
     }
 }

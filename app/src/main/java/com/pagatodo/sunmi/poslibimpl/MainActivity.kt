@@ -14,6 +14,7 @@ import com.pagatodo.sunmi.poslib.config.PosConfig
 import com.pagatodo.sunmi.poslib.model.Aid
 import com.pagatodo.sunmi.poslib.model.Capk
 import com.pagatodo.sunmi.poslib.posInstance
+import com.pagatodo.sunmi.poslib.util.PosLogger
 import com.pagatodo.sunmi.poslibimpl.util.LoadFile
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
@@ -58,7 +59,7 @@ class MainActivity : AppCompatActivity() {
                 PosLib.loadGlobalConfig(posConfig)
                 Log.i("MainActivity", "configure terminal success")
             } catch (e: Exception) {
-                Log.e("MainActivity", e.toString())
+               PosLogger.e("MainActivity", e.toString())
             }
         }
     }

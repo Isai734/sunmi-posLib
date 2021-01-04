@@ -4,7 +4,6 @@ import android.util.Log
 import com.pagatodo.sunmi.poslib.model.Aid
 import com.pagatodo.sunmi.poslib.model.Capk
 import com.pagatodo.sunmi.poslib.util.ByteUtil
-import com.pagatodo.sunmi.poslib.util.ByteUtilJava
 import com.pagatodo.sunmi.poslib.util.Constants.MAESTRO
 import com.pagatodo.sunmi.poslib.util.Constants.MASTERCARD
 import com.pagatodo.sunmi.poslib.util.Constants.forRefund
@@ -15,10 +14,10 @@ import java.util.*
 class PosConfig {
 
     var security = Security(
-        plainDataKey = ByteUtilJava.hexStr2Bytes("F40379AB9E0EC533F40379AB9E0EC533"),
-        plainDataKcvKey = ByteUtilJava.hexStr2Bytes("82E13665B4624DF5"),
-        plainPinkey = ByteUtilJava.hexStr2Bytes("F40379AB9E0EC533F40379AB9E0EC533"),
-        plainPinKcvkey = ByteUtilJava.hexStr2Bytes("82E13665B4624DF5")
+        plainDataKey = ByteUtil.hexStr2Bytes("F40379AB9E0EC533F40379AB9E0EC533"),
+        plainDataKcvKey = ByteUtil.hexStr2Bytes("82E13665B4624DF5"),
+        plainPinkey = ByteUtil.hexStr2Bytes("F40379AB9E0EC533F40379AB9E0EC533"),
+        plainPinKcvkey = ByteUtil.hexStr2Bytes("82E13665B4624DF5")
     )
 
     var capks: List<Capk> = LinkedList<Capk>()
