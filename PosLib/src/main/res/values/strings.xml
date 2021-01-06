@@ -16,5 +16,6 @@
     <string name="cancel_operation">Operación Cancelada.</string>
     <string name="trans_refused">Transacción Declinada.</string>
     <string name="sync_operation">Cancelando la Operación.</string>
+    <string name="sync_operation_failed">Verifica la Conexión.</string>
     <string name="error_check_present_card">Error al Validar la Tarjeta Presente.</string>
 </resources>

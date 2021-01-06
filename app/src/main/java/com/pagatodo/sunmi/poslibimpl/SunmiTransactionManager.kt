@@ -18,15 +18,14 @@ import com.sunmi.pay.hardware.aidl.AidlConstants
 import com.sunmi.pay.hardware.aidlv2.bean.PinPadConfigV2
 import com.sunmi.pay.hardware.aidlv2.pinpad.PinPadListenerV2
 
-class SunmiTransactionManager(private val activity: AppCompatActivity) : SunmiTransaction(),
-    Observer<Results<String>> {
+class SunmiTransactionManager(private val activity: AppCompatActivity) :SunmiTransaction() {
 
+    private val mTransactionData = TransactionData()
     private val dialogProgress: DialogProgress? by lazy {
         DialogProgress().apply {
             isCancelable = false
         }
     }
-    private val mTransactionData = TransactionData()
 
     private val askForCard: AlertDialog? by lazy {
         val builder: AlertDialog.Builder = AlertDialog.Builder(activity)
@@ -36,7 +35,7 @@ class SunmiTransactionManager(private val activity: AppCompatActivity) : SunmiTr
 
     private val viewModelPci: ViewModelPci by lazy {
         ViewModelProvider(activity)[ViewModelPci::class.java].apply {
-            purchaseMlData.observe(activity, this@SunmiTransactionManager)
+            purchaseMlData.observe(activity, pciObserver)
         }
     }
 
@@ -80,7 +79,7 @@ class SunmiTransactionManager(private val activity: AppCompatActivity) : SunmiTr
 
     override fun onApprovedTrx() {
         dialogProgress?.dismiss()
-        Toast.makeText(activity, "Operación aprovada", Toast.LENGTH_LONG).show()
+        Toast.makeText(activity, "Operación aprobada", Toast.LENGTH_LONG).show()
     }
 
     override fun getCheckCardType(): Int {
@@ -112,15 +111,15 @@ class SunmiTransactionManager(private val activity: AppCompatActivity) : SunmiTr
 
     override fun getTransactionData() = mTransactionData
 
-    override fun onChanged(t: Results<String>?) {
-        when (t) {
+    private val pciObserver = Observer<Results<String>> {
+        when (it) {
             is Results.Success -> {
                 finishOnlineProcessStatus(tlvResponse = Constants.TlvResponses.Approved)
             }
             is Results.Failure -> {
                 finishOnlineProcessStatus(
                     tlvResponse = Constants.TlvResponses.Decline,
-                    message = t.exception.message
+                    message = it.exception.message
                 )
             }
         }

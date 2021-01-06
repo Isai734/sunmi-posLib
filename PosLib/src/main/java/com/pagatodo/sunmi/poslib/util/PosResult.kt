@@ -21,6 +21,7 @@ enum class PosResult(var code: Int, var message: String) {
     OperationCanceled(8, getMessage(R.string.cancel_operation)),
     ErrorCheckPresentCard(9, getMessage(R.string.error_check_present_card)),
     CardPresentWait(10, getMessage(R.string.card_present_wait)),
+    SyncOperationFailed(11, getMessage(R.string.sync_operation_failed)),
     Generic(100, getMessage(R.string.generic));
 }
 

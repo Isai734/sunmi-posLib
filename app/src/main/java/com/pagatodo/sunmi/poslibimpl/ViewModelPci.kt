@@ -15,8 +15,8 @@ class ViewModelPci : ViewModel() {
 
     fun purchase() {
         viewModelScope.launch(Dispatchers.Main) {
-            delay(1500L)
-            purchaseMlData.value = Results.Failure(Exception("Venta Fallida!"))
+            delay(2500L)
+            purchaseMlData.value = Results.Success("Operación Exitosa!")
         }
     }
 }

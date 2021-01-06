@@ -75,13 +75,15 @@ abstract class SunmiTransaction {
 
         val out = ByteArray(1024)
         val len = posInstance().mEMVOptV2?.importOnlineProcStatus(tlvResponse.status, tags.toTypedArray(), values.toTypedArray(), out)
-        PosLogger.e(PosLib.TAG, "finishOnlineProcessStatus::card update status code::: $len")
-        len?.also {
-            if (it < 0) {//Validar si esto aplica para MTIP 2.60 Refund
-                if ((it == PosResult.SyncOperation.code || it == PosResult.TransRefused.code) && tlvResponse.status == 0) {
-                    onFailureTrx(PosResult.SyncOperation)
-                }
-            }
+        PosLogger.e(PosLib.TAG, "card update status code::$len")
+        len?.also {  //Validar si esto aplica para MTIP 2.60 Refund
+            if ((it == PosResult.SyncOperation.code || it == PosResult.TransRefused.code) && tlvResponse.status == 0) {
+                onFailureTrx(PosResult.SyncOperation)
+                customMessage = PosResult.SyncOperation.message
+            } else if (mCardType == AidlConstants.CardType.MAGNETIC && len == 0)
+                onApprovedTrx()
+            else if (mCardType == AidlConstants.CardType.MAGNETIC)
+                onFailureTrx(getPosResult(AidlConstants.CardType.MAGNETIC.value, customMessage))
         }
     } catch (exe: Exception) {
         PosLogger.e(PosLib.TAG, exe.message)
@@ -134,7 +136,7 @@ abstract class SunmiTransaction {
         val cardHolderName = name.substring(0, name.indexOf("^"))
         var serviceCode = ""
         track2.apply {
-            val index = indexOf("=")
+            val index  = indexOf("=")
             if (index != -1) {
                 mCardNo = substring(0, index)
                 serviceCode = substring(index + 5, index + 8)
@@ -149,7 +151,7 @@ abstract class SunmiTransaction {
             this.serviceCode = serviceCode
             this.pinBlock = ByteUtil.bytes2HexStr(hexStrPin)
             this.expireDate = name.substring(name.indexOf("^")).substring(1, 5)
-            PosLogger.e(PosLib.TAG, toString())
+             PosLogger.e(PosLib.TAG, toString())
         }
     }
 
@@ -163,19 +165,19 @@ abstract class SunmiTransaction {
     private val mCheckCardCallback: CheckCardCallbackV2 = object : CheckCardCallbackV2Wrapper() {
         @Throws(RemoteException::class)
         override fun findMagCard(info: Bundle) {
-            //PosLogger.e(PosLib.TAG, "info::$info")
+            PosLogger.e(PosLib.TAG, "info::$info")
             mCardType = AidlConstants.CardType.MAGNETIC
             try {
                 val dataCard = getDataCard(info)
                 if (EmvUtil.isChipCard(dataCard.serviceCode) && !allowFallback) { //Tarjeta por chip no fallback
-                    onFailureTrx(PosResult.CardDenial)
+                    GlobalScope.launch (Dispatchers.Main){ onFailureTrx(PosResult.CardDenial)}
                     cancelProcessEmv()
                 } else if (pinMustBeForced() || EmvUtil.requiredNip(dataCard.serviceCode))
                     initPinPad(dataCard)
                 else
                     GlobalScope.launch(Dispatchers.Main) { goOnlineProcess(dataCard) }
             } catch (e: Exception) {
-                 PosLogger.e(PosLib.TAG, e.toString())
+                PosLogger.e(PosLib.TAG, e.toString())
                 GlobalScope.launch (Dispatchers.Main){ onFailureTrx(PosResult.ErrorCheckCard) }
             }
         }
@@ -189,7 +191,7 @@ abstract class SunmiTransaction {
 
         @Throws(RemoteException::class)
         override fun findRFCard(uuid: String) {
-            PosLogger.e(PosLib.TAG, "findRFCard uuid::$uuid")
+            PosLogger.e(PosLib.TAG, "uuid::$uuid")
             mCardType = AidlConstants.CardType.NFC
             transactProcess()
         }
@@ -227,7 +229,7 @@ abstract class SunmiTransaction {
 
         @Throws(RemoteException::class)
         override fun onAppFinalSelect(appSelected: String) {
-            PosLogger.e(PosLib.TAG, "onAppFinalSelect tag9F06Value::$appSelected")
+            PosLogger.e(PosLib.TAG, "tag9F06Value::$appSelected")
             if (appSelected.isNotEmpty()) {
                 val isVisa = appSelected.startsWith("A000000003")
                 val isMaster = appSelected.startsWith("A000000004")
@@ -253,14 +255,14 @@ abstract class SunmiTransaction {
 
         @Throws(RemoteException::class)
         override fun onConfirmCardNo(cardNo: String) {
-            PosLogger.e(PosLib.TAG, "onConfirmCardNo::$cardNo")
+            PosLogger.e(PosLib.TAG, cardNo)
             mCardNo = cardNo
             posInstance().mEMVOptV2?.importCardNoStatus(0)
         }
 
         @Throws(RemoteException::class)
         override fun onRequestShowPinPad(pinType: Int, remainTime: Int) {
-            PosLogger.e(PosLib.TAG, "onRequestShowPinPad pinType::$pinType")
+            PosLogger.e(PosLib.TAG, "pinType::$pinType")
             mPinType = pinType
             isRequestPin = true
             initPinPad()
@@ -291,13 +293,17 @@ abstract class SunmiTransaction {
 
         @Throws(RemoteException::class)
         override fun onTransResult(code: Int, desc: String?) { //when has finalized process online
-            PosLogger.e(PosLib.TAG, "onTransResult code: $code desc: $desc")
+            PosLogger.e(PosLib.TAG, "code: $code desc: $desc")
             if (getTransactionData().transType == Constants.TransType.REFUND && code == PosResult.TransTerminate.code) {//transResult does not matter when transaction is a refund
                 onOnlineProc()
             } else if (code == PosResult.CardAbsentAproved.code)
                 checkAndRemoveCard()
-            else
-                GlobalScope.launch(Dispatchers.Main) { onFailureTrx(getPosResult(code, customMessage ?: desc)) }
+            else GlobalScope.launch(Dispatchers.Main) {
+                customMessage?.apply {
+                    if(this != PosResult.SyncOperation.message)
+                        onFailureTrx(getPosResult(code, this))
+                }?: onFailureTrx(getPosResult(code, desc))
+            }
         }
 
         @Throws(RemoteException::class)
@@ -311,7 +317,7 @@ abstract class SunmiTransaction {
                 }
             }
             posInstance().mReadCardOptV2?.cardOff(mCardType.value) // card off
-            onFailureTrx(PosResult.SeePhone)
+            GlobalScope.launch(Dispatchers.Main) { onFailureTrx(PosResult.SeePhone) }
         }
 
         @Throws(RemoteException::class)
@@ -328,7 +334,7 @@ abstract class SunmiTransaction {
                 posInstance().mEMVOptV2?.apply {
                     val len = getTlvList(AidlConstants.EMV.TLVOpCode.OP_NORMAL, tagList, outData)
                     if (len <= 0) {
-                        PosLogger.e(PosLib.TAG, "getCardNo error, code: $len"); return ""
+                        PosLogger.e(PosLib.TAG, "error, code::$len"); return ""
                     }
                     val bytes = outData.copyOf(len)
                     val tlvMap = TLVUtil.buildTLVMap(bytes)
@@ -371,6 +377,7 @@ abstract class SunmiTransaction {
         allowFallback = false
         isRequestSignature = false
         hexStrPin = ByteArray(0)
+        customMessage = null
     }
 
     private fun getCandidateNames(candiList: List<EMVCandidateV2>): List<String> {
@@ -415,7 +422,7 @@ abstract class SunmiTransaction {
             }
             cleanMap(map)
         } catch (exe: Exception) {
-            PosLogger.e(PosLib.TAG, "tlvData: " + exe.message)
+            PosLogger.e(PosLib.TAG, exe.message)
             cancelOperation()
             emptyMap()
         }
@@ -459,7 +466,7 @@ abstract class SunmiTransaction {
                         } ?: posInstance().mEMVOptV2?.importPinInputStatus(mPinType, 2)
 
                     } catch (exe: RemoteException) {
-                        PosLogger.e(PosLib.TAG, "initPinPad::onConfirm" + exe.message)
+                        PosLogger.e(PosLib.TAG, exe.message)
                         cancelOperation()
                     }
                 }
@@ -468,23 +475,23 @@ abstract class SunmiTransaction {
                     try {
                         posInstance().mEMVOptV2?.importPinInputStatus(mPinType, 1)
                     } catch (exe: RemoteException) {
-                        PosLogger.e(PosLib.TAG, "initPinPad::onCancel" + exe.message)
+                        PosLogger.e(PosLib.TAG, exe.message)
                         cancelOperation()
                     }
                 }
 
                 override fun onError(code: Int) {
                     try {
-                        PosLogger.e(PosLib.TAG, "onError Pin:$code")
+                        PosLogger.e(PosLib.TAG, "code::$code")
                         posInstance().mEMVOptV2?.importPinInputStatus(mPinType, 3)
                     } catch (exe: RemoteException) {
-                        PosLogger.e(PosLib.TAG, "initPinPad::onError" + exe.message)
+                        PosLogger.e(PosLib.TAG, exe.message)
                         cancelOperation()
                     }
                 }
             }, pinPadConfig)
         } catch (exe: Exception) {
-            PosLogger.e(PosLib.TAG, "initPinPad::" + exe.message)
+            PosLogger.e(PosLib.TAG, exe.message)
             cancelOperation()
         }
     }
@@ -494,14 +501,15 @@ abstract class SunmiTransaction {
             val status = posInstance().mReadCardOptV2?.getCardExistStatus(mCardType.value)?.also {
                 if (it < 0) { onFailureTrx(PosResult.ErrorCheckPresentCard); return }
             }
+            PosLogger.e(PosLib.TAG, "status::$status")
             when (status) {
-                AidlConstants.CardExistStatus.CARD_ABSENT -> { onApprovedTrx() }
+                AidlConstants.CardExistStatus.CARD_ABSENT -> { GlobalScope.launch(Dispatchers.Main) { onApprovedTrx() } }
                 AidlConstants.CardExistStatus.CARD_PRESENT -> {
-                    onFailureTrx(PosResult.CardPresentWait)
+                    GlobalScope.launch(Dispatchers.Main) { onFailureTrx(PosResult.CardPresentWait) }
                     posInstance().mBasicOptV2?.buzzerOnDevice(1, 2750, 200, 0)
                     loopRemoveCard()
                 }
-                else -> throw IllegalArgumentException("Unknown result checkAndRemoveCard.")
+                else -> throw IllegalArgumentException("Unknown status $status.")
             }
         } catch (e: Exception) {
             PosLogger.e(PosLib.TAG, e.message)
@@ -525,7 +533,7 @@ abstract class SunmiTransaction {
 
     abstract fun onShowPinPad(pinPadListener: PinPadListenerV2.Stub, pinPadConfig: PinPadConfigV2)
 
-    abstract fun onSelectEmvApp(listEMVApps: List<String>, applicationEmv: AppEmvSelectListener)
+    abstract fun onSelectEmvApp(listEmvApps: List<String>, applicationEmv: AppEmvSelectListener)
 
     abstract fun getTransactionData(): TransactionData
 }

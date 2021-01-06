@@ -88,31 +88,29 @@ object EmvUtil {
             val result = emvOptV2.setTerminalParam(params)
             Log.i(TAG, "setTerminalParam result: $result -> params ${params.toString()}")
         } catch (e: Exception) {
-            e.printStackTrace()
-            Log.i(TAG, "setTerminalParam fail")
+            Log.i(TAG, "setTerminalParam fail $e")
         }
     }
 
     fun initKey(mSecurityOptV2: SecurityOptV2) { //Initialize keys
         try {
             val cvByte = ByteUtil.hexStr2Bytes("82E13665B4624DF5")
-            // save TMK
             val dataByte = ByteUtil.hexStr2Bytes("F40379AB9E0EC533F40379AB9E0EC533")
+            // save TMK
             val security = posInstance().posConfig.security
-            var result = mSecurityOptV2.savePlaintextKey(AidlConstants.Security.KEY_TYPE_TDK, dataByte, cvByte, AidlConstants.Security.KEY_ALG_TYPE_3DES, 10)
+            var result = mSecurityOptV2.savePlaintextKey(AidlConstants.Security.KEY_TYPE_TDK, security.plainDataKey, security.plainDataKcvKey, AidlConstants.Security.KEY_ALG_TYPE_3DES, 10)
             if (result != 0) {
                 PosLogger.e(TAG, "save KEK fail")
                 return
             }
-            result = mSecurityOptV2.savePlaintextKey(AidlConstants.Security.KEY_TYPE_PIK, dataByte, cvByte, AidlConstants.Security.KEY_ALG_TYPE_3DES, 11)
+            result = mSecurityOptV2.savePlaintextKey(AidlConstants.Security.KEY_TYPE_PIK, security.plainPinkey, security.plainPinKcvkey, AidlConstants.Security.KEY_ALG_TYPE_3DES, 11)
             if (result != 0) {
                 PosLogger.e(TAG, "save KEK fail")
                 return
             }
             PosLogger.d(TAG, "init  key success")
         } catch (e: Exception) {
-            e.printStackTrace()
-            PosLogger.e(TAG, "init key fail")
+            PosLogger.e(TAG, "init key fail $e")
         }
     }
 
