@@ -8,15 +8,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import net.fullcarga.android.api.data.respuesta.AbstractRespuesta
+import net.fullcarga.android.api.data.respuesta.RespuestaTrxCierreTurno
 import java.lang.Exception
 
 class ViewModelPci : ViewModel() {
-    val purchaseMlData = MutableLiveData<Results<String>>()
+    val purchaseMlData = MutableLiveData<Results<RespuestaTrxCierreTurno>>()
 
     fun purchase() {
         viewModelScope.launch(Dispatchers.Main) {
             delay(2500L)
-            purchaseMlData.value = Results.Success("Operación Exitosa!")
+            //purchaseMlData.value =
         }
     }
 }
