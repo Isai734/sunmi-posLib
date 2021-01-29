@@ -66,27 +66,6 @@ class PasswordEditText constructor(context: Context,attributeSet: AttributeSet):
         }
     }
 
-    private fun createList(w: Int, h: Int){
-        for (i in 0 until numberDigits) {
-            listText.add(TextView(context).apply {
-                layoutParams = LayoutParams((width / numberDigits)-3, ViewGroup.LayoutParams.MATCH_PARENT, 1f)
-                textAlignment = TEXT_ALIGNMENT_CENTER
-                visibility = View.VISIBLE
-                id = generateViewId()
-                setBackgroundColor(Color.TRANSPARENT)
-                setTextColor(Color.parseColor("#212121"))
-                setHintTextColor(Color.parseColor("#b2b2b2"))
-                gravity = Gravity.START
-                textSize = 18f
-            })
-        }
-        
-        listText.reverse()
-        listText.forEachIndexed {index,view->
-            addView(view,index)
-        }
-    }
-
     private fun init() {
         paint.style = Paint.Style.STROKE
         paint.strokeWidth = 3f
@@ -94,7 +73,7 @@ class PasswordEditText constructor(context: Context,attributeSet: AttributeSet):
         paintVertical.style = Paint.Style.STROKE
         paintVertical.strokeWidth = 1f
         paintVertical.color = Color.parseColor("#f3f4f5")
-        orientation = LinearLayout.HORIZONTAL
+        orientation = HORIZONTAL
         gravity = Gravity.START
         inputSB = StringBuilder()
         setWillNotDraw(false)

@@ -1,26 +1,27 @@
 package com.pagatodo.sunmi.poslibimpl
 
 import android.os.Bundle
-import android.provider.Settings
 import android.util.Log
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
-import androidx.appcompat.app.AppCompatActivity
-import android.view.Menu
-import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.text.isDigitsOnly
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.ViewModelProvider
 import com.pagatodo.sunmi.poslib.PosLib
+import com.pagatodo.sunmi.poslib.SunmiTrxWrapper
 import com.pagatodo.sunmi.poslib.config.PosConfig
 import com.pagatodo.sunmi.poslib.interfaces.AppEmvSelectListener
+import com.pagatodo.sunmi.poslib.interfaces.OnClickAcceptListener
 import com.pagatodo.sunmi.poslib.interfaces.SunmiTrxListener
-import com.pagatodo.sunmi.poslib.model.Aid
-import com.pagatodo.sunmi.poslib.model.Capk
-import com.pagatodo.sunmi.poslib.posInstance
+import com.pagatodo.sunmi.poslib.model.*
+import com.pagatodo.sunmi.poslib.util.Constants
+import com.pagatodo.sunmi.poslib.util.EmvUtil
 import com.pagatodo.sunmi.poslib.util.PosLogger
 import com.pagatodo.sunmi.poslib.util.PosResult
-import com.pagatodo.sunmi.poslibimpl.util.LoadFile
+import com.pagatodo.sunmi.poslib.viewmodel.SunmiViewModel
+import com.pagatodo.sunmi.poslib.util.LoadFile
+import com.sunmi.pay.hardware.aidl.AidlConstants
 import com.sunmi.pay.hardware.aidlv2.bean.PinPadConfigV2
 import com.sunmi.pay.hardware.aidlv2.pinpad.PinPadListenerV2
 import kotlinx.android.synthetic.main.activity_main.*
@@ -28,13 +29,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.lang.Exception
+import net.fullcarga.android.api.data.respuesta.OperacionSiguiente
 
-class MainActivity : AppCompatActivity(),SunmiTrxListener {
+class MainActivity : AppCompatActivity(), SunmiTrxListener {
 
-    private val sunmiTransactionManager: SunmiTransactionManager by lazy {
-        SunmiTransactionManager(this)
-    }
+    private val viewModelPci by lazy { ViewModelProvider(this)[ViewModelPci::class.java] }
+    private val trxManager by lazy { SunmiTrxWrapper(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,8 +42,8 @@ class MainActivity : AppCompatActivity(),SunmiTrxListener {
         setSupportActionBar(findViewById(R.id.toolbar))
         PosLib.createInstance(this)
         btnAccept.setOnClickListener {
-            if (amount.text.isNotEmpty() && amount.text.isDigitsOnly())
-                sunmiTransactionManager.initTransaction(amount.text.toString())
+            if (amountTxv.text.isNotEmpty() && amountTxv.text.isDigitsOnly())
+                trxManager.initTransaction()
         }
     }
 
@@ -58,49 +58,82 @@ class MainActivity : AppCompatActivity(),SunmiTrxListener {
                 delay(2000L)
                 val fileAid = resources.openRawResource(R.raw.aids_es_1_2)
                 val fileCapk = resources.openRawResource(R.raw.capks_es_1_2)
+                val fileDrl = resources.openRawResource(R.raw.dlrs_es_1_0)
                 val aidList = LoadFile.readConfigFile<Aid>(fileAid)
                 val capkList = LoadFile.readConfigFile<Capk>(fileCapk)
+                val drlsList = LoadFile.readConfigFile<Drl>(fileDrl)
                 val posConfig = PosConfig()
                 posConfig.aids = aidList
                 posConfig.capks = capkList
+                posConfig.drls = drlsList
                 PosLib.loadGlobalConfig(posConfig)
                 Log.i("MainActivity", "configure terminal success")
             } catch (e: Exception) {
-               PosLogger.e("MainActivity", e.toString())
+                PosLogger.e("MainActivity", e.toString())
             }
         }
     }
 
-    override fun onShowRequestCard() {
+    override fun onDialogRequestCard(message: String?) {
         askForCard?.show()
     }
 
     override fun onDismissRequestCard() {
-        TODO("Not yet implemented")
+        askForCard?.dismiss()
     }
 
-    override fun onShowProcessOnline() {
-        dialogProgress?.show(supportFragmentManager, dialogProgress?.tag)
+    override fun onDialogProcessOnline(message: String?) {
+        dialogProgress.show(supportFragmentManager, dialogProgress.tag)
     }
 
     override fun onDismissRequestOnline() {
-        TODO("Not yet implemented")
+        if (dialogProgress.isAdded) dialogProgress.dismiss()
     }
 
     override fun onShowSingDialog() {
-        TODO("Not yet implemented")
+        Toast.makeText(this, "Mostrar dialogo de firma", Toast.LENGTH_LONG).show()
+    }
+
+    override fun createTransactionData() = TransactionData().apply {
+        transType = Constants.TransType.PURCHASE
+        amount = amountTxv.text.toString()
+        totalAmount = amountTxv.text.toString()
+        otherAmount = "00"
+        currencyCode = "0156"
+        cashBackAmount = "00"
+        taxes = "00"
+        comisions = "00"
+        gratuity = "00"
+        sigmaOperation = "V"
+        tagsEmv = EmvUtil.tagsDefault.toList()
+    }
+
+    override fun pinMustBeForced(): Boolean {
+        return true
+    }
+
+    override fun checkCardTypes(): Int {
+        return AidlConstants.CardType.MAGNETIC.value or AidlConstants.CardType.IC.value or AidlConstants.CardType.NFC.value
+    }
+
+    override fun onShowTicketDialog(singBytes: ByteArray?) {
+        Toast.makeText(this, "Mostrar dialogo de ticket", Toast.LENGTH_LONG).show()
     }
 
     override fun onShowDniDialog() {
-        TODO("Not yet implemented")
+        Toast.makeText(this, "Mostrar dialogo de DNI", Toast.LENGTH_LONG).show()
     }
 
-    override fun onShowPinPadDialog(pinPadListener: PinPadListenerV2.Stub, pinPadConfig: PinPadConfigV2) {
+    override fun onShowPinPadDialog(
+        pinPadListener: PinPadListenerV2.Stub,
+        pinPadConfig: PinPadConfigV2
+    ) {
         val pinPadDialog = PinPadDialog.createInstance(pinPadConfig)
         pinPadDialog.setPasswordLength(6)
         pinPadDialog.setTextAccept("Aceptar")
         pinPadDialog.setTextCancel("Cancelar")
         pinPadDialog.setPinPadListenerV2(pinPadListener)
+
         val transaction: FragmentTransaction = supportFragmentManager.beginTransaction()
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
         transaction.add(android.R.id.content, pinPadDialog, pinPadDialog.tag).commit()
@@ -110,18 +143,26 @@ class MainActivity : AppCompatActivity(),SunmiTrxListener {
         TODO("Not yet implemented")
     }
 
-    override fun <E> onSuccess(request: E) {
-
+    override fun onSync(dataCard: DataCard) {
+        viewModelPci.sync()
     }
 
-    override fun onFailure(result: PosResult) {
-        TODO("Not yet implemented")
+    override fun onFailure(error: PosResult, listener: OnClickAcceptListener?) {
+        Toast.makeText(this, error.message, Toast.LENGTH_LONG).show()
     }
 
-    private val dialogProgress: DialogProgress? by lazy {
-        DialogProgress().apply {
-            isCancelable = false
-        }
+    override fun onPurchase(dataCard: DataCard) {
+        viewModelPci.purchase()
+    }
+
+    override fun doOperationNext(nextOperation: OperacionSiguiente) {
+        Toast.makeText(this, "Operacion Siguiente", Toast.LENGTH_LONG).show()
+    }
+
+    override fun getVmodelPCI(): SunmiViewModel = viewModelPci
+
+    private val dialogProgress: DialogProgress by lazy {
+        DialogProgress().apply { isCancelable = false }
     }
 
     private val askForCard: AlertDialog? by lazy {

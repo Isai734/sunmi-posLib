@@ -1,24 +1,26 @@
 package com.pagatodo.sunmi.poslibimpl
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pagatodo.sunmi.poslib.model.Results
+import com.pagatodo.sunmi.poslib.viewmodel.SunmiViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import net.fullcarga.android.api.data.respuesta.AbstractRespuesta
-import net.fullcarga.android.api.data.respuesta.RespuestaTrxCierreTurno
-import java.lang.Exception
 
-class ViewModelPci : ViewModel() {
-    val purchaseMlData = MutableLiveData<Results<RespuestaTrxCierreTurno>>()
+class ViewModelPci : SunmiViewModel() {
 
     fun purchase() {
         viewModelScope.launch(Dispatchers.Main) {
             delay(2500L)
-            //purchaseMlData.value =
+            pciViewModel.value = Results.Success("Venta Exitosa!")
         }
     }
+
+    fun sync() {
+        viewModelScope.launch(Dispatchers.Main) {
+            delay(2500L)
+            syncViewModel.value = Results.Success("Sync Exitosa!")
+        }
+    }
+
 }

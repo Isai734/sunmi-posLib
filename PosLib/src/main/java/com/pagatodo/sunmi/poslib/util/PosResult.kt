@@ -10,7 +10,9 @@ enum class PosResult(var code: Int, var message: String) {
     FallBack(-2800, getMessage(R.string.chip_fallback)),
     TransTerminate(-4002, getMessage(R.string.card_no_supported)),
     TransRefused(-4000, getMessage(R.string.trans_refused)),
-    SyncOperation(-4115, getMessage(R.string.sync_operation)),
+    DoSyncOperation(-4115, getMessage(R.string.sync_operation)),
+    CardNoSupported(-4125, getMessage(R.string.error_card_no_supported)),
+    NfcTerminated(-2520, getMessage(R.string.error_card_no_supported)),
 
     CardAbsentAproved(0, getMessage(R.string.transaction_approved)),
     OfflineDecline(2, getMessage(R.string.offline_declined)),
@@ -22,6 +24,7 @@ enum class PosResult(var code: Int, var message: String) {
     ErrorCheckPresentCard(9, getMessage(R.string.error_check_present_card)),
     CardPresentWait(10, getMessage(R.string.card_present_wait)),
     SyncOperationFailed(11, getMessage(R.string.sync_operation_failed)),
+    SyncOperationSuccess(11, getMessage(R.string.sync_operation_success)),
     Generic(100, getMessage(R.string.generic));
 }
 

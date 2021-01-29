@@ -1,7 +1,7 @@
-package com.pagatodo.sunmi.poslib.model
+package com.pagatodo.sunmi.poslib.util
 
 import android.text.TextUtils
-import com.pagatodo.sunmi.poslib.util.ByteUtil
+import com.pagatodo.sunmi.poslib.model.TLV
 import java.util.*
 
 class TLVUtil private constructor() {

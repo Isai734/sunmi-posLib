@@ -1,0 +1,58 @@
+[
+  {
+    "_comment": "this dlr for apid 01",
+    "programID": "01",
+    "isDefaultLmt": false,
+    "statusCheck": false,
+    "zeroCheck": 1,
+    "cvmLmt": "000000005001",
+    "termClssLmt": "999999999999",
+    "termClssFloorLmt": "000000000000",
+    "termFloorLmt": "000000000000",
+    "cvmLmtActivate": true,
+    "termClssLmtActivate": false,
+    "termClssFloorLmtActivate": 1
+  },
+  {
+    "_comment": "this dlr for apid 02",
+    "programID": "02",
+    "isDefaultLmt": false,
+    "statusCheck": false,
+    "zeroCheck": 1,
+    "cvmLmt": "000000005001",
+    "termClssLmt": "999999999999",
+    "termClssFloorLmt": "000000000000",
+    "termFloorLmt": "000000000000",
+    "cvmLmtActivate": true,
+    "termClssLmtActivate": false,
+    "termClssFloorLmtActivate": 1
+  },
+  {
+    "_comment": "this dlr for apid 03",
+    "programID": "03",
+    "isDefaultLmt": false,
+    "statusCheck": false,
+    "zeroCheck": 1,
+    "cvmLmt": "000000005001",
+    "termClssLmt": "999999999999",
+    "termClssFloorLmt": "000000000000",
+    "termFloorLmt": "000000000000",
+    "cvmLmtActivate": true,
+    "termClssLmtActivate": false,
+    "termClssFloorLmtActivate": 1
+  },
+  {
+    "_comment": "this dlr for apid 04",
+    "programID": "04",
+    "isDefaultLmt": false,
+    "statusCheck": false,
+    "zeroCheck": 1,
+    "cvmLmt": "000000005001",
+    "termClssLmt": "999999999999",
+    "termClssFloorLmt": "000000000000",
+    "termFloorLmt": "000000000000",
+    "cvmLmtActivate": true,
+    "termClssLmtActivate": false,
+    "termClssFloorLmtActivate": 1
+  }
+]

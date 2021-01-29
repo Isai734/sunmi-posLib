@@ -17,7 +17,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.lang.IllegalArgumentException
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
@@ -33,9 +32,8 @@ abstract class SunmiTransaction {
     protected var mPinType: Int = 0 // 0-online pin, 1-offline pin
     private var mCardNo: String = ""
         get() {
-            if (field.isEmpty()) {
+            if (field.isEmpty())
                 field = cardNoFromKernel
-            }
             return field
         }
 
@@ -77,12 +75,12 @@ abstract class SunmiTransaction {
         val len = posInstance().mEMVOptV2?.importOnlineProcStatus(tlvResponse.status, tags.toTypedArray(), values.toTypedArray(), out)
         PosLogger.e(PosLib.TAG, "card update status code::$len")
         len?.also {  //Validar si esto aplica para MTIP 2.60 Refund
-            if ((it == PosResult.SyncOperation.code || it == PosResult.TransRefused.code) && tlvResponse.status == 0) {
-                onFailureTrx(PosResult.SyncOperation)
-                customMessage = PosResult.SyncOperation.message
-            } else if (mCardType == AidlConstants.CardType.MAGNETIC && len == 0)
+            if ((it == PosResult.DoSyncOperation.code || it == PosResult.TransRefused.code) && tlvResponse.status == 0) {
+                onFailureTrx(PosResult.DoSyncOperation)
+                customMessage = PosResult.DoSyncOperation.message
+            } else if (mCardType != AidlConstants.CardType.IC && len == 0)
                 onApprovedTrx()
-            else if (mCardType == AidlConstants.CardType.MAGNETIC)
+            else if (mCardType != AidlConstants.CardType.IC)
                 onFailureTrx(getPosResult(AidlConstants.CardType.MAGNETIC.value, customMessage))
         }
     } catch (exe: Exception) {
@@ -136,7 +134,7 @@ abstract class SunmiTransaction {
         val cardHolderName = name.substring(0, name.indexOf("^"))
         var serviceCode = ""
         track2.apply {
-            val index  = indexOf("=")
+            val index = indexOf("=")
             if (index != -1) {
                 mCardNo = substring(0, index)
                 serviceCode = substring(index + 5, index + 8)
@@ -151,7 +149,7 @@ abstract class SunmiTransaction {
             this.serviceCode = serviceCode
             this.pinBlock = ByteUtil.bytes2HexStr(hexStrPin)
             this.expireDate = name.substring(name.indexOf("^")).substring(1, 5)
-             PosLogger.e(PosLib.TAG, toString())
+            PosLogger.e(PosLib.TAG, toString())
         }
     }
 
@@ -165,12 +163,12 @@ abstract class SunmiTransaction {
     private val mCheckCardCallback: CheckCardCallbackV2 = object : CheckCardCallbackV2Wrapper() {
         @Throws(RemoteException::class)
         override fun findMagCard(info: Bundle) {
-            PosLogger.e(PosLib.TAG, "info::$info")
+            PosLogger.e(PosLib.TAG, "info:: $info")
             mCardType = AidlConstants.CardType.MAGNETIC
             try {
                 val dataCard = getDataCard(info)
                 if (EmvUtil.isChipCard(dataCard.serviceCode) && !allowFallback) { //Tarjeta por chip no fallback
-                    GlobalScope.launch (Dispatchers.Main){ onFailureTrx(PosResult.CardDenial)}
+                    GlobalScope.launch(Dispatchers.Main) { onFailureTrx(PosResult.CardDenial) }
                     cancelProcessEmv()
                 } else if (pinMustBeForced() || EmvUtil.requiredNip(dataCard.serviceCode))
                     initPinPad(dataCard)
@@ -178,28 +176,30 @@ abstract class SunmiTransaction {
                     GlobalScope.launch(Dispatchers.Main) { goOnlineProcess(dataCard) }
             } catch (e: Exception) {
                 PosLogger.e(PosLib.TAG, e.toString())
-                GlobalScope.launch (Dispatchers.Main){ onFailureTrx(PosResult.ErrorCheckCard) }
+                GlobalScope.launch(Dispatchers.Main) { onFailureTrx(PosResult.ErrorCheckCard) }
             }
         }
 
         @Throws(RemoteException::class)
         override fun findICCard(atr: String) {
-            PosLogger.e(PosLib.TAG, "findICCard atr::$atr")
+            PosLogger.e(PosLib.TAG, "findICCard atr:: $atr")
             mCardType = AidlConstants.CardType.IC
             transactProcess()
         }
 
         @Throws(RemoteException::class)
         override fun findRFCard(uuid: String) {
-            PosLogger.e(PosLib.TAG, "uuid::$uuid")
+            PosLogger.e(PosLib.TAG, "uuid:: $uuid")
             mCardType = AidlConstants.CardType.NFC
             transactProcess()
         }
 
         @Throws(RemoteException::class)
         override fun onError(code: Int, message: String) {
-            PosLogger.e(PosLib.TAG, "onError::$code message::$message")
-            GlobalScope.launch(Dispatchers.Main) { onFailureTrx(getPosResult(code, PosResult.ErrorCheckCard.message)) }
+            PosLogger.e(PosLib.TAG, "onError::$code message:: $message")
+            GlobalScope.launch(Dispatchers.Main) {
+                onFailureTrx(getPosResult(code, PosResult.ErrorCheckCard.message))
+            }
         }
     }
 
@@ -229,7 +229,7 @@ abstract class SunmiTransaction {
 
         @Throws(RemoteException::class)
         override fun onAppFinalSelect(appSelected: String) {
-            PosLogger.e(PosLib.TAG, "tag9F06Value::$appSelected")
+            PosLogger.e(PosLib.TAG, "tag9F06Value:: $appSelected")
             if (appSelected.isNotEmpty()) {
                 val isVisa = appSelected.startsWith("A000000003")
                 val isMaster = appSelected.startsWith("A000000004")
@@ -279,11 +279,17 @@ abstract class SunmiTransaction {
         override fun onOnlineProc() {
             val mapTags = tlvData
             emvTags = tagsTlvToTagsString(mapTags)
-            GlobalScope.launch(Dispatchers.Main) { goOnlineProcess(getDataCard(mapTags)) }
+            val dataCard = getDataCard(mapTags)
+            if(!isRequestPin && pinMustBeForced())
+                initPinPad(dataCard)
+            else if(mCardType == AidlConstants.CardType.NFC)
+                checkAndRemoveCard(dataCard)
+            else
+                GlobalScope.launch(Dispatchers.Main) { goOnlineProcess(dataCard) }
         }
 
         override fun onCertVerify(p0: Int, p1: String?) {
-            PosLogger.e(PosLib.TAG, "onCertVerify p0-> $p0 p1-> $p1")
+            PosLogger.e(PosLib.TAG, "p0-> $p0 p1-> $p1")
         }
 
         @Throws(RemoteException::class)
@@ -300,9 +306,9 @@ abstract class SunmiTransaction {
                 checkAndRemoveCard()
             else GlobalScope.launch(Dispatchers.Main) {
                 customMessage?.apply {
-                    if(this != PosResult.SyncOperation.message)
+                    if (this != PosResult.DoSyncOperation.message)
                         onFailureTrx(getPosResult(code, this))
-                }?: onFailureTrx(getPosResult(code, desc))
+                } ?: onFailureTrx(getPosResult(code, desc))
             }
         }
 
@@ -360,7 +366,7 @@ abstract class SunmiTransaction {
         PosLogger.e(PosLib.TAG, e.message)
     }
 
-    fun cancelOperation() = try {
+    fun cancelOperationWithMessage() = try {
         cancelProcessEmv()
         onFailureTrx(PosResult.OperationCanceled)
     } catch (exe: Exception) {
@@ -376,6 +382,7 @@ abstract class SunmiTransaction {
         mCardNo = ""
         allowFallback = false
         isRequestSignature = false
+        isRequestPin = false
         hexStrPin = ByteArray(0)
         customMessage = null
     }
@@ -423,7 +430,7 @@ abstract class SunmiTransaction {
             cleanMap(map)
         } catch (exe: Exception) {
             PosLogger.e(PosLib.TAG, exe.message)
-            cancelOperation()
+            cancelOperationWithMessage()
             emptyMap()
         }
 
@@ -437,7 +444,8 @@ abstract class SunmiTransaction {
 
     private fun initPinPad(dataCard: DataCard? = null) {//dataCard must be different null for a manual pin
         try {
-            val panBytes = mCardNo.substring(mCardNo.length - 13, mCardNo.length - 1).toByteArray(charset("US-ASCII"))
+            val panBytes = mCardNo.substring(mCardNo.length - 13, mCardNo.length - 1)
+                .toByteArray(charset("US-ASCII"))
             val pinPadConfig = PinPadConfigV2()
             pinPadConfig.pinPadType = 1
             pinPadConfig.pinType = mPinType
@@ -457,17 +465,20 @@ abstract class SunmiTransaction {
 
                 override fun onConfirm(i: Int, pinBlock: ByteArray?) {
                     try {
-                        pinBlock?.apply {
+                        pinBlock?.also {
                             hexStrPin = pinBlock
                             dataCard?.apply {
                                 this.pinBlock = ByteUtil.bytes2HexStr(hexStrPin)
-                                GlobalScope.launch(Dispatchers.Main) { goOnlineProcess(this@apply) }
+                                if(mCardType == AidlConstants.CardType.NFC)
+                                    checkAndRemoveCard(dataCard)
+                                else
+                                    GlobalScope.launch(Dispatchers.Main) { goOnlineProcess(this@apply) }
                             } ?: posInstance().mEMVOptV2?.importPinInputStatus(mPinType, 0)
                         } ?: posInstance().mEMVOptV2?.importPinInputStatus(mPinType, 2)
 
                     } catch (exe: RemoteException) {
                         PosLogger.e(PosLib.TAG, exe.message)
-                        cancelOperation()
+                        cancelOperationWithMessage()
                     }
                 }
 
@@ -476,7 +487,7 @@ abstract class SunmiTransaction {
                         posInstance().mEMVOptV2?.importPinInputStatus(mPinType, 1)
                     } catch (exe: RemoteException) {
                         PosLogger.e(PosLib.TAG, exe.message)
-                        cancelOperation()
+                        cancelOperationWithMessage()
                     }
                 }
 
@@ -486,28 +497,35 @@ abstract class SunmiTransaction {
                         posInstance().mEMVOptV2?.importPinInputStatus(mPinType, 3)
                     } catch (exe: RemoteException) {
                         PosLogger.e(PosLib.TAG, exe.message)
-                        cancelOperation()
+                        cancelOperationWithMessage()
                     }
                 }
             }, pinPadConfig)
         } catch (exe: Exception) {
             PosLogger.e(PosLib.TAG, exe.message)
-            cancelOperation()
+            cancelOperationWithMessage()
         }
     }
 
-    private fun checkAndRemoveCard() {
+    private fun checkAndRemoveCard(dataCard: DataCard? = null) {
         try {//Check and notify remove card
             val status = posInstance().mReadCardOptV2?.getCardExistStatus(mCardType.value)?.also {
-                if (it < 0) { onFailureTrx(PosResult.ErrorCheckPresentCard); return }
+                if (it < 0) {
+                    onFailureTrx(PosResult.ErrorCheckPresentCard); return
+                }
             }
             PosLogger.e(PosLib.TAG, "status::$status")
             when (status) {
-                AidlConstants.CardExistStatus.CARD_ABSENT -> { GlobalScope.launch(Dispatchers.Main) { onApprovedTrx() } }
+                AidlConstants.CardExistStatus.CARD_ABSENT -> {
+                    GlobalScope.launch(Dispatchers.Main) {
+                        dataCard?.apply { if(mCardType == AidlConstants.CardType.NFC)
+                            goOnlineProcess(this) } ?: run{ onApprovedTrx() }
+                    }
+                }
                 AidlConstants.CardExistStatus.CARD_PRESENT -> {
                     GlobalScope.launch(Dispatchers.Main) { onFailureTrx(PosResult.CardPresentWait) }
                     posInstance().mBasicOptV2?.buzzerOnDevice(1, 2750, 200, 0)
-                    loopRemoveCard()
+                    loopRemoveCard(dataCard)
                 }
                 else -> throw IllegalArgumentException("Unknown status $status.")
             }
@@ -516,9 +534,9 @@ abstract class SunmiTransaction {
         }
     }
 
-    private fun loopRemoveCard() = GlobalScope.launch(Dispatchers.Main) {
+    private fun loopRemoveCard(dataCard: DataCard? = null) = GlobalScope.launch(Dispatchers.Main) {
         delay(1000)
-        checkAndRemoveCard()
+        checkAndRemoveCard(dataCard)
     }
 
     protected abstract fun goOnlineProcess(dataCard: DataCard)

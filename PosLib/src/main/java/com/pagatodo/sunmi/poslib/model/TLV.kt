@@ -1,5 +1,6 @@
 package com.pagatodo.sunmi.poslib.model
 
+import com.pagatodo.sunmi.poslib.util.TLVUtil
 import java.util.*
 
 class TLV(tag: String?, val length: Int, value: String?) {

@@ -1,5 +1,6 @@
 package com.pagatodo.sunmi.poslib.util
 
+import android.os.Bundle
 import android.util.Log
 import com.pagatodo.sunmi.poslib.PosLib
 import com.pagatodo.sunmi.poslib.SunmiTransaction
@@ -100,12 +101,12 @@ object EmvUtil {
             val security = posInstance().posConfig.security
             var result = mSecurityOptV2.savePlaintextKey(AidlConstants.Security.KEY_TYPE_TDK, security.plainDataKey, security.plainDataKcvKey, AidlConstants.Security.KEY_ALG_TYPE_3DES, 10)
             if (result != 0) {
-                PosLogger.e(TAG, "save KEK fail")
+                PosLogger.e(TAG, "save TDK fail: $result")
                 return
             }
             result = mSecurityOptV2.savePlaintextKey(AidlConstants.Security.KEY_TYPE_PIK, security.plainPinkey, security.plainPinKcvkey, AidlConstants.Security.KEY_ALG_TYPE_3DES, 11)
             if (result != 0) {
-                PosLogger.e(TAG, "save KEK fail")
+                PosLogger.e(TAG, "save PIK fail: $result")
                 return
             }
             PosLogger.d(TAG, "init  key success")
@@ -126,6 +127,17 @@ object EmvUtil {
         for (aid in posInstance().posConfig.aids) {
             if (aid.aidType == normal)
                 emvOptV2.addAid(aid.toAidV2())
+        }
+    }
+
+    fun setDlr(emvOptV2: EMVOptV2) {//Load application aids
+        val bundle = Bundle().apply {
+            this.putBoolean("supportDRL", true)
+        }
+        emvOptV2.deleteDrlLimitSet(null)
+        emvOptV2.setTermParamEx(bundle)
+        for (drl in posInstance().posConfig.drls) {
+            emvOptV2.addDrlLimitSet(drl.toDrlV2())
         }
     }
 
@@ -161,17 +173,20 @@ object EmvUtil {
         if (mTrack2.length > index + 8) {
             serviceCode = mTrack2.substring(index + 5, index + 8)
         }
-        PosLogger.i(PosLib.TAG, "cardNumber: $cardNumber expireDate: $expiryDate serviceCode: $serviceCode")
+        PosLogger.i(
+            PosLib.TAG,
+            "cardNumber: $cardNumber expireDate: $expiryDate serviceCode: $serviceCode"
+        )
         cardInfo.cardNo = cardNumber
         cardInfo.expireDate = expiryDate
         cardInfo.serviceCode = serviceCode
         return cardInfo
     }
 
-    private fun stringFilter(str: String?): String {//remove characters not number,=,D
+    private fun stringFilter(str: CharSequence?): String {//remove characters not number,=,D
         val regEx = "[^0-9=D]"
         val p = Pattern.compile(regEx)
-        val matcher = p.matcher(str)
+        val matcher = p.matcher(str ?: "")
         return matcher.replaceAll("").trim { it <= ' ' }
     }
 }

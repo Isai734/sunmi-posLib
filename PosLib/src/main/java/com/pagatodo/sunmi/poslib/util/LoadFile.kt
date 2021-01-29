@@ -1,4 +1,4 @@
-package com.pagatodo.sunmi.poslibimpl.util
+package com.pagatodo.sunmi.poslib.util
 
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -17,7 +17,9 @@ object LoadFile {
             val moshi = Moshi.Builder().build()
             val type: Type = Types.newParameterizedType(MutableList::class.java, E::class.java)
             val adapter: JsonAdapter<List<E>> = moshi.adapter(type)
-            return adapter.fromJson(this) ?: LinkedList()
+            return (adapter.fromJson(this) ?: LinkedList()).apply {
+                PosLogger.e("LoadFile","size: $size")
+            }
         }
     }
 }

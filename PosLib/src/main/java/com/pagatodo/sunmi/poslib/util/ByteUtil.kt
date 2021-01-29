@@ -34,15 +34,14 @@ object ByteUtil {
     }
 
     fun hexStr2Bytes(hexStr: String): ByteArray {
-        var hexStr = hexStr
-        hexStr = hexStr.toLowerCase(Locale.ROOT)
-        val length = hexStr.length
+        val hexStr1 = hexStr.toLowerCase(Locale.ROOT)
+        val length = hexStr1.length
         val bytes = ByteArray(length shr 1)
         var index = 0
         for (i in 0 until length) {
-            if (index > hexStr.length - 1) return bytes
-            val highDit = (Character.digit(hexStr[index], 16) and 0xFF)
-            val lowDit = (Character.digit(hexStr[index + 1], 16) and 0xFF)
+            if (index > hexStr1.length - 1) return bytes
+            val highDit = (Character.digit(hexStr1[index], 16) and 0xFF)
+            val lowDit = (Character.digit(hexStr1[index + 1], 16) and 0xFF)
             bytes[i] = (highDit shl 4 or lowDit).toByte()
             index += 2
         }
@@ -69,12 +68,11 @@ object ByteUtil {
     }
 
     fun hexStr2AsciiStr(hexStr: String): String {
-        var hexStr = hexStr
         val vi = "0123456789ABC DEF".trim { it <= ' ' }
-        hexStr = hexStr.trim { it <= ' ' }.replace(" ", "").toUpperCase(Locale.US)
-        val array = hexStr.toCharArray()
-        val bytes = ByteArray(hexStr.length / 2)
-        var temp = 0x00
+        val hexStr1 = hexStr.trim { it <= ' ' }.replace(" ", "").toUpperCase(Locale.US)
+        val array = hexStr1.toCharArray()
+        val bytes = ByteArray(hexStr1.length / 2)
+        var temp: Int
         for (i in bytes.indices) {
             var c = array[2 * i]
             temp = vi.indexOf(c) shl 4

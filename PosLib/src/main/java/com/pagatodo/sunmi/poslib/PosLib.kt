@@ -17,6 +17,7 @@ class PosLib private constructor(val activity: Activity) : SunmiServiceWrapper()
         mEMVOptV2?.apply {
             EmvUtil.setAids(this)
             EmvUtil.setCapks(this)
+            EmvUtil.setDlr(this)
         }
     }
 
@@ -27,8 +28,7 @@ class PosLib private constructor(val activity: Activity) : SunmiServiceWrapper()
         @Volatile
         private var INSTANCE: PosLib? = null
 
-        fun createInstance(activity: Activity):
-                PosLib = INSTANCE ?: synchronized(this) {
+        fun createInstance(activity: Activity): PosLib = INSTANCE ?: synchronized(this) {
             INSTANCE ?: PosLib(activity).also { INSTANCE = it }
         }
 

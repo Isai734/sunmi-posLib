@@ -3,6 +3,7 @@ package com.pagatodo.sunmi.poslib.config
 import android.util.Log
 import com.pagatodo.sunmi.poslib.model.Aid
 import com.pagatodo.sunmi.poslib.model.Capk
+import com.pagatodo.sunmi.poslib.model.Drl
 import com.pagatodo.sunmi.poslib.util.ByteUtil
 import com.pagatodo.sunmi.poslib.util.Constants.MAESTRO
 import com.pagatodo.sunmi.poslib.util.Constants.MASTERCARD
@@ -22,6 +23,7 @@ class PosConfig {
 
     var capks: List<Capk> = LinkedList<Capk>()
     var aids: List<Aid> = LinkedList<Aid>()
+    var drls: List<Drl> = LinkedList<Drl>()
     internal val paypassConfig get() = PaypassConfig(aids)
 
     class Security(
