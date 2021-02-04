@@ -3,7 +3,7 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-android-extensions'
     id 'kotlin-kapt'
-    id 'maven-publish'
+    //id 'maven-publish' Uncomment for upload new version of PayLib
 }
 
 android {
@@ -59,9 +59,9 @@ dependencies {
     //noinspection LifecycleAnnotationProcessorWithJava8
     annotationProcessor 'android.arch.lifecycle:compiler:1.1.1'
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0"
-    implementation 'com.pagatodo.sunmi:PayLib:1.4.40'
 
     implementation project(path: ':PosLib')
+    implementation 'com.pagatodo.sunmi:PayLib:1.4.40'
 }
 
 /**
