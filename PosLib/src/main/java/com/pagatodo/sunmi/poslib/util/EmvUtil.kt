@@ -95,8 +95,6 @@ object EmvUtil {
 
     fun initKey(mSecurityOptV2: SecurityOptV2) { //Initialize keys
         try {
-            val cvByte = ByteUtil.hexStr2Bytes("82E13665B4624DF5")
-            val dataByte = ByteUtil.hexStr2Bytes("F40379AB9E0EC533F40379AB9E0EC533")
             // save TMK
             val security = posInstance().posConfig.security
             var result = mSecurityOptV2.savePlaintextKey(AidlConstants.Security.KEY_TYPE_TDK, security.plainDataKey, security.plainDataKcvKey, AidlConstants.Security.KEY_ALG_TYPE_3DES, 10)
