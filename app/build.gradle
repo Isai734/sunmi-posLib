@@ -3,7 +3,6 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-android-extensions'
     id 'kotlin-kapt'
-    id 'maven'
     id 'maven-publish'
 }
 
@@ -65,7 +64,9 @@ dependencies {
     implementation project(path: ':PosLib')
 }
 
-publishing {
+/**
+ * Uncomment for upload new version of PayLib
+ * publishing {
     publications {
         bar(MavenPublication) {
             groupId 'com.pagatodo.sunmi'
@@ -84,5 +85,5 @@ publishing {
             url "$mavenInternalUrl"
         }
     }
-}
+}*/
 
