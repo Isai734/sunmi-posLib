@@ -7,7 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class ViewModelPci : SunmiViewModel() {
+class ViewModelPci : SunmiViewModel<String>() {
 
     fun purchase() {
         viewModelScope.launch(Dispatchers.Main) {

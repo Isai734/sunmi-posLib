@@ -31,9 +31,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.fullcarga.android.api.data.respuesta.OperacionSiguiente
 
-class MainActivity : AppCompatActivity(), SunmiTrxListener {
+class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
 
-    private val viewModelPci by lazy { ViewModelProvider(this)[ViewModelPci::class.java] }
+    private val viewMPci by lazy { ViewModelProvider(this)[ViewModelPci::class.java] }
     private val trxManager by lazy { SunmiTrxWrapper(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -144,7 +144,7 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener {
     }
 
     override fun onSync(dataCard: DataCard) {
-        viewModelPci.sync()
+        viewMPci.sync()
     }
 
     override fun onFailure(error: PosResult, listener: OnClickAcceptListener?) {
@@ -152,14 +152,14 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener {
     }
 
     override fun onPurchase(dataCard: DataCard) {
-        viewModelPci.purchase()
+        viewMPci.purchase()
     }
 
     override fun doOperationNext(nextOperation: OperacionSiguiente) {
         Toast.makeText(this, "Operacion Siguiente", Toast.LENGTH_LONG).show()
     }
 
-    override fun getVmodelPCI(): SunmiViewModel = viewModelPci
+    override fun getVmodelPCI() = viewMPci
 
     private val dialogProgress: DialogProgress by lazy {
         DialogProgress().apply { isCancelable = false }
