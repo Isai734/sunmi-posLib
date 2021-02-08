@@ -24,11 +24,11 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
 
     private val mTransactionData by lazy { sunmiListener.createTransactionData() }
     private lateinit var dataCard: DataCard
-    private val sunmiListener: SunmiTrxListener
+    private val sunmiListener: SunmiTrxListener<*>
     private var requestTransaction: RespuestaTrxCierreTurno? = null
 
     init {
-        if (owner is SunmiTrxListener)
+        if (owner is SunmiTrxListener<*>)
             sunmiListener = owner
         else
             throw InstantiationException("Owner must be instance of SunmiTrxListener.")
