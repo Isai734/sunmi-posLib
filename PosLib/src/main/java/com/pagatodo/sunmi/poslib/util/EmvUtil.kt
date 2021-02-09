@@ -3,7 +3,6 @@ package com.pagatodo.sunmi.poslib.util
 import android.os.Bundle
 import android.util.Log
 import com.pagatodo.sunmi.poslib.PosLib
-import com.pagatodo.sunmi.poslib.SunmiTransaction
 import com.pagatodo.sunmi.poslib.model.DataCard
 import com.pagatodo.sunmi.poslib.posInstance
 import com.pagatodo.sunmi.poslib.util.Constants.normal
@@ -97,12 +96,12 @@ object EmvUtil {
         try {
             // save TMK
             val security = posInstance().posConfig.security
-            var result = mSecurityOptV2.savePlaintextKey(AidlConstants.Security.KEY_TYPE_TDK, security.plainDataKey, security.plainDataKcvKey, AidlConstants.Security.KEY_ALG_TYPE_3DES, 10)
+            var result = mSecurityOptV2.savePlaintextKey(AidlConstants.Security.KEY_TYPE_TDK, security.plainDataKey, security.plainDataKcvKey, AidlConstants.Security.KEY_ALG_TYPE_3DES, security.keyDataIndex)
             if (result != 0) {
                 PosLogger.e(TAG, "save TDK fail: $result")
                 return
             }
-            result = mSecurityOptV2.savePlaintextKey(AidlConstants.Security.KEY_TYPE_PIK, security.plainPinkey, security.plainPinKcvkey, AidlConstants.Security.KEY_ALG_TYPE_3DES, 11)
+            result = mSecurityOptV2.savePlaintextKey(AidlConstants.Security.KEY_TYPE_PIK, security.plainPinKey, security.plainPinKcvKey, AidlConstants.Security.KEY_ALG_TYPE_3DES, security.keyPinIndex)
             if (result != 0) {
                 PosLogger.e(TAG, "save PIK fail: $result")
                 return

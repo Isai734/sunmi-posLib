@@ -1,14 +1,16 @@
 package com.pagatodo.sunmi.poslib.keychain
 
 import android.os.RemoteException
+import com.pagatodo.sunmi.poslib.PosLib
+import com.pagatodo.sunmi.poslib.posInstance
 import com.pagatodo.sunmi.poslib.util.Constants
 import com.sunmi.pay.hardware.aidl.AidlConstants
 import com.sunmi.pay.hardware.aidlv2.security.SecurityOptV2
 import java.util.*
 
-class SecUtil(private val mSecurityOptV2: SecurityOptV2) {
+class CryptUtil(private val mSecurityOptV2: SecurityOptV2) {
     @Throws(RemoteException::class)
-     fun getTrackEncrypt(selectTAG: ByteArray, keyIndex: Int): ByteArray {
+    private fun getTrackEncrypt(selectTAG: ByteArray, keyIndex: Int): ByteArray {
         val dataIn = createBytePaddingTrack(selectTAG)
         val dataOut = ByteArray(dataIn.size)
         val result = mSecurityOptV2.dataEncrypt(keyIndex, dataIn, AidlConstants.Security.DATA_MODE_ECB, null, dataOut)
@@ -20,8 +22,7 @@ class SecUtil(private val mSecurityOptV2: SecurityOptV2) {
     }
 
     @Throws(RemoteException::class)
-     fun getPanEncrypt(selectTAG: ByteArray, keyIndex: Int): ByteArray {
-        val dataIn = createBytePadding(selectTAG)
+    private fun getByteEncrypt(dataIn: ByteArray, keyIndex: Int): ByteArray {
         val dataOut = ByteArray(dataIn.size)
         val result = mSecurityOptV2.dataEncrypt(keyIndex, dataIn, AidlConstants.Security.DATA_MODE_ECB, null, dataOut)
         return if (result == 0) {
@@ -31,58 +32,37 @@ class SecUtil(private val mSecurityOptV2: SecurityOptV2) {
         }
     }
 
-    @Throws(RemoteException::class)
-     fun getByteEncrypt(data: ByteArray?, keyIndex: Int): ByteArray {
-        val dataOut = ByteArray(data!!.size)
-        val result = mSecurityOptV2.dataEncrypt(keyIndex, data, AidlConstants.Security.DATA_MODE_ECB, null, dataOut)
-        if (result == 0) {
-            return dataOut
-        }
-        return ByteArray(0)
-    }
-
-    private fun onPosPanEncrypt(bytes: ByteArray): ByteArray? {
-        return try {
-            getPanEncrypt(bytes, 10)
-        } catch (e: RemoteException) {
-            e.printStackTrace()
-            null
-        }
-    }
-
     private fun onPosTrackEncrypt(bytes: ByteArray): ByteArray? {
         return try {
-            getTrackEncrypt(bytes, 10)
+            getTrackEncrypt(bytes, posInstance().posConfig.security.keyDataIndex)
         } catch (e: RemoteException) {
             e.printStackTrace()
-            null
-        }
-    }
-
-
-    private fun onPosPINEncrypt(bytes: ByteArray?): ByteArray? {
-        return try {
-            getByteEncrypt(bytes, 11)
-        } catch (e: RemoteException) {
             null
         }
     }
 
     private fun onPosEncryptData(bytes: ByteArray): ByteArray? {
         return try {
-            getByteEncrypt(createBytePadding(bytes), 10)
+            getByteEncrypt(createBytePadding(bytes), posInstance().posConfig.security.keyDataIndex)
         } catch (e: RemoteException) {
             e.printStackTrace()
             null
         }
     }
 
+    private fun onPosPINEncrypt(bytes: ByteArray): ByteArray? {
+        return try {
+            getByteEncrypt(bytes, posInstance().posConfig.security.keyPinIndex)
+        } catch (e: RemoteException) {
+            null
+        }
+    }
+
     fun onEncryptData(bytes: ByteArray, type: Constants.EncrypType): ByteArray? {
         return when (type) {
-            Constants.EncrypType.PANENCRYPT -> onPosPanEncrypt(bytes)
-            Constants.EncrypType.TRACKENCRYPT -> onPosTrackEncrypt(bytes)
-            Constants.EncrypType.ICCENCRYPT -> onPosEncryptData(bytes)
             Constants.EncrypType.PINENCRYPT -> onPosPINEncrypt(bytes)
+            Constants.EncrypType.TRACKENCRYPT -> onPosTrackEncrypt(bytes)
+            Constants.EncrypType.PANENCRYPT, Constants.EncrypType.ICCENCRYPT -> onPosEncryptData(bytes)
         }
     }
 

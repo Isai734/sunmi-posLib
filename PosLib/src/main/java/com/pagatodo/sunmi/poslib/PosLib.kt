@@ -1,12 +1,16 @@
 package com.pagatodo.sunmi.poslib
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import com.pagatodo.sunmi.poslib.config.PosConfig
+import com.pagatodo.sunmi.poslib.keychain.CryptUtil
 import com.pagatodo.sunmi.poslib.util.EmvUtil
 
 class PosLib private constructor(val activity: Activity) : SunmiServiceWrapper() {
 
     var posConfig = PosConfig()
+    var encryptUtil = mSecurityOptV2?.let { CryptUtil(it) }
+        ?: throw IllegalStateException("SecurityOptV2 is null.")
 
     init {
         connectPayService(activity)
@@ -25,6 +29,7 @@ class PosLib private constructor(val activity: Activity) : SunmiServiceWrapper()
 
         val TAG: String = PosLib::class.java.simpleName
 
+        @SuppressLint("StaticFieldLeak")
         @Volatile
         private var INSTANCE: PosLib? = null
 

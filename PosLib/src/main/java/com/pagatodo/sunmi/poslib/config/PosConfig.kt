@@ -14,11 +14,11 @@ import java.util.*
 
 class PosConfig {
 
-    var security = Security(
+    var security = EncryptKeys(
         plainDataKey = ByteUtil.hexStr2Bytes("F40379AB9E0EC533F40379AB9E0EC533"),
         plainDataKcvKey = ByteUtil.hexStr2Bytes("82E13665B4624DF5"),
-        plainPinkey = ByteUtil.hexStr2Bytes("F40379AB9E0EC533F40379AB9E0EC533"),
-        plainPinKcvkey = ByteUtil.hexStr2Bytes("82E13665B4624DF5")
+        plainPinKey = ByteUtil.hexStr2Bytes("F40379AB9E0EC533F40379AB9E0EC533"),
+        plainPinKcvKey = ByteUtil.hexStr2Bytes("82E13665B4624DF5")
     )
 
     var capks: List<Capk> = LinkedList<Capk>()
@@ -26,11 +26,13 @@ class PosConfig {
     var drls: List<Drl> = LinkedList<Drl>()
     internal val paypassConfig get() = PaypassConfig(aids)
 
-    class Security(
+    class EncryptKeys(
         val plainDataKey: ByteArray,
         val plainDataKcvKey: ByteArray,
-        val plainPinkey: ByteArray,
-        val plainPinKcvkey: ByteArray
+        val plainPinKey: ByteArray,
+        val plainPinKcvKey: ByteArray,
+        val keyDataIndex: Int = 10,
+        val keyPinIndex: Int = 11
     )
 
     class PaypassConfig(val aids: List<Aid> = LinkedList()) {
