@@ -121,10 +121,7 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         Toast.makeText(this, "Mostrar dialogo de ticket", Toast.LENGTH_LONG).show()
     }
 
-    override fun onShowPinPadDialog(
-        pinPadListener: PinPadListenerV2.Stub,
-        pinPadConfig: PinPadConfigV2
-    ) {
+    override fun onShowPinPadDialog(pinPadListener: PinPadListenerV2.Stub, pinPadConfig: PinPadConfigV2) {
         val pinPadDialog = PinPadDialog.createInstance(pinPadConfig)
         pinPadDialog.setPasswordLength(6)
         pinPadDialog.setTextAccept("Aceptar")
@@ -152,7 +149,7 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         viewMPci.purchase()
     }
 
-    override fun doOperationNext(nextOperation: OperacionSiguiente) {
+    override fun doOperationNext(nextOperation: OperacionSiguiente, nextOprResult: PosResult) {
         Toast.makeText(this, "Operacion Siguiente", Toast.LENGTH_LONG).show()
     }
 

@@ -55,7 +55,7 @@ abstract class SunmiTransaction {
 
     fun tryAgain() = checkCard()
 
-    fun getPin(dataCard: DataCard) {
+    protected fun getPin(dataCard: DataCard) {
         PosLogger.e(PosLib.TAG, "getPin (dataCard != null required): $dataCard")
         initPinPad(dataCard)
     }

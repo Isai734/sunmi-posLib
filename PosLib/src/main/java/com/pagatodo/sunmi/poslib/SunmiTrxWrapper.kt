@@ -48,6 +48,10 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
         super.startPayProcess()
     }
 
+    fun getPin(){
+        getPin(dataCard)
+    }
+
     override fun goOnlineProcess(dataCard: DataCard) {
         this.dataCard = dataCard
         sunmiListener.onDismissRequestCard()
@@ -65,7 +69,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
             }
             PosResult.ReplaceCard, PosResult.SeePhone, PosResult.CardNoSupported,
             PosResult.CardDenial, PosResult.OtherInterface,
-            PosResult.NfcTerminated, PosResult.FallBack -> {
+            PosResult.NfcTerminated, PosResult.FallBack, PosResult.NextOperetion -> {
                 sunmiListener.onFailure(result, listener = createAcceptListener(result.message))
             }
             else -> sunmiListener.onFailure(result)
@@ -96,9 +100,9 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
 
     override fun getTransactionData() = mTransactionData
 
-    private fun doNextOpr(operacionSiguiente: OperacionSiguiente) {
+    private fun doNextOpr(operacionSiguiente: OperacionSiguiente, nextOprResult:PosResult) {
         cancelProcessEmv()
-        sunmiListener.doOperationNext(operacionSiguiente)
+        sunmiListener.doOperationNext(operacionSiguiente, nextOprResult)
     }
 
     private fun createAcceptListener(message: String? = null) = object : OnClickAcceptListener {
@@ -114,7 +118,11 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
                     if (it.data is RespuestaTrxCierreTurno) {
                         requestTransaction = it.data
                         if (it.data.isCorrecta) {
-                            it.data.operacionSiguiente?.apply { doNextOpr(this) } ?: run {
+                            it.data.operacionSiguiente?.apply {
+                                val resultNexOpr = PosResult.NextOperetion
+                                resultNexOpr.message = it.data.campo60.first()
+                                doNextOpr(this, resultNexOpr)
+                            } ?: run {
                                 val tags = String(it.data.campoTagsEmv, Charset.defaultCharset()).trim()
                                 finishOnlineProcessStatus(tlvString = tags, tlvResponse = Constants.TlvResponses.Approved)
                             }

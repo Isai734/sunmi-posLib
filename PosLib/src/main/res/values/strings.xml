@@ -20,4 +20,5 @@
     <string name="sync_operation_success">Se canceló la operación.</string>
     <string name="error_check_present_card">Error al Validar la Tarjeta Presente.</string>
     <string name="error_card_no_supported">Error al Leer la Tarjeta, Intente de Nuevo.</string>
+    <string name="next_operation">Operacion Siguiente.</string>
 </resources>
