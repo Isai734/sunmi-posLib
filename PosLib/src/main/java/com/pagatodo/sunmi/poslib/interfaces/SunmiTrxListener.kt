@@ -14,12 +14,13 @@ interface SunmiTrxListener<E : Any> {
     fun onDismissRequestCard()
     fun onDialogProcessOnline(message: String? = null)
     fun onDismissRequestOnline()
-    fun onShowSingDialog()
+    fun onShowSingDialog(responseTrx: Respuesta, dataCard: DataCard)
     fun createTransactionData(): TransactionData
     fun pinMustBeForced(): Boolean
     fun checkCardTypes(): Int
-    fun onShowTicketDialog(singBytes: ByteArray?, responseTrx: Respuesta)
-    fun onShowDniDialog()
+    fun onShowTicketDialog(singBytes: ByteArray?, responseTrx: Respuesta, dataCard: DataCard)
+    fun onShowDniDialog(dataCard: DataCard)
+    fun onShowZipDialog(dataCard: DataCard)
     fun onShowPinPadDialog(pinPadListener: PinPadListenerV2.Stub, pinPadConfig: PinPadConfigV2)
     fun onShowSelectApp(listEmvApps: List<String>, applicationEmv: AppEmvSelectListener)
     fun onSync(dataCard: DataCard)

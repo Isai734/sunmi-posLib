@@ -75,9 +75,9 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
     override fun onApprovedTrx() {
         sunmiListener.onDismissRequestOnline()
         if (isRequestSignature || VentaPCIUtils.emvRequestSignature(dataCard.tlvData))
-            sunmiListener.onShowSingDialog()
+            sunmiListener.onShowSingDialog(requestTransaction as Respuesta, dataCard)
         else
-            sunmiListener.onShowTicketDialog(null, requestTransaction as Respuesta)
+            sunmiListener.onShowTicketDialog(null, requestTransaction as Respuesta, dataCard)
     }
 
     override fun getCheckCardType() = sunmiListener.checkCardTypes()

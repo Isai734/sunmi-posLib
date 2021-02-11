@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         if (dialogProgress.isAdded) dialogProgress.dismiss()
     }
 
-    override fun onShowSingDialog() {
+    override fun onShowSingDialog(responseTrx: Respuesta, dataCard: DataCard) {
         Toast.makeText(this, "Mostrar dialogo de firma", Toast.LENGTH_LONG).show()
     }
 
@@ -117,12 +117,8 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         return AidlConstants.CardType.MAGNETIC.value or AidlConstants.CardType.IC.value or AidlConstants.CardType.NFC.value
     }
 
-    override fun onShowTicketDialog(singBytes: ByteArray?, responseTrx: Respuesta) {
+    override fun onShowTicketDialog(singBytes: ByteArray?, responseTrx: Respuesta, dataCard: DataCard) {
         Toast.makeText(this, "Mostrar dialogo de ticket", Toast.LENGTH_LONG).show()
-    }
-
-    override fun onShowDniDialog() {
-        Toast.makeText(this, "Mostrar dialogo de DNI", Toast.LENGTH_LONG).show()
     }
 
     override fun onShowPinPadDialog(
@@ -170,5 +166,13 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         val builder: AlertDialog.Builder = AlertDialog.Builder(this)
         builder.setMessage("Por favor inserta, desliza o acerca la tarjeta.")
         builder.create()
+    }
+
+    override fun onShowDniDialog(dataCard: DataCard) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onShowZipDialog(dataCard: DataCard) {
+        TODO("Not yet implemented")
     }
 }
