@@ -15,6 +15,7 @@ import com.pagatodo.sunmi.poslib.util.getPosResult
 import com.sunmi.pay.hardware.aidlv2.bean.PinPadConfigV2
 import com.sunmi.pay.hardware.aidlv2.pinpad.PinPadListenerV2
 import net.fullcarga.android.api.data.respuesta.OperacionSiguiente
+import net.fullcarga.android.api.data.respuesta.Respuesta
 import net.fullcarga.android.api.data.respuesta.RespuestaTrxCierreTurno
 import net.fullcarga.android.api.exc.SincronizacionRequeridaException
 import java.nio.charset.Charset
@@ -76,7 +77,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
         if (isRequestSignature || VentaPCIUtils.emvRequestSignature(dataCard.tlvData))
             sunmiListener.onShowSingDialog()
         else
-            sunmiListener.onShowTicketDialog(null)
+            sunmiListener.onShowTicketDialog(null, requestTransaction as Respuesta)
     }
 
     override fun getCheckCardType() = sunmiListener.checkCardTypes()

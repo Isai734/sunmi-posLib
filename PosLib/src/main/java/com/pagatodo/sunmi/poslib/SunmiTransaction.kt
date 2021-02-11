@@ -135,6 +135,7 @@ abstract class SunmiTransaction {
         dataCard.pinBlock = ByteUtil.bytes2HexStr(hexStrPin)
         dataCard.entryMode =
             if (mCardType == AidlConstants.CardType.NFC) DataOpTarjeta.PosEntryMode.CONTACLESS else DataOpTarjeta.PosEntryMode.CHIP
+        dataCard.mapTags = emvTags
         return dataCard.apply { cardNo = Regex("[^0-9 ]").replace(cardNo, "") }
     }
 

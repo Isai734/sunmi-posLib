@@ -7,8 +7,9 @@ import com.pagatodo.sunmi.poslib.viewmodel.SunmiViewModel
 import com.sunmi.pay.hardware.aidlv2.bean.PinPadConfigV2
 import com.sunmi.pay.hardware.aidlv2.pinpad.PinPadListenerV2
 import net.fullcarga.android.api.data.respuesta.OperacionSiguiente
+import net.fullcarga.android.api.data.respuesta.Respuesta
 
-interface SunmiTrxListener<E: Any> {
+interface SunmiTrxListener<E : Any> {
     fun onDialogRequestCard(message: String? = null)
     fun onDismissRequestCard()
     fun onDialogProcessOnline(message: String? = null)
@@ -17,7 +18,7 @@ interface SunmiTrxListener<E: Any> {
     fun createTransactionData(): TransactionData
     fun pinMustBeForced(): Boolean
     fun checkCardTypes(): Int
-    fun onShowTicketDialog(singBytes: ByteArray?)
+    fun onShowTicketDialog(singBytes: ByteArray?, responseTrx: Respuesta)
     fun onShowDniDialog()
     fun onShowPinPadDialog(pinPadListener: PinPadListenerV2.Stub, pinPadConfig: PinPadConfigV2)
     fun onShowSelectApp(listEmvApps: List<String>, applicationEmv: AppEmvSelectListener)

@@ -30,6 +30,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.fullcarga.android.api.data.respuesta.OperacionSiguiente
+import net.fullcarga.android.api.data.respuesta.Respuesta
 
 class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
 
@@ -116,7 +117,7 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         return AidlConstants.CardType.MAGNETIC.value or AidlConstants.CardType.IC.value or AidlConstants.CardType.NFC.value
     }
 
-    override fun onShowTicketDialog(singBytes: ByteArray?) {
+    override fun onShowTicketDialog(singBytes: ByteArray?, responseTrx: Respuesta) {
         Toast.makeText(this, "Mostrar dialogo de ticket", Toast.LENGTH_LONG).show()
     }
 
