@@ -132,6 +132,18 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
             }
         }
 
+    fun cancelProcess() {
+        cancelProcessEmv()
+    }
+
+    fun cancelProcessWithMessage() {
+        cancelOperationWithMessage()
+    }
+
+    fun cancelProcessWithTvrError() {
+        finishOnlineProcessStatus(tlvResponse = Constants.TlvResponses.Decline)
+    }
+
     private val syncObserver
         get() = Observer<Results<Any>> {
             when (it) {
