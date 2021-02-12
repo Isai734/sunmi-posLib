@@ -60,11 +60,7 @@ abstract class SunmiTransaction {
         initPinPad(dataCard)
     }
 
-    fun finishOnlineProcessStatus(
-        tlvString: String? = null,
-        tlvResponse: Constants.TlvResponses,
-        message: String? = null
-    ) = try {//(CSU)Card Update Status
+    fun finishOnlineProcessStatus(tlvString: String? = null, tlvResponse: Constants.TlvResponses, message: String? = null) = try {//(CSU)Card Update Status
         val tlvMap = TLVUtil.buildTLVMap(tlvString ?: tlvResponse.response)
         customMessage = message
         val tags = LinkedList<String>()
@@ -77,20 +73,15 @@ abstract class SunmiTransaction {
         }
 
         val out = ByteArray(1024)
-        val len = posInstance().mEMVOptV2?.importOnlineProcStatus(
-            tlvResponse.status,
-            tags.toTypedArray(),
-            values.toTypedArray(),
-            out
-        )
+        val len = posInstance().mEMVOptV2?.importOnlineProcStatus(tlvResponse.status, tags.toTypedArray(), values.toTypedArray(), out)
         PosLogger.e(PosLib.TAG, "card update status code::$len")
         len?.also {  //Validar si esto aplica para MTIP 2.60 Refund
             if ((it == PosResult.DoSyncOperation.code || it == PosResult.TransRefused.code) && tlvResponse.status == 0) {
                 onFailureTrx(PosResult.DoSyncOperation)
                 customMessage = PosResult.DoSyncOperation.message
-            } else if (mCardType != AidlConstants.CardType.IC && len == 0)
+            } else if (mCardType == AidlConstants.CardType.MAGNETIC && tlvResponse.status == 0)
                 onApprovedTrx()
-            else if (mCardType != AidlConstants.CardType.IC)
+            else if (mCardType == AidlConstants.CardType.MAGNETIC)
                 onFailureTrx(getPosResult(AidlConstants.CardType.MAGNETIC.value, customMessage))
         }
     } catch (exe: Exception) {
@@ -330,18 +321,11 @@ abstract class SunmiTransaction {
         @Throws(RemoteException::class)
         override fun onConfirmationCodeVerified() { //Only confirmation phone required
             val outData = ByteArray(512)
-            posInstance().mEMVOptV2?.getTlv(
-                AidlConstants.EMV.TLVOpCode.OP_PAYPASS,
-                "DF8129",
-                outData
-            )?.apply {
+            posInstance().mEMVOptV2?.getTlv(AidlConstants.EMV.TLVOpCode.OP_PAYPASS, "DF8129", outData)?.apply {
                 if (this > 0) {
                     val data = ByteArray(this)
                     System.arraycopy(outData, 0, data, 0, this)
-                    PosLogger.e(
-                        PosLib.TAG,
-                        "onRequestDataExchange DF8129:: ${ByteUtil.bytes2HexStr(data)}"
-                    )
+                    PosLogger.e(PosLib.TAG, "onRequestDataExchange DF8129:: ${ByteUtil.bytes2HexStr(data)}")
                 }
             }
             posInstance().mReadCardOptV2?.cardOff(mCardType.value) // card off
@@ -381,45 +365,9 @@ abstract class SunmiTransaction {
 
     private fun setPayPassConfig(configId: String) = try {// set PayPass(MasterCard) tlv data
         val posCfg = posInstance().posConfig.paypassConfig.getConfig(configId)
-        val tagsPayPass = arrayOf(
-            "DF8117",
-            "DF8118",
-            "DF8119",
-            "DF811F",
-            "DF811E",
-            "DF812C",
-            "DF8123",
-            "DF8124",
-            "DF8125",
-            "DF8126",
-            "DF811B",
-            "DF811D",
-            "DF8122",
-            "DF8120",
-            "DF8121"
-        )
-        val valuesPayPass = arrayOf(
-            "60",
-            posCfg.cvmCapability,
-            "08",
-            "C8",
-            "00",
-            "00",
-            posCfg.floorLimit,
-            posCfg.termClssLmt,
-            posCfg.termClssLmt,
-            posCfg.cvmLmt,
-            "B0",
-            "02",
-            posCfg.tACOnline,
-            posCfg.tACDefault,
-            posCfg.tACDenial
-        )
-        posInstance().mEMVOptV2?.setTlvList(
-            AidlConstants.EMV.TLVOpCode.OP_PAYPASS,
-            tagsPayPass,
-            valuesPayPass
-        )
+        val tagsPayPass = arrayOf("DF8117", "DF8118", "DF8119", "DF811F", "DF811E", "DF812C", "DF8123", "DF8124", "DF8125", "DF8126", "DF811B", "DF811D", "DF8122", "DF8120", "DF8121")
+        val valuesPayPass = arrayOf("60", posCfg.cvmCapability, "08", "C8", "00", "00", posCfg.floorLimit, posCfg.termClssLmt, posCfg.termClssLmt, posCfg.cvmLmt, "B0", "02", posCfg.tACOnline, posCfg.tACDefault, posCfg.tACDenial)
+        posInstance().mEMVOptV2?.setTlvList(AidlConstants.EMV.TLVOpCode.OP_PAYPASS, tagsPayPass, valuesPayPass)
     } catch (e: RemoteException) {
         PosLogger.e(PosLib.TAG, e.message)
     }
@@ -468,11 +416,7 @@ abstract class SunmiTransaction {
             PosLogger.e(PosLib.TAG, "tagList to get-> ${tagList.toList()}")
             val outData = ByteArray(4096)
             val map: MutableMap<String, TLV> = LinkedHashMap()
-            posInstance().mEMVOptV2?.getTlvList(
-                AidlConstants.EMV.TLVOpCode.OP_NORMAL,
-                tagList,
-                outData
-            )?.let {
+            posInstance().mEMVOptV2?.getTlvList(AidlConstants.EMV.TLVOpCode.OP_NORMAL, tagList, outData)?.let {
                 if (it > 0) {
                     val bytes = outData.copyOf(it)
                     val hexStr = ByteUtil.bytes2HexStr(bytes)
@@ -481,11 +425,7 @@ abstract class SunmiTransaction {
                 }
             }
             //Contacless tags
-            posInstance().mEMVOptV2?.getTlvList(
-                AidlConstants.EMV.TLVOpCode.OP_PAYPASS,
-                EmvUtil.payPassTags,
-                outData
-            )?.let {
+            posInstance().mEMVOptV2?.getTlvList(AidlConstants.EMV.TLVOpCode.OP_PAYPASS, EmvUtil.payPassTags, outData)?.let {
                 if (it > 0) {
                     val bytes = outData.copyOf(it)
                     val hexStr = ByteUtil.bytes2HexStr(bytes)
