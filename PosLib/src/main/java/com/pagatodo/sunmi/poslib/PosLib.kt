@@ -9,8 +9,7 @@ import com.pagatodo.sunmi.poslib.util.EmvUtil
 class PosLib private constructor(val activity: Activity) : SunmiServiceWrapper() {
 
     var posConfig = PosConfig()
-    var encryptUtil = mSecurityOptV2?.let { CryptUtil(it) }
-        ?: throw IllegalStateException("SecurityOptV2 is null.")
+    lateinit var encryptUtil: CryptUtil
 
     init {
         connectPayService(activity)
@@ -18,6 +17,8 @@ class PosLib private constructor(val activity: Activity) : SunmiServiceWrapper()
 
     private fun setGlobalConfig() {
         mSecurityOptV2?.apply { EmvUtil.initKey(this) }
+        mSecurityOptV2?.let { CryptUtil(it) }
+            ?: throw IllegalStateException("SecurityOptV2 is null.")
         mEMVOptV2?.apply {
             EmvUtil.setAids(this)
             EmvUtil.setCapks(this)
