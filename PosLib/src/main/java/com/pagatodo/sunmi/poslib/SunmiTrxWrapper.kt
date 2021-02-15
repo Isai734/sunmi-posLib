@@ -3,15 +3,14 @@ package com.pagatodo.sunmi.poslib
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
+import com.pagatodo.sunmi.poslib.PosLib.Companion.TAG
 import com.pagatodo.sunmi.poslib.interfaces.AppEmvSelectListener
 import com.pagatodo.sunmi.poslib.interfaces.OnClickAcceptListener
 import com.pagatodo.sunmi.poslib.interfaces.SunmiTrxListener
 import com.pagatodo.sunmi.poslib.model.DataCard
 import com.pagatodo.sunmi.poslib.model.Results
-import com.pagatodo.sunmi.poslib.util.Constants
-import com.pagatodo.sunmi.poslib.util.PosResult
-import com.pagatodo.sunmi.poslib.util.VentaPCIUtils
-import com.pagatodo.sunmi.poslib.util.getPosResult
+import com.pagatodo.sunmi.poslib.util.*
+import com.sunmi.pay.hardware.aidl.AidlConstants
 import com.sunmi.pay.hardware.aidlv2.bean.PinPadConfigV2
 import com.sunmi.pay.hardware.aidlv2.pinpad.PinPadListenerV2
 import net.fullcarga.android.api.data.respuesta.OperacionSiguiente
@@ -27,6 +26,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
     private lateinit var dataCard: DataCard
     private val sunmiListener: SunmiTrxListener<*>
     private var requestTransaction: RespuestaTrxCierreTurno? = null
+    private var forceCheckCard: Int = -1
 
     init {
         if (owner is SunmiTrxListener<*>)
@@ -39,6 +39,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
 
     fun initTransaction() {
         setTerminalParams()
+        forceCheckCard = -1
         sunmiListener.onDialogRequestCard()
         super.startPayProcess()
     }
@@ -48,12 +49,12 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
         super.startPayProcess()
     }
 
-    fun getPin(){
+    fun getPin() {
         getPin(dataCard)
     }
 
     override fun goOnlineProcess(dataCard: DataCard) {
-        this.dataCard = dataCard
+        this.dataCard = dataCard.apply { PosLogger.d(TAG, this.toString()) }
         sunmiListener.onDismissRequestCard()
         sunmiListener.onDialogProcessOnline()
         sunmiListener.onPurchase(dataCard)
@@ -68,8 +69,11 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
                 sunmiListener.onSync(dataCard)
             }
             PosResult.ReplaceCard, PosResult.SeePhone, PosResult.CardNoSupported,
-            PosResult.CardDenial, PosResult.OtherInterface,
-            PosResult.NfcTerminated, PosResult.FallBack, PosResult.NextOperetion -> {
+            PosResult.CardDenial, PosResult.NfcTerminated, PosResult.FallBack, PosResult.NextOperetion -> {
+                sunmiListener.onFailure(result, listener = createAcceptListener(result.message))
+            }
+            PosResult.OtherInterface -> {
+                forceCheckCard = rfOffCheckCard
                 sunmiListener.onFailure(result, listener = createAcceptListener(result.message))
             }
             else -> sunmiListener.onFailure(result)
@@ -84,7 +88,12 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
             sunmiListener.onShowTicketDialog(null, requestTransaction as Respuesta, dataCard)
     }
 
-    override fun getCheckCardType() = sunmiListener.checkCardTypes()
+    override fun getCheckCardType(): Int {
+       return if (forceCheckCard == -1)
+            sunmiListener.checkCardTypes()
+        else
+            forceCheckCard
+    }
 
     override fun pinMustBeForced() = sunmiListener.pinMustBeForced()
 
@@ -100,7 +109,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
 
     override fun getTransactionData() = mTransactionData
 
-    private fun doNextOpr(operacionSiguiente: OperacionSiguiente, nextOprResult:PosResult) {
+    private fun doNextOpr(operacionSiguiente: OperacionSiguiente, nextOprResult: PosResult) {
         cancelProcessEmv()
         sunmiListener.doOperationNext(operacionSiguiente, nextOprResult)
     }
@@ -118,7 +127,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
                     if (it.data is RespuestaTrxCierreTurno) {
                         requestTransaction = it.data
                         if (it.data.isCorrecta) {
-                            if(validateNextOpr(it.data.operacionSiguiente)) {
+                            if (validateNextOpr(it.data.operacionSiguiente)) {
                                 val resultNexOpr = PosResult.NextOperetion
                                 resultNexOpr.message = it.data.campo60.first()
                                 doNextOpr(it.data.operacionSiguiente, resultNexOpr)
@@ -140,8 +149,8 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
             }
         }
 
-    private fun validateNextOpr(nxtOpr: OperacionSiguiente?):Boolean{
-       return nxtOpr?.let { it.procodIdNext > 0 } ?: false
+    private fun validateNextOpr(nxtOpr: OperacionSiguiente?): Boolean {
+        return nxtOpr?.let { it.procodIdNext > 0 } ?: false
     }
 
     fun cancelProcess() {
@@ -155,6 +164,9 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
     fun cancelProcessWithTvrError() {
         finishOnlineProcessStatus(tlvResponse = Constants.TlvResponses.Decline)
     }
+
+    private val rfOffCheckCard: Int
+        get() = AidlConstants.CardType.MAGNETIC.value or AidlConstants.CardType.IC.value
 
     private val syncObserver
         get() = Observer<Results<Any>> {

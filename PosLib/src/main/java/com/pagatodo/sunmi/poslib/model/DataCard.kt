@@ -16,9 +16,6 @@ class DataCard(
     var monthlyPayments: Int = 0,
     var daysDeferred: Int = 0
 ) : CardInfo() {
-    override fun toString(): String {
-        return "DataCard(tlvData='$tlvData', holderName='$holderName', pinBlock='$pinBlock') ${super.toString()}"
-    }
 
     val panEncrypt: ByteArray?
         get() {
@@ -72,5 +69,9 @@ class DataCard(
             string,
             Charset.defaultCharset()
         )
+    }
+
+    override fun toString(): String {
+        return "DataCard(tlvData='$tlvData', holderName='$holderName', pinBlock='$pinBlock', entryMode=$entryMode, monthlyPayments=$monthlyPayments, daysDeferred=$daysDeferred, ${super.toString()})"
     }
 }
