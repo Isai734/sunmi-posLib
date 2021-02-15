@@ -116,12 +116,11 @@ abstract class SunmiTransaction {
 
     private fun getDataCard(mapTags: Map<String, TLV?>): DataCard { //NOSONAR
         val dataCard = EmvUtil.parseTrack2(mapTags["57"]?.value)
-        dataCard.cardNo = mapTags[Constants.TagsEmv.ENC_PAN.tag]?.value ?: ""
+        dataCard.cardNo = if(dataCard.cardNo.isNullOrEmpty()) mapTags[Constants.TagsEmv.ENC_PAN.tag]?.value else dataCard.cardNo
         dataCard.track1 = mapTags[Constants.TagsEmv.ENC_TRACK_1.tag]?.value ?: ""
         dataCard.track2 = mapTags[Constants.TagsEmv.ENC_TRACK_2.tag]?.value ?: ""
         dataCard.track3 = mapTags[Constants.TagsEmv.ENC_TRACK_3.tag]?.value ?: ""
         dataCard.holderName = mapTags[Constants.TagsEmv.CARDHOLDER_NAME.tag]?.value ?: ""
-        dataCard.serviceCode = mapTags[Constants.TagsEmv.SERVICE_CODE.tag]?.value ?: ""
         dataCard.tlvData = getHexEmvTags(mapTags)
         dataCard.pinBlock = ByteUtil.bytes2HexStr(hexStrPin)
         dataCard.entryMode =
