@@ -118,11 +118,11 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
                     if (it.data is RespuestaTrxCierreTurno) {
                         requestTransaction = it.data
                         if (it.data.isCorrecta) {
-                            it.data.operacionSiguiente?.apply {
+                            if(validateNextOpr(it.data.operacionSiguiente)) {
                                 val resultNexOpr = PosResult.NextOperetion
                                 resultNexOpr.message = it.data.campo60.first()
-                                doNextOpr(this, resultNexOpr)
-                            } ?: run {
+                                doNextOpr(it.data.operacionSiguiente, resultNexOpr)
+                            } else {
                                 val tags = String(it.data.campoTagsEmv, Charset.defaultCharset()).trim()
                                 finishOnlineProcessStatus(tlvString = tags, tlvResponse = Constants.TlvResponses.Approved)
                             }
@@ -139,6 +139,10 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
                 }
             }
         }
+
+    private fun validateNextOpr(nxtOpr: OperacionSiguiente?):Boolean{
+       return nxtOpr?.let { it.procodIdNext > 0 } ?: false
+    }
 
     fun cancelProcess() {
         cancelProcessEmv()
