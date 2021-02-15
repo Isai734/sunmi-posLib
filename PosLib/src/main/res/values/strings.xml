@@ -8,7 +8,7 @@
     <string name="see_phone">Por Favor Siga las Instrucciones del Teléfono.</string>
     <string name="offline_declined">Transacción Declinada Fuera de Línea.</string>
     <string name="track2_error">Tarjeta No Soportada: Track2 Rechazado.</string>
-    <string name="chip_fallback">Error, No se Puede Leer el Chip.</string>
+    <string name="chip_fallback">Error, No se Puede Leer el Chip, Deslice la tajeta.</string>
     <string name="card_no_supported">Tarjeta no Compatible.</string>
     <string name="check_card">Error al Intentar Leer la Tarjeta.</string>
     <string name="select_app">Error al Seleccionar la Aplicación.</string>

@@ -8,6 +8,7 @@ enum class PosResult(var code: Int, var message: String) {
     OtherInterface(-4001, getMessage(R.string.other_interface)),
     SeePhone(-4003, getMessage(R.string.see_phone)),
     FallBack(-2800, getMessage(R.string.chip_fallback)),
+    FallBackCommonApp(-4107, getMessage(R.string.chip_fallback)),
     TransTerminate(-4002, getMessage(R.string.card_no_supported)),
     TransRefused(-4000, getMessage(R.string.trans_refused)),
     DoSyncOperation(-4115, getMessage(R.string.sync_operation)),

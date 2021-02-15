@@ -41,6 +41,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
         setTerminalParams()
         forceCheckCard = -1
         sunmiListener.onDialogRequestCard()
+        super.clearVars()
         super.startPayProcess()
     }
 
@@ -69,7 +70,12 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
                 sunmiListener.onSync(dataCard)
             }
             PosResult.ReplaceCard, PosResult.SeePhone, PosResult.CardNoSupported,
-            PosResult.CardDenial, PosResult.NfcTerminated, PosResult.FallBack, PosResult.NextOperetion -> {
+            PosResult.CardDenial, PosResult.NfcTerminated, PosResult.NextOperetion -> {
+                sunmiListener.onFailure(result, listener = createAcceptListener(result.message))
+            }
+            PosResult.FallBack, PosResult.FallBackCommonApp -> {
+                allowFallback = true
+                forceCheckCard = mcrOnlyCheckCard
                 sunmiListener.onFailure(result, listener = createAcceptListener(result.message))
             }
             PosResult.OtherInterface -> {
@@ -167,6 +173,9 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
 
     private val rfOffCheckCard: Int
         get() = AidlConstants.CardType.MAGNETIC.value or AidlConstants.CardType.IC.value
+
+    private val mcrOnlyCheckCard: Int
+        get() = AidlConstants.CardType.MAGNETIC.value
 
     private val syncObserver
         get() = Observer<Results<Any>> {

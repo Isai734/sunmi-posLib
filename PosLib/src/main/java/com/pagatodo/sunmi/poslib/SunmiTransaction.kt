@@ -43,7 +43,6 @@ abstract class SunmiTransaction {
     }
 
     fun startPayProcess() = try {
-        clearVars()
         val amount = setDecimalsAmount(getTransactionData().amount)
         posInstance().mEMVOptV2?.initEmvProcess()// Before check card, initialize emv process(clear all TLV)
         if (amount.toLong() > 0 || getTransactionData().transType == Constants.TransType.REFUND) {
@@ -383,7 +382,7 @@ abstract class SunmiTransaction {
             append(mapTags[tag]?.recoverToHexStr())
     }.toString()
 
-    private fun clearVars() {
+    protected fun clearVars() {
         mCardNo = ""
         allowFallback = false
         isRequestSignature = false
