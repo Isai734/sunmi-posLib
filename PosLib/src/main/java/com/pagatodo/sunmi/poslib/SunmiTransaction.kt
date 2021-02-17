@@ -531,7 +531,7 @@ abstract class SunmiTransaction {
                     }
                 }
                 AidlConstants.CardExistStatus.CARD_PRESENT -> {
-                    GlobalScope.launch(Dispatchers.Main) { onRemoveCard() }
+                    GlobalScope.launch(Dispatchers.Main) { onRemoveCard(dataCard) }
                     posInstance().mBasicOptV2?.buzzerOnDevice(1, 2750, 200, 0)
                     loopRemoveCard(dataCard)
                 }
@@ -565,5 +565,5 @@ abstract class SunmiTransaction {
 
     abstract fun getTransactionData(): TransactionData
 
-    abstract fun onRemoveCard()
+    abstract fun onRemoveCard(dataCard: DataCard?)
 }
