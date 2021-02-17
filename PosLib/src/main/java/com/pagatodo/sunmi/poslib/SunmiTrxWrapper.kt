@@ -55,9 +55,9 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
     }
 
     override fun goOnlineProcess(dataCard: DataCard) {
+        sunmiListener.onDialogProcessOnline()
         this.dataCard = dataCard.apply { PosLogger.d(TAG, this.toString()) }
         sunmiListener.onDismissRequestCard()
-        sunmiListener.onDialogProcessOnline()
         sunmiListener.onPurchase(dataCard)
     }
 
