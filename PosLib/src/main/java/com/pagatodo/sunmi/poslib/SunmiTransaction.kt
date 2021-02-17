@@ -531,7 +531,7 @@ abstract class SunmiTransaction {
                     }
                 }
                 AidlConstants.CardExistStatus.CARD_PRESENT -> {
-                    GlobalScope.launch(Dispatchers.Main) { onFailureTrx(PosResult.CardPresentWait) }
+                    GlobalScope.launch(Dispatchers.Main) { onRemoveCard() }
                     posInstance().mBasicOptV2?.buzzerOnDevice(1, 2750, 200, 0)
                     loopRemoveCard(dataCard)
                 }
@@ -564,4 +564,6 @@ abstract class SunmiTransaction {
     abstract fun onSelectEmvApp(listEmvApps: List<String>, applicationEmv: AppEmvSelectListener)
 
     abstract fun getTransactionData(): TransactionData
+
+    abstract fun onRemoveCard()
 }

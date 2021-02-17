@@ -29,4 +29,5 @@ interface SunmiTrxListener<E : Any> {
     fun doOperationNext(nextOperation: OperacionSiguiente, nextOprResult: PosResult)
     fun getVmodelPCI(): SunmiViewModel<E>
     fun showReading()
+    fun showRemoveCard()
 }

@@ -95,7 +95,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
     }
 
     override fun getCheckCardType(): Int {
-       return if (forceCheckCard == -1)
+        return if (forceCheckCard == -1)
             sunmiListener.checkCardTypes()
         else
             forceCheckCard
@@ -116,6 +116,8 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
     }
 
     override fun getTransactionData() = mTransactionData
+
+    override fun onRemoveCard() = sunmiListener.showRemoveCard()
 
     private fun doNextOpr(operacionSiguiente: OperacionSiguiente, nextOprResult: PosResult) {
         cancelProcessEmv()
@@ -140,8 +142,12 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
                                 resultNexOpr.message = it.data.campo60.first()
                                 doNextOpr(it.data.operacionSiguiente, resultNexOpr)
                             } else {
-                                val tags = String(it.data.campoTagsEmv, Charset.defaultCharset()).trim()
-                                finishOnlineProcessStatus(tlvString = tags, tlvResponse = Constants.TlvResponses.Approved)
+                                val tags =
+                                    String(it.data.campoTagsEmv, Charset.defaultCharset()).trim()
+                                finishOnlineProcessStatus(
+                                    tlvString = tags,
+                                    tlvResponse = Constants.TlvResponses.Approved
+                                )
                             }
                         } else finishOnlineProcessStatus(tlvResponse = Constants.TlvResponses.Decline)
                     } else finishOnlineProcessStatus(tlvResponse = Constants.TlvResponses.Approved)
@@ -152,7 +158,10 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
                         PosResult.DoSyncOperation.message
                     } else
                         it.exception.message
-                    finishOnlineProcessStatus(tlvResponse = Constants.TlvResponses.Decline, message = msgError)
+                    finishOnlineProcessStatus(
+                        tlvResponse = Constants.TlvResponses.Decline,
+                        message = msgError
+                    )
                 }
             }
         }
