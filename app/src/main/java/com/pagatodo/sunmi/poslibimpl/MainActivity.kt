@@ -172,4 +172,12 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
     override fun onShowZipDialog(dataCard: DataCard) {
         TODO("Not yet implemented")
     }
+
+    override fun showReading() {
+        TODO("Not yet implemented")
+    }
+
+    override fun showRemoveCard(dataCard: DataCard?) {
+        TODO("Not yet implemented")
+    }
 }
