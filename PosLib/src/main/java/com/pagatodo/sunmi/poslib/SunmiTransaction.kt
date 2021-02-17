@@ -115,7 +115,7 @@ abstract class SunmiTransaction {
 
     private fun getDataCard(mapTags: Map<String, TLV?>): DataCard { //NOSONAR
         val dataCard = EmvUtil.parseTrack2(mapTags["57"]?.value)
-        dataCard.cardNo = if(dataCard.cardNo.isNullOrEmpty()) mapTags[Constants.TagsEmv.ENC_PAN.tag]?.value else dataCard.cardNo
+        dataCard.cardNo = if (dataCard.cardNo.isNullOrEmpty()) mapTags[Constants.TagsEmv.ENC_PAN.tag]?.value else dataCard.cardNo
         dataCard.track1 = mapTags[Constants.TagsEmv.ENC_TRACK_1.tag]?.value ?: ""
         dataCard.track2 = mapTags[Constants.TagsEmv.ENC_TRACK_2.tag]?.value ?: ""
         dataCard.track3 = mapTags[Constants.TagsEmv.ENC_TRACK_3.tag]?.value ?: ""
@@ -169,8 +169,7 @@ abstract class SunmiTransaction {
             mCardType = AidlConstants.CardType.MAGNETIC
             try {
                 val dataCard = getDataCard(info)
-                dataCard.entryMode =
-                    if (allowFallback) DataOpTarjeta.PosEntryMode.FALLBACK else DataOpTarjeta.PosEntryMode.BANDA
+                dataCard.entryMode = if (allowFallback) DataOpTarjeta.PosEntryMode.FALLBACK else DataOpTarjeta.PosEntryMode.BANDA
                 if (EmvUtil.isChipCard(dataCard.serviceCode) && !allowFallback) { //Tarjeta por chip no fallback
                     GlobalScope.launch(Dispatchers.Main) { onFailureTrx(PosResult.CardDenial) }
                     cancelProcessEmv()
@@ -195,6 +194,7 @@ abstract class SunmiTransaction {
         override fun findRFCard(uuid: String) {
             PosLogger.e(PosLib.TAG, "uuid:: $uuid")
             mCardType = AidlConstants.CardType.NFC
+            readingCard()
             transactProcess()
         }
 
