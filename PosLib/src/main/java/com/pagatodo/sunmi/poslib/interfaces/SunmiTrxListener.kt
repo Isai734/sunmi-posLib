@@ -28,4 +28,5 @@ interface SunmiTrxListener<E : Any> {
     fun onPurchase(dataCard: DataCard)
     fun doOperationNext(nextOperation: OperacionSiguiente, nextOprResult: PosResult)
     fun getVmodelPCI(): SunmiViewModel<E>
+    fun showReading()
 }

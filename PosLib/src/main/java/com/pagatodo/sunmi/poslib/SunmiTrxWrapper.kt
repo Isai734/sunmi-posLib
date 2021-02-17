@@ -103,6 +103,8 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
 
     override fun pinMustBeForced() = sunmiListener.pinMustBeForced()
 
+    override fun readingCard() = sunmiListener.showReading()
+
     override fun onShowPinPad(pinPadListener: PinPadListenerV2.Stub, pinPadConfig: PinPadConfigV2) {
         sunmiListener.onDismissRequestCard()
         sunmiListener.onShowPinPadDialog(pinPadListener, pinPadConfig)

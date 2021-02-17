@@ -242,8 +242,7 @@ abstract class SunmiTransaction {
                     isUnion -> 0
                     isVisa -> 1
                     isMaster -> {// MasterCard(PayPass)
-                        val configId =
-                            if (getTransactionData().transType == Constants.TransType.REFUND)
+                        val configId = if (getTransactionData().transType == Constants.TransType.REFUND)
                                 DEVOLUCION
                             else
                                 appSelected.substring(0, 13)
@@ -287,7 +286,10 @@ abstract class SunmiTransaction {
             if (!isRequestPin && pinMustBeForced())
                 initPinPad(dataCard)
             else if (mCardType == AidlConstants.CardType.NFC)
-                checkAndRemoveCard(dataCard)
+                GlobalScope.launch(Dispatchers.Main) {
+                    delay(500L)
+                    checkAndRemoveCard(dataCard)
+                }
             else
                 GlobalScope.launch(Dispatchers.Main) { goOnlineProcess(dataCard) }
         }
@@ -541,7 +543,7 @@ abstract class SunmiTransaction {
     }
 
     private fun loopRemoveCard(dataCard: DataCard? = null) = GlobalScope.launch(Dispatchers.Main) {
-        delay(1000)
+        delay(500)
         checkAndRemoveCard(dataCard)
     }
 
@@ -554,6 +556,8 @@ abstract class SunmiTransaction {
     abstract fun getCheckCardType(): Int
 
     abstract fun pinMustBeForced(): Boolean
+
+    abstract fun readingCard()
 
     abstract fun onShowPinPad(pinPadListener: PinPadListenerV2.Stub, pinPadConfig: PinPadConfigV2)
 
