@@ -117,7 +117,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
 
     override fun getTransactionData() = mTransactionData
 
-    override fun onRemoveCard(dataCard: DataCard?) = sunmiListener.showRemoveCard(dataCard)
+    override fun onRemoveCard(dataCard: DataCard?) = sunmiListener.showRemoveCard(dataCard?: this.dataCard)
 
     private fun doNextOpr(operacionSiguiente: OperacionSiguiente, nextOprResult: PosResult) {
         cancelProcessEmv()
