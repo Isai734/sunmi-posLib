@@ -5,15 +5,16 @@ import com.pagatodo.sunmi.poslib.requireContext
 
 enum class PosResult(var code: Int, var message: String) {
     CardDenial(-33, getMessage(R.string.card_denial)),
-    OtherInterface(-4001, getMessage(R.string.other_interface)),
-    SeePhone(-4003, getMessage(R.string.see_phone)),
+    NfcTerminated(-2520, getMessage(R.string.error_card_no_supported)),
     FallBack(-2800, getMessage(R.string.chip_fallback)),
-    FallBackCommonApp(-4107, getMessage(R.string.chip_fallback)),
-    TransTerminate(-4002, getMessage(R.string.card_no_supported)),
     TransRefused(-4000, getMessage(R.string.trans_refused)),
+    OtherInterface(-4001, getMessage(R.string.other_interface)),
+    TransTerminate(-4002, getMessage(R.string.card_no_supported)),
+    SeePhone(-4003, getMessage(R.string.see_phone)),
+    NoCommonAppNfc(-4106, getMessage(R.string.common_app_nfc)),
+    FallBackCommonApp(-4107, getMessage(R.string.chip_fallback)),
     DoSyncOperation(-4115, getMessage(R.string.sync_operation)),
     CardNoSupported(-4125, getMessage(R.string.error_card_no_supported)),
-    NfcTerminated(-2520, getMessage(R.string.error_card_no_supported)),
 
     CardAbsentAproved(0, getMessage(R.string.transaction_approved)),
     OfflineDecline(2, getMessage(R.string.offline_declined)),

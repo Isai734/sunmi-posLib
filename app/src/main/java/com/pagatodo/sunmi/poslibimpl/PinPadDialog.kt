@@ -32,11 +32,6 @@ class PinPadDialog : DialogFragment() {
     private var passwordLength = 4
     private var customPinPadConfigV2: PinPadConfigV2? = null
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        //(context as AbstractActivity<*>).setOnFullView()
-    }
-
     fun setPinPadListenerV2(pinPadListenerV2: PinPadListenerV2.Stub) {
         this.pinPadListenerV2 = pinPadListenerV2
     }
