@@ -60,7 +60,11 @@ abstract class SunmiTransaction {
         initPinPad(dataCard)
     }
 
-    fun finishOnlineProcessStatus(tlvString: String? = null, tlvResponse: Constants.TlvResponses, message: String? = null) = try {//(CSU)Card Update Status
+    fun finishOnlineProcessStatus(
+        tlvString: String? = null,
+        tlvResponse: Constants.TlvResponses,
+        message: String? = null
+    ) = try {//(CSU)Card Update Status
         val tlvMap = TLVUtil.buildTLVMap(tlvString ?: tlvResponse.response)
         customMessage = message
         val tags = LinkedList<String>()
@@ -73,7 +77,12 @@ abstract class SunmiTransaction {
         }
 
         val out = ByteArray(1024)
-        val len = posInstance().mEMVOptV2?.importOnlineProcStatus(tlvResponse.status, tags.toTypedArray(), values.toTypedArray(), out)
+        val len = posInstance().mEMVOptV2?.importOnlineProcStatus(
+            tlvResponse.status,
+            tags.toTypedArray(),
+            values.toTypedArray(),
+            out
+        )
         PosLogger.e(PosLib.TAG, "card update status code::$len")
         len?.also {  //Validar si esto aplica para MTIP 2.60 Refund
             if ((it == PosResult.DoSyncOperation.code || it == PosResult.TransRefused.code) && tlvResponse.status == 0) {
@@ -116,14 +125,16 @@ abstract class SunmiTransaction {
 
     private fun getDataCard(mapTags: Map<String, TLV?>): DataCard { //NOSONAR
         val dataCard = EmvUtil.parseTrack2(mapTags["57"]?.value)
-        dataCard.cardNo = if (dataCard.cardNo.isNullOrEmpty()) mapTags[Constants.TagsEmv.ENC_PAN.tag]?.value else dataCard.cardNo
+        dataCard.cardNo =
+            if (dataCard.cardNo.isNullOrEmpty()) mapTags[Constants.TagsEmv.ENC_PAN.tag]?.value else dataCard.cardNo
         dataCard.track1 = mapTags[Constants.TagsEmv.ENC_TRACK_1.tag]?.value ?: ""
         dataCard.track2 = mapTags[Constants.TagsEmv.ENC_TRACK_2.tag]?.value ?: ""
         dataCard.track3 = mapTags[Constants.TagsEmv.ENC_TRACK_3.tag]?.value ?: ""
         dataCard.holderName = mapTags[Constants.TagsEmv.CARDHOLDER_NAME.tag]?.value ?: ""
         dataCard.tlvData = getHexEmvTags(mapTags)
         dataCard.pinBlock = ByteUtil.bytes2HexStr(hexStrPin)
-        dataCard.entryMode = if (mCardType == AidlConstants.CardType.NFC) DataOpTarjeta.PosEntryMode.CONTACLESS else DataOpTarjeta.PosEntryMode.CHIP
+        dataCard.entryMode =
+            if (mCardType == AidlConstants.CardType.NFC) DataOpTarjeta.PosEntryMode.CONTACLESS else DataOpTarjeta.PosEntryMode.CHIP
         dataCard.mapTags = emvTags
         return dataCard.apply { cardNo = Regex("[^0-9 ]").replace(cardNo, "") }
     }
@@ -169,7 +180,8 @@ abstract class SunmiTransaction {
             mCardType = AidlConstants.CardType.MAGNETIC
             try {
                 val dataCard = getDataCard(info)
-                dataCard.entryMode = if (allowFallback) DataOpTarjeta.PosEntryMode.FALLBACK else DataOpTarjeta.PosEntryMode.BANDA
+                dataCard.entryMode =
+                    if (allowFallback) DataOpTarjeta.PosEntryMode.FALLBACK else DataOpTarjeta.PosEntryMode.BANDA
                 if (EmvUtil.isChipCard(dataCard.serviceCode) && !allowFallback) { //Tarjeta por chip no fallback
                     GlobalScope.launch(Dispatchers.Main) { onFailureTrx(PosResult.CardDenial) }
                     cancelProcessEmv()
@@ -287,9 +299,7 @@ abstract class SunmiTransaction {
             if (!isRequestPin && pinMustBeForced())
                 initPinPad(dataCard)
             else if (mCardType == AidlConstants.CardType.NFC)
-                GlobalScope.launch(Dispatchers.Main) {
-                    checkAndRemoveCard(dataCard)
-                }
+                checkAndRemoveCard(dataCard)
             else
                 goOnlineProcess(dataCard)
         }
@@ -321,11 +331,18 @@ abstract class SunmiTransaction {
         @Throws(RemoteException::class)
         override fun onConfirmationCodeVerified() { //Only confirmation phone required
             val outData = ByteArray(512)
-            posInstance().mEMVOptV2?.getTlv(AidlConstants.EMV.TLVOpCode.OP_PAYPASS, "DF8129", outData)?.apply {
+            posInstance().mEMVOptV2?.getTlv(
+                AidlConstants.EMV.TLVOpCode.OP_PAYPASS,
+                "DF8129",
+                outData
+            )?.apply {
                 if (this > 0) {
                     val data = ByteArray(this)
                     System.arraycopy(outData, 0, data, 0, this)
-                    PosLogger.e(PosLib.TAG, "onRequestDataExchange DF8129:: ${ByteUtil.bytes2HexStr(data)}")
+                    PosLogger.e(
+                        PosLib.TAG,
+                        "onRequestDataExchange DF8129:: ${ByteUtil.bytes2HexStr(data)}"
+                    )
                 }
             }
             posInstance().mReadCardOptV2?.cardOff(mCardType.value) // card off
@@ -365,9 +382,45 @@ abstract class SunmiTransaction {
 
     private fun setPayPassConfig(configId: String) = try {// set PayPass(MasterCard) tlv data
         val posCfg = posInstance().posConfig.paypassConfig.getConfig(configId)
-        val tagsPayPass = arrayOf("DF8117", "DF8118", "DF8119", "DF811F", "DF811E", "DF812C", "DF8123", "DF8124", "DF8125", "DF8126", "DF811B", "DF811D", "DF8122", "DF8120", "DF8121")
-        val valuesPayPass = arrayOf("60", posCfg.cvmCapability, "08", "C8", "00", "00", posCfg.floorLimit, posCfg.termClssLmt, posCfg.termClssLmt, posCfg.cvmLmt, "B0", "02", posCfg.tACOnline, posCfg.tACDefault, posCfg.tACDenial)
-        posInstance().mEMVOptV2?.setTlvList(AidlConstants.EMV.TLVOpCode.OP_PAYPASS, tagsPayPass, valuesPayPass)
+        val tagsPayPass = arrayOf(
+            "DF8117",
+            "DF8118",
+            "DF8119",
+            "DF811F",
+            "DF811E",
+            "DF812C",
+            "DF8123",
+            "DF8124",
+            "DF8125",
+            "DF8126",
+            "DF811B",
+            "DF811D",
+            "DF8122",
+            "DF8120",
+            "DF8121"
+        )
+        val valuesPayPass = arrayOf(
+            "60",
+            posCfg.cvmCapability,
+            "08",
+            "C8",
+            "00",
+            "00",
+            posCfg.floorLimit,
+            posCfg.termClssLmt,
+            posCfg.termClssLmt,
+            posCfg.cvmLmt,
+            "B0",
+            "02",
+            posCfg.tACOnline,
+            posCfg.tACDefault,
+            posCfg.tACDenial
+        )
+        posInstance().mEMVOptV2?.setTlvList(
+            AidlConstants.EMV.TLVOpCode.OP_PAYPASS,
+            tagsPayPass,
+            valuesPayPass
+        )
     } catch (e: RemoteException) {
         PosLogger.e(PosLib.TAG, e.message)
     }
@@ -425,7 +478,11 @@ abstract class SunmiTransaction {
             } else {
                 AidlConstants.EMV.TLVOpCode.OP_NORMAL
             }
-            posInstance().mEMVOptV2?.getTlvList(AidlConstants.EMV.TLVOpCode.OP_NORMAL, tagList, outData)?.let {
+            posInstance().mEMVOptV2?.getTlvList(
+                AidlConstants.EMV.TLVOpCode.OP_NORMAL,
+                tagList,
+                outData
+            )?.let {
                 if (it > 0) {
                     val bytes = outData.copyOf(it)
                     val hexStr = ByteUtil.bytes2HexStr(bytes)
@@ -487,7 +544,7 @@ abstract class SunmiTransaction {
                                 if (mCardType == AidlConstants.CardType.NFC)
                                     checkAndRemoveCard(dataCard)
                                 else
-                                   goOnlineProcess(this@apply)
+                                    goOnlineProcess(this@apply)
                             } ?: posInstance().mEMVOptV2?.importPinInputStatus(mPinType, 0)
                         } ?: posInstance().mEMVOptV2?.importPinInputStatus(mPinType, 2)
 
