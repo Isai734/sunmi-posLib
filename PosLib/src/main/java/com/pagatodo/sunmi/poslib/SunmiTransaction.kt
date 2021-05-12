@@ -288,7 +288,6 @@ abstract class SunmiTransaction {
                 initPinPad(dataCard)
             else if (mCardType == AidlConstants.CardType.NFC)
                 GlobalScope.launch(Dispatchers.Main) {
-                    delay(500L)
                     checkAndRemoveCard(dataCard)
                 }
             else
