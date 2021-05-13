@@ -103,10 +103,6 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
             forceCheckCard
     }
 
-    override fun onSeePhone(outcomeMessage: String) {
-        resendTransaction(outcomeMessage)
-    }
-
     override fun pinMustBeForced() = sunmiListener.pinMustBeForced()
 
     override fun readingCard() = sunmiListener.showReading()

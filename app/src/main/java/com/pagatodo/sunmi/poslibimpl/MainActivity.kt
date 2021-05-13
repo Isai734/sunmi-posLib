@@ -139,7 +139,9 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
     }
 
     override fun onFailure(error: PosResult, listener: OnClickAcceptListener?) {
-        Toast.makeText(this, error.message, Toast.LENGTH_LONG).show()
+        GlobalScope.launch(Dispatchers.Main) {
+            Toast.makeText(this@MainActivity, error.message, Toast.LENGTH_LONG).show()
+        }
     }
 
     override fun onPurchase(dataCard: DataCard) {

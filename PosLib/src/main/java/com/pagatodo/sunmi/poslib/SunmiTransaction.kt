@@ -341,7 +341,7 @@ abstract class SunmiTransaction {
                 }
             }
             posInstance().mReadCardOptV2?.cardOff(mCardType.value) // card off
-            GlobalScope.launch(Dispatchers.Main) { onSeePhone(PosResult.SeePhone.message) }
+            onFailureTrx(PosResult.SeePhone)
         }
 
         @Throws(RemoteException::class)
@@ -575,8 +575,6 @@ abstract class SunmiTransaction {
     protected abstract fun goOnlineProcess(dataCard: DataCard)
 
     abstract fun onFailureTrx(result: PosResult)
-
-    abstract fun onSeePhone(outcomeMessage: String)
 
     abstract fun onApprovedTrx()
 
