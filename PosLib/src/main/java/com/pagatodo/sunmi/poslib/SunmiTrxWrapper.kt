@@ -104,7 +104,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
     }
 
     override fun onSeePhone(outcomeMessage: String) {
-        sunmiListener.onSeePhone(outcomeMessage)
+        resendTransaction(outcomeMessage)
     }
 
     override fun pinMustBeForced() = sunmiListener.pinMustBeForced()

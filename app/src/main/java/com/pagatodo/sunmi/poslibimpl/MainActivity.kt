@@ -74,12 +74,6 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         askForCard?.show()
     }
 
-    override fun onSeePhone(message: String) {
-        GlobalScope.launch(Dispatchers.Main) {
-            Toast.makeText(this@MainActivity, message, Toast.LENGTH_LONG).show()
-        }
-    }
-
     override fun onDismissRequestCard() {
         askForCard?.dismiss()
     }

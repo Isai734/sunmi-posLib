@@ -30,5 +30,4 @@ interface SunmiTrxListener<E : Any> {
     fun getVmodelPCI(): SunmiViewModel<E>
     fun showReading()
     fun showRemoveCard(dataCard: DataCard?)
-    fun onSeePhone(message: String)
 }
