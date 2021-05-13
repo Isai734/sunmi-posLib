@@ -10,19 +10,14 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProvider
 import com.pagatodo.sunmi.poslib.PosLib
 import com.pagatodo.sunmi.poslib.SunmiTrxWrapper
+import com.pagatodo.sunmi.poslib.config.PinPadConfigV3
 import com.pagatodo.sunmi.poslib.config.PosConfig
 import com.pagatodo.sunmi.poslib.interfaces.AppEmvSelectListener
 import com.pagatodo.sunmi.poslib.interfaces.OnClickAcceptListener
 import com.pagatodo.sunmi.poslib.interfaces.SunmiTrxListener
 import com.pagatodo.sunmi.poslib.model.*
-import com.pagatodo.sunmi.poslib.util.Constants
-import com.pagatodo.sunmi.poslib.util.EmvUtil
-import com.pagatodo.sunmi.poslib.util.PosLogger
-import com.pagatodo.sunmi.poslib.util.PosResult
-import com.pagatodo.sunmi.poslib.viewmodel.SunmiViewModel
-import com.pagatodo.sunmi.poslib.util.LoadFile
+import com.pagatodo.sunmi.poslib.util.*
 import com.sunmi.pay.hardware.aidl.AidlConstants
-import com.sunmi.pay.hardware.aidlv2.bean.PinPadConfigV2
 import com.sunmi.pay.hardware.aidlv2.pinpad.PinPadListenerV2
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
@@ -79,6 +74,12 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         askForCard?.show()
     }
 
+    override fun onSeePhone(message: String) {
+        GlobalScope.launch(Dispatchers.Main) {
+            Toast.makeText(this@MainActivity, message, Toast.LENGTH_LONG).show()
+        }
+    }
+
     override fun onDismissRequestCard() {
         askForCard?.dismiss()
     }
@@ -91,7 +92,7 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         if (dialogProgress.isAdded) dialogProgress.dismiss()
     }
 
-    override fun onShowSingDialog(responseTrx: Respuesta, dataCard: DataCard) {
+    override fun onShowSingDialog(responseTrx: Respuesta?, dataCard: DataCard) {
         Toast.makeText(this, "Mostrar dialogo de firma", Toast.LENGTH_LONG).show()
     }
 
@@ -117,11 +118,13 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         return AidlConstants.CardType.MAGNETIC.value or AidlConstants.CardType.IC.value or AidlConstants.CardType.NFC.value
     }
 
-    override fun onShowTicketDialog(singBytes: ByteArray?, responseTrx: Respuesta, dataCard: DataCard) {
-        Toast.makeText(this, "Mostrar dialogo de ticket", Toast.LENGTH_LONG).show()
+    override fun onShowTicketDialog(singBytes: ByteArray?, responseTrx: Respuesta?, dataCard: DataCard) {
+        GlobalScope.launch(Dispatchers.Main) {
+            Toast.makeText(this@MainActivity, "Mostrar dialogo de ticket", Toast.LENGTH_LONG).show()
+        }
     }
 
-    override fun onShowPinPadDialog(pinPadListener: PinPadListenerV2.Stub, pinPadConfig: PinPadConfigV2) {
+    override fun onShowPinPadDialog(pinPadListener: PinPadListenerV2.Stub, pinPadConfig: PinPadConfigV3) {
         val pinPadDialog = PinPadDialog.createInstance(pinPadConfig)
         pinPadDialog.setPasswordLength(6)
         pinPadDialog.setTextAccept("Aceptar")
@@ -134,7 +137,7 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
     }
 
     override fun onShowSelectApp(listEmvApps: List<String>, applicationEmv: AppEmvSelectListener) {
-        TODO("Not yet implemented")
+        applicationEmv.onAppEmvSelected(0)
     }
 
     override fun onSync(dataCard: DataCard) {
@@ -174,10 +177,14 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
     }
 
     override fun showReading() {
-        TODO("Not yet implemented")
+        GlobalScope.launch(Dispatchers.Main) {
+            Toast.makeText(this@MainActivity, "Leyendo tarjeta", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun showRemoveCard(dataCard: DataCard?) {
-        TODO("Not yet implemented")
+        GlobalScope.launch(Dispatchers.Main) {
+            Toast.makeText(this@MainActivity, "Por favor retire la tarjeta.", Toast.LENGTH_SHORT).show()
+        }
     }
 }

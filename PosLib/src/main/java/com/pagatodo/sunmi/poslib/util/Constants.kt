@@ -21,8 +21,6 @@ object Constants {
     const val MAESTRO = "A000000004306"
 
     //Pin types
-    const val PIN_OFFLINE = 1
-    const val PIN_ONLINE = 0
 
     //AidTypes
     const val contact = "01"
@@ -57,4 +55,9 @@ object Constants {
         Decline("8A023035", 2),
         Approved("8A023030", 0),
     }
+}
+
+enum class PinTypes(val pinValue: Int){
+    PIN_OFFLINE(1),
+    PIN_ONLINE(0)
 }

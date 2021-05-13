@@ -12,11 +12,15 @@
     <string name="common_app_nfc">Inserte, Deslice o Pruebe con Otra Tajeta.</string>
     <string name="card_no_supported">Tarjeta no Compatible.</string>
     <string name="check_card">Error al Intentar Leer la Tarjeta.</string>
+    <string name="repeat_call">Ya se ha iniciado un proceso de lectura.</string>
     <string name="select_app">Error al Seleccionar la Aplicación.</string>
     <string name="generic">Error Generico.</string>
     <string name="cancel_operation">Operación Cancelada.</string>
     <string name="trans_refused">Transacción Declinada.</string>
     <string name="sync_operation">Cancelando la Operación.</string>
+    <string name="magnetic_mode_not_support">Operación Denegada.</string>
+    <string name="empty_pin">Por favor escriba su numero secreto.</string>
+    <string name="secret_wrong">No. Secreto Erróneo</string>
     <string name="sync_operation_failed">Verifica la Conexión.</string>
     <string name="sync_operation_success">Se canceló la operación.</string>
     <string name="error_check_present_card">Error al Validar la Tarjeta Presente.</string>

@@ -1,6 +1,5 @@
 package com.pagatodo.sunmi.poslibimpl
 
-import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
 import android.os.RemoteException
@@ -11,6 +10,7 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import androidx.annotation.Nullable
 import androidx.fragment.app.DialogFragment
+import com.pagatodo.sunmi.poslib.config.PinPadConfigV3
 import com.pagatodo.sunmi.poslib.posInstance
 import com.sunmi.pay.hardware.aidlv2.bean.PinPadConfigV2
 import com.sunmi.pay.hardware.aidlv2.bean.PinPadDataV2
@@ -30,7 +30,7 @@ class PinPadDialog : DialogFragment() {
     private var textAccept = "Aceptar"
     private var textCancel = "Cerrar"
     private var passwordLength = 4
-    private var customPinPadConfigV2: PinPadConfigV2? = null
+    private var customPinPadConfigV2: PinPadConfigV3? = null
 
     fun setPinPadListenerV2(pinPadListenerV2: PinPadListenerV2.Stub) {
         this.pinPadListenerV2 = pinPadListenerV2
@@ -47,12 +47,13 @@ class PinPadDialog : DialogFragment() {
 
         btnPinPadAccept.text = textAccept
         btnPinPadCancel.text = textCancel
+
         initView()
     }
 
     private fun initView() {
         val mIntent = arguments
-        customPinPadConfigV2 = mIntent?.getSerializable("PinPadConfigV2") as PinPadConfigV2
+        customPinPadConfigV2 = mIntent?.getSerializable("PinPadConfigV2") as PinPadConfigV3
         initPinPad()
     }
 
@@ -107,6 +108,10 @@ class PinPadDialog : DialogFragment() {
             fixPasswordKeyboard.keepScreenOn = true
             fixPasswordKeyboard.setKeyBoard(result)
             fixPasswordKeyboard.visibility = View.VISIBLE
+            customPinPadConfigV2?.informError?.apply {
+                pinError.visibility = View.VISIBLE
+                pinError.text = this
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -203,7 +208,7 @@ class PinPadDialog : DialogFragment() {
 
     companion object {
         val TAG: String = PinPadDialog::class.java.simpleName
-        fun createInstance(padConfigV2: PinPadConfigV2): PinPadDialog {
+        fun createInstance(padConfigV2: PinPadConfigV3): PinPadDialog {
             val args = Bundle()
             val pinPadDialog = PinPadDialog()
             args.putSerializable("PinPadConfigV2", padConfigV2)

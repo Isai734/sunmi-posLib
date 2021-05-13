@@ -5,6 +5,7 @@ import com.pagatodo.sunmi.poslib.requireContext
 
 enum class PosResult(var code: Int, var message: String) {
     CardDenial(-33, getMessage(R.string.card_denial)),
+    ErrorRepeatCall(-20001, getMessage(R.string.repeat_call)),
     NfcTerminated(-2520, getMessage(R.string.error_card_no_supported)),
     FallBack(-2800, getMessage(R.string.chip_fallback)),
     TransRefused(-4000, getMessage(R.string.trans_refused)),
@@ -14,6 +15,7 @@ enum class PosResult(var code: Int, var message: String) {
     NoCommonAppNfc(-4106, getMessage(R.string.common_app_nfc)),
     FallBackCommonApp(-4107, getMessage(R.string.chip_fallback)),
     DoSyncOperation(-4115, getMessage(R.string.sync_operation)),
+    NoMagneticMode(-4122, getMessage(R.string.magnetic_mode_not_support)),
     CardNoSupported(-4125, getMessage(R.string.error_card_no_supported)),
 
     CardAbsentAproved(0, getMessage(R.string.transaction_approved)),
@@ -28,6 +30,8 @@ enum class PosResult(var code: Int, var message: String) {
     SyncOperationFailed(11, getMessage(R.string.sync_operation_failed)),
     SyncOperationSuccess(12, getMessage(R.string.sync_operation_success)),
     NextOperetion(13, getMessage(R.string.sync_operation)),
+    ErrorEmptyPin(14, getMessage(R.string.empty_pin)),
+    NoSecretWrong(15, getMessage(R.string.secret_wrong)),
     Generic(100, getMessage(R.string.generic));
 }
 

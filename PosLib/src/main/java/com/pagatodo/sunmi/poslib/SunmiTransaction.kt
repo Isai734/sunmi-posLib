@@ -3,13 +3,13 @@ package com.pagatodo.sunmi.poslib
 import android.os.Bundle
 import android.os.RemoteException
 import android.text.TextUtils
+import com.pagatodo.sunmi.poslib.config.PinPadConfigV3
 import com.pagatodo.sunmi.poslib.interfaces.AppEmvSelectListener
 import com.pagatodo.sunmi.poslib.model.*
 import com.pagatodo.sunmi.poslib.util.*
 import com.pagatodo.sunmi.poslib.util.Constants.DEVOLUCION
 import com.sunmi.pay.hardware.aidl.AidlConstants
 import com.sunmi.pay.hardware.aidlv2.bean.EMVCandidateV2
-import com.sunmi.pay.hardware.aidlv2.bean.PinPadConfigV2
 import com.sunmi.pay.hardware.aidlv2.emv.EMVListenerV2
 import com.sunmi.pay.hardware.aidlv2.pinpad.PinPadListenerV2
 import com.sunmi.pay.hardware.aidlv2.readcard.CheckCardCallbackV2
@@ -60,11 +60,7 @@ abstract class SunmiTransaction {
         initPinPad(dataCard)
     }
 
-    fun finishOnlineProcessStatus(
-        tlvString: String? = null,
-        tlvResponse: Constants.TlvResponses,
-        message: String? = null
-    ) = try {//(CSU)Card Update Status
+    fun finishOnlineProcessStatus(tlvString: String? = null, tlvResponse: Constants.TlvResponses, message: String? = null) = try {//(CSU)Card Update Status
         val tlvMap = TLVUtil.buildTLVMap(tlvString ?: tlvResponse.response)
         customMessage = message
         val tags = LinkedList<String>()
@@ -278,10 +274,13 @@ abstract class SunmiTransaction {
 
         @Throws(RemoteException::class)
         override fun onRequestShowPinPad(pinType: Int, remainTime: Int) {
-            PosLogger.e(PosLib.TAG, "pinType::$pinType")
+            PosLogger.e(PosLib.TAG, "pinType::$pinType, remainTime::$remainTime")
             mPinType = pinType
             isRequestPin = true
-            initPinPad()
+            if(remainTime == -1)
+                initPinPad()
+            else
+                initPinPad(messageError = PosResult.NoSecretWrong.message + ", 3 Intento(s) Restante(s).")
         }
 
         @Throws(RemoteException::class)
@@ -293,6 +292,7 @@ abstract class SunmiTransaction {
 
         @Throws(RemoteException::class)
         override fun onOnlineProc() {
+            PosLogger.e(PosLib.TAG, "::")
             val mapTags = tlvData
             emvTags = tagsTlvToTagsString(mapTags)
             val dataCard = getDataCard(mapTags)
@@ -331,22 +331,17 @@ abstract class SunmiTransaction {
         @Throws(RemoteException::class)
         override fun onConfirmationCodeVerified() { //Only confirmation phone required
             val outData = ByteArray(512)
-            posInstance().mEMVOptV2?.getTlv(
-                AidlConstants.EMV.TLVOpCode.OP_PAYPASS,
-                "DF8129",
-                outData
-            )?.apply {
+            var strOutcomeMessage = ""
+            posInstance().mEMVOptV2?.getTlv(AidlConstants.EMV.TLVOpCode.OP_PAYPASS, "DF8129", outData)?.apply {
                 if (this > 0) {
                     val data = ByteArray(this)
                     System.arraycopy(outData, 0, data, 0, this)
-                    PosLogger.e(
-                        PosLib.TAG,
-                        "onRequestDataExchange DF8129:: ${ByteUtil.bytes2HexStr(data)}"
-                    )
+                    strOutcomeMessage = ByteUtil.bytes2HexStr(data)
+                    PosLogger.e(PosLib.TAG, "onRequestDataExchange DF8129:: $strOutcomeMessage")
                 }
             }
             posInstance().mReadCardOptV2?.cardOff(mCardType.value) // card off
-            GlobalScope.launch(Dispatchers.Main) { onFailureTrx(PosResult.SeePhone) }
+            GlobalScope.launch(Dispatchers.Main) { onSeePhone(PosResult.SeePhone.message) }
         }
 
         @Throws(RemoteException::class)
@@ -382,40 +377,8 @@ abstract class SunmiTransaction {
 
     private fun setPayPassConfig(configId: String) = try {// set PayPass(MasterCard) tlv data
         val posCfg = posInstance().posConfig.paypassConfig.getConfig(configId)
-        val tagsPayPass = arrayOf(
-            "DF8117",
-            "DF8118",
-            "DF8119",
-            "DF811F",
-            "DF811E",
-            "DF812C",
-            "DF8123",
-            "DF8124",
-            "DF8125",
-            "DF8126",
-            "DF811B",
-            "DF811D",
-            "DF8122",
-            "DF8120",
-            "DF8121"
-        )
-        val valuesPayPass = arrayOf(
-            "60",
-            posCfg.cvmCapability,
-            "08",
-            "C8",
-            "00",
-            "00",
-            posCfg.floorLimit,
-            posCfg.termClssLmt,
-            posCfg.termClssLmt,
-            posCfg.cvmLmt,
-            "B0",
-            "02",
-            posCfg.tACOnline,
-            posCfg.tACDefault,
-            posCfg.tACDenial
-        )
+        val tagsPayPass = arrayOf("DF8117", "DF8118", "DF8119", "DF811F", "DF811E", "DF812C", "DF8123", "DF8124", "DF8125", "DF8126", "DF811B", "DF811D", "DF8122", "DF8120", "DF8121")
+        val valuesPayPass = arrayOf("60", posCfg.cvmCapability, "08", "C8", "00", "00", posCfg.floorLimit, posCfg.termClssLmt, posCfg.termClssLmt, posCfg.cvmLmt, "B0", "02", posCfg.tACOnline, posCfg.tACDefault, posCfg.tACDenial)
         posInstance().mEMVOptV2?.setTlvList(
             AidlConstants.EMV.TLVOpCode.OP_PAYPASS,
             tagsPayPass,
@@ -478,11 +441,7 @@ abstract class SunmiTransaction {
             } else {
                 AidlConstants.EMV.TLVOpCode.OP_NORMAL
             }
-            posInstance().mEMVOptV2?.getTlvList(
-                AidlConstants.EMV.TLVOpCode.OP_NORMAL,
-                tagList,
-                outData
-            )?.let {
+            posInstance().mEMVOptV2?.getTlvList(AidlConstants.EMV.TLVOpCode.OP_NORMAL, tagList, outData)?.let {
                 if (it > 0) {
                     val bytes = outData.copyOf(it)
                     val hexStr = ByteUtil.bytes2HexStr(bytes)
@@ -514,12 +473,11 @@ abstract class SunmiTransaction {
         it
     }
 
-    private fun initPinPad(dataCard: DataCard? = null) {//dataCard must be different null for a manual pin
+    private fun initPinPad(dataCard: DataCard? = null, messageError: String? = null) {//dataCard must be different null for a manual pin
         try {
-            val panBytes = mCardNo.substring(mCardNo.length - 13, mCardNo.length - 1)
-                .toByteArray(charset("US-ASCII"))
-            val pinPadConfig = PinPadConfigV2()
-            pinPadConfig.pinPadType = 1
+            val pinPadConfig = PinPadConfigV3()
+            val panBytes = mCardNo.substring(mCardNo.length - 13, mCardNo.length - 1).toByteArray(charset("US-ASCII"))
+            pinPadConfig.pinPadType = 1 //0: Default 1:Custom
             pinPadConfig.pinType = mPinType
             pinPadConfig.isOrderNumKey = true
             pinPadConfig.pan = panBytes
@@ -529,25 +487,28 @@ abstract class SunmiTransaction {
             pinPadConfig.minInput = 4
             pinPadConfig.keySystem = 0
             pinPadConfig.algorithmType = 0
+            pinPadConfig.informError = messageError
 
             onShowPinPad(object : PinPadListenerV2.Stub() {
                 override fun onPinLength(len: Int) {
-                    //Length pin
+                    //Empty method
                 }
 
                 override fun onConfirm(i: Int, pinBlock: ByteArray?) {
+                    PosLogger.e(PosLib.TAG, "i:: $i pinBlock:: $pinBlock")
                     try {
                         pinBlock?.also {
                             hexStrPin = pinBlock
                             dataCard?.apply {
-                                this.pinBlock = ByteUtil.bytes2HexStr(hexStrPin)
+                                this.pinBlock = if(mPinType == PinTypes.PIN_ONLINE.pinValue) ByteUtil.bytes2HexStr(hexStrPin) else null
                                 if (mCardType == AidlConstants.CardType.NFC)
                                     checkAndRemoveCard(dataCard)
                                 else
                                     goOnlineProcess(this@apply)
                             } ?: posInstance().mEMVOptV2?.importPinInputStatus(mPinType, 0)
-                        } ?: posInstance().mEMVOptV2?.importPinInputStatus(mPinType, 2)
-
+                        } ?: run {
+                            initPinPad(dataCard, PosResult.ErrorEmptyPin.message)
+                        }
                     } catch (exe: RemoteException) {
                         PosLogger.e(PosLib.TAG, exe.message)
                         cancelOperationWithMessage()
@@ -615,6 +576,8 @@ abstract class SunmiTransaction {
 
     abstract fun onFailureTrx(result: PosResult)
 
+    abstract fun onSeePhone(outcomeMessage: String)
+
     abstract fun onApprovedTrx()
 
     abstract fun getCheckCardType(): Int
@@ -623,7 +586,7 @@ abstract class SunmiTransaction {
 
     abstract fun readingCard()
 
-    abstract fun onShowPinPad(pinPadListener: PinPadListenerV2.Stub, pinPadConfig: PinPadConfigV2)
+    abstract fun onShowPinPad(pinPadListener: PinPadListenerV2.Stub, pinPadConfig: PinPadConfigV3)
 
     abstract fun onSelectEmvApp(listEmvApps: List<String>, applicationEmv: AppEmvSelectListener)
 

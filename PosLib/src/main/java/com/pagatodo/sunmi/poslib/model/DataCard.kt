@@ -7,15 +7,7 @@ import net.fullcarga.android.api.data.DataOpTarjeta
 import net.fullcarga.android.api.util.HexUtil
 import java.nio.charset.Charset
 
-class DataCard(
-    var tlvData: String = "",
-    var holderName: String = "",
-    var pinBlock: String = "",
-    var entryMode: DataOpTarjeta.PosEntryMode? = null,
-    var mapTags: Map<String, String> = HashMap(),
-    var monthlyPayments: Int = 0,
-    var daysDeferred: Int = 0
-) : CardInfo() {
+class DataCard(var tlvData: String = "", var holderName: String = "", var pinBlock: String? = null, var entryMode: DataOpTarjeta.PosEntryMode? = null, var mapTags: Map<String, String> = HashMap(), var monthlyPayments: Int = 0, var daysDeferred: Int = 0) : CardInfo() {
 
     val panEncrypt: ByteArray?
         get() {
@@ -58,17 +50,14 @@ class DataCard(
 
     val pinEncrypt: ByteArray?
         get() {
-            return HexUtil.hex2byte(pinBlock, Charset.defaultCharset())
+            return pinBlock?.let { HexUtil.hex2byte(pinBlock, Charset.defaultCharset()) }
         }
 
-    private fun stringToByteArray(
-        string: String,
-        entryMode: DataOpTarjeta.PosEntryMode
-    ): ByteArray {
-        return if (entryMode == DataOpTarjeta.PosEntryMode.BANDA) string.toByteArray(Charsets.ISO_8859_1) else HexUtil.hex2byte(
-            string,
-            Charset.defaultCharset()
-        )
+    private fun stringToByteArray(string: String, entryMode: DataOpTarjeta.PosEntryMode): ByteArray {
+        return if (entryMode == DataOpTarjeta.PosEntryMode.BANDA || entryMode == DataOpTarjeta.PosEntryMode.FALLBACK)
+            string.toByteArray(Charsets.ISO_8859_1)
+        else
+            HexUtil.hex2byte(string, Charset.defaultCharset())
     }
 
     override fun toString(): String {

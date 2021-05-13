@@ -4,6 +4,7 @@ import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import com.pagatodo.sunmi.poslib.PosLib.Companion.TAG
+import com.pagatodo.sunmi.poslib.config.PinPadConfigV3
 import com.pagatodo.sunmi.poslib.interfaces.AppEmvSelectListener
 import com.pagatodo.sunmi.poslib.interfaces.OnClickAcceptListener
 import com.pagatodo.sunmi.poslib.interfaces.SunmiTrxListener
@@ -11,10 +12,8 @@ import com.pagatodo.sunmi.poslib.model.DataCard
 import com.pagatodo.sunmi.poslib.model.Results
 import com.pagatodo.sunmi.poslib.util.*
 import com.sunmi.pay.hardware.aidl.AidlConstants
-import com.sunmi.pay.hardware.aidlv2.bean.PinPadConfigV2
 import com.sunmi.pay.hardware.aidlv2.pinpad.PinPadListenerV2
 import net.fullcarga.android.api.data.respuesta.OperacionSiguiente
-import net.fullcarga.android.api.data.respuesta.Respuesta
 import net.fullcarga.android.api.data.respuesta.RespuestaTrxCierreTurno
 import net.fullcarga.android.api.exc.SincronizacionRequeridaException
 import java.nio.charset.Charset
@@ -82,6 +81,9 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
                 forceCheckCard = rfOffCheckCard
                 sunmiListener.onFailure(result, listener = createAcceptListener(result.message))
             }
+            PosResult.ErrorRepeatCall -> {
+                sunmiListener.onDialogRequestCard()
+            }
             else -> sunmiListener.onFailure(result)
         }
     }
@@ -89,9 +91,9 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
     override fun onApprovedTrx() {
         sunmiListener.onDismissRequestOnline()
         if (isRequestSignature || VentaPCIUtils.emvRequestSignature(dataCard.tlvData))
-            sunmiListener.onShowSingDialog(requestTransaction as Respuesta, dataCard)
+            sunmiListener.onShowSingDialog(requestTransaction, dataCard)
         else
-            sunmiListener.onShowTicketDialog(null, requestTransaction as Respuesta, dataCard)
+            sunmiListener.onShowTicketDialog(null, requestTransaction, dataCard)
     }
 
     override fun getCheckCardType(): Int {
@@ -101,11 +103,15 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
             forceCheckCard
     }
 
+    override fun onSeePhone(outcomeMessage: String) {
+        sunmiListener.onSeePhone(outcomeMessage)
+    }
+
     override fun pinMustBeForced() = sunmiListener.pinMustBeForced()
 
     override fun readingCard() = sunmiListener.showReading()
 
-    override fun onShowPinPad(pinPadListener: PinPadListenerV2.Stub, pinPadConfig: PinPadConfigV2) {
+    override fun onShowPinPad(pinPadListener: PinPadListenerV2.Stub, pinPadConfig: PinPadConfigV3) {
         sunmiListener.onDismissRequestCard()
         sunmiListener.onShowPinPadDialog(pinPadListener, pinPadConfig)
     }
@@ -142,12 +148,8 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
                                 resultNexOpr.message = it.data.campo60.first()
                                 doNextOpr(it.data.operacionSiguiente, resultNexOpr)
                             } else {
-                                val tags =
-                                    String(it.data.campoTagsEmv, Charset.defaultCharset()).trim()
-                                finishOnlineProcessStatus(
-                                    tlvString = tags,
-                                    tlvResponse = Constants.TlvResponses.Approved
-                                )
+                                val tags = String(it.data.campoTagsEmv, Charset.defaultCharset()).trim()
+                                finishOnlineProcessStatus(tlvString = tags, tlvResponse = Constants.TlvResponses.Approved)
                             }
                         } else finishOnlineProcessStatus(tlvResponse = Constants.TlvResponses.Decline)
                     } else finishOnlineProcessStatus(tlvResponse = Constants.TlvResponses.Approved)
@@ -158,10 +160,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
                         PosResult.DoSyncOperation.message
                     } else
                         it.exception.message
-                    finishOnlineProcessStatus(
-                        tlvResponse = Constants.TlvResponses.Decline,
-                        message = msgError
-                    )
+                    finishOnlineProcessStatus(tlvResponse = Constants.TlvResponses.Decline, message = msgError)
                 }
             }
         }
