@@ -320,7 +320,7 @@ abstract class SunmiTransaction {
                 onOnlineProc()
             } else if (code == PosResult.CardAbsentAproved.code)
                 checkAndRemoveCard()
-            else GlobalScope.launch(Dispatchers.Main) {
+            else{
                 customMessage?.apply {
                     if (this != PosResult.DoSyncOperation.message)
                         onFailureTrx(getPosResult(code, this))
@@ -556,7 +556,7 @@ abstract class SunmiTransaction {
                     } ?: run { onApprovedTrx() }
                 }
                 AidlConstants.CardExistStatus.CARD_PRESENT -> {
-                    GlobalScope.launch(Dispatchers.Main) { onRemoveCard(dataCard) }
+                    onRemoveCard(dataCard)
                     posInstance().mBasicOptV2?.buzzerOnDevice(1, 2750, 200, 0)
                     loopRemoveCard(dataCard)
                 }
@@ -567,7 +567,7 @@ abstract class SunmiTransaction {
         }
     }
 
-    private fun loopRemoveCard(dataCard: DataCard? = null) = GlobalScope.launch(Dispatchers.Main) {
+    private fun loopRemoveCard(dataCard: DataCard? = null) = GlobalScope.launch(Dispatchers.IO) {
         delay(500)
         checkAndRemoveCard(dataCard)
     }
