@@ -128,7 +128,7 @@ abstract class SunmiTransaction {
         dataCard.track3 = mapTags[Constants.TagsEmv.ENC_TRACK_3.tag]?.value ?: ""
         dataCard.holderName = mapTags[Constants.TagsEmv.CARDHOLDER_NAME.tag]?.value ?: ""
         dataCard.tlvData = getHexEmvTags(mapTags)
-        dataCard.pinBlock = ByteUtil.bytes2HexStr(hexStrPin)
+        dataCard.pinBlock = if(mPinType == PinTypes.PIN_ONLINE.pinValue) ByteUtil.bytes2HexStr(hexStrPin) else null
         dataCard.entryMode =
             if (mCardType == AidlConstants.CardType.NFC) DataOpTarjeta.PosEntryMode.CONTACLESS else DataOpTarjeta.PosEntryMode.CHIP
         dataCard.mapTags = emvTags
@@ -156,7 +156,7 @@ abstract class SunmiTransaction {
             this.track3 = track3
             this.holderName = cardHolderName
             this.serviceCode = serviceCode
-            this.pinBlock = ByteUtil.bytes2HexStr(hexStrPin)
+            this.pinBlock = if(mPinType == PinTypes.PIN_ONLINE.pinValue) ByteUtil.bytes2HexStr(hexStrPin) else null
             this.expireDate = name.substring(name.indexOf("^")).substring(1, 5)
             PosLogger.e(PosLib.TAG, toString())
         }
