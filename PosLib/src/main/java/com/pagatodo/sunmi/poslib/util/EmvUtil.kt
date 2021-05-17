@@ -129,7 +129,7 @@ object EmvUtil {
 
     fun setDlr(emvOptV2: EMVOptV2) {//Load application aids
         val bundle = Bundle().apply {
-            this.putBoolean("supportDRL", true)
+            this.putBoolean("supportDRL", posInstance().posConfig.drls.isNotEmpty())
         }
         emvOptV2.deleteDrlLimitSet(null)
         emvOptV2.setTermParamEx(bundle)
