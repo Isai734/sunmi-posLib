@@ -73,9 +73,11 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
                 sunmiListener.onFailure(result, listener = createAcceptListener(result.message))
             }
             PosResult.FallBack, PosResult.FallBackCommonApp -> {
-                allowFallback = true
-                forceCheckCard = mcrOnlyCheckCard
-                sunmiListener.onFailure(result, listener = createAcceptListener(result.message))
+                if(sunmiListener.isPossibleFallback()) {
+                    allowFallback = true
+                    forceCheckCard = mcrOnlyCheckCard
+                    sunmiListener.onFailure(result, listener = createAcceptListener(result.message))
+                } else  sunmiListener.onFailure(PosResult.ErrorCheckCard)
             }
             PosResult.OtherInterface -> {
                 forceCheckCard = rfOffCheckCard

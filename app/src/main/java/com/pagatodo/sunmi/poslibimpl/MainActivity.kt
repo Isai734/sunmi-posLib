@@ -183,4 +183,6 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
             Toast.makeText(this@MainActivity, "Por favor retire la tarjeta.", Toast.LENGTH_SHORT).show()
         }
     }
+
+    override fun isPossibleFallback(): Boolean = false
 }

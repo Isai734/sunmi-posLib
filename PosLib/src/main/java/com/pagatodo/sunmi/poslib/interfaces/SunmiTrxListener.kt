@@ -17,6 +17,7 @@ interface SunmiTrxListener<E : Any> {
     fun onShowSingDialog(responseTrx: Respuesta?, dataCard: DataCard)
     fun createTransactionData(): TransactionData
     fun pinMustBeForced(): Boolean
+    fun isPossibleFallback(): Boolean
     fun checkCardTypes(): Int
     fun onShowTicketDialog(singBytes: ByteArray?, responseTrx: Respuesta?, dataCard: DataCard)
     fun onShowDniDialog(dataCard: DataCard)
