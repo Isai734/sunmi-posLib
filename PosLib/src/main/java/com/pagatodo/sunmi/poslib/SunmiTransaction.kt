@@ -298,8 +298,8 @@ abstract class SunmiTransaction {
             val dataCard = getDataCard(mapTags)
             if (!isRequestPin && pinMustBeForced())
                 initPinPad(dataCard)
-            else if (mCardType == AidlConstants.CardType.NFC)
-                checkAndRemoveRfCard(dataCard)
+            /*else if (mCardType == AidlConstants.CardType.NFC)
+                checkAndRemoveRfCard(dataCard)*/
             else
                 goOnlineProcess(dataCard)
         }
@@ -501,9 +501,9 @@ abstract class SunmiTransaction {
                             hexStrPin = pinBlock
                             dataCard?.apply {
                                 this.pinBlock = if(mPinType == PinTypes.PIN_ONLINE.pinValue) ByteUtil.bytes2HexStr(hexStrPin) else null
-                                if (mCardType == AidlConstants.CardType.NFC)
+                                /*if (mCardType == AidlConstants.CardType.NFC)
                                     checkAndRemoveRfCard(dataCard)
-                                else
+                                else*/
                                     goOnlineProcess(this@apply)
                             } ?: posInstance().mEMVOptV2?.importPinInputStatus(mPinType, 0)
                         } ?: run {
