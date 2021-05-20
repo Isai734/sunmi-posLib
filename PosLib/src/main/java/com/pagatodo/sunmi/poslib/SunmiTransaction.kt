@@ -122,7 +122,7 @@ abstract class SunmiTransaction {
     private fun getDataCard(mapTags: Map<String, TLV?>): DataCard { //NOSONAR
         val dataCard = EmvUtil.parseTrack2(mapTags["57"]?.value)
         dataCard.cardNo =
-            if (dataCard.cardNo.isNullOrEmpty()) mapTags[Constants.TagsEmv.ENC_PAN.tag]?.value else dataCard.cardNo
+            if (dataCard.cardNo.isNullOrEmpty()) mCardNo else dataCard.cardNo
         dataCard.track1 = mapTags[Constants.TagsEmv.ENC_TRACK_1.tag]?.value ?: ""
         dataCard.track2 = mapTags[Constants.TagsEmv.ENC_TRACK_2.tag]?.value ?: ""
         dataCard.track3 = mapTags[Constants.TagsEmv.ENC_TRACK_3.tag]?.value ?: ""
@@ -280,7 +280,7 @@ abstract class SunmiTransaction {
             if(remainTime == -1)
                 initPinPad()
             else
-                initPinPad(messageError = PosResult.NoSecretWrong.message + ", 3 Intento(s) Restante(s).")
+                initPinPad(messageError = PosResult.NoSecretWrong.message + ", $remainTime Intento(s) Restante(s).")
         }
 
         @Throws(RemoteException::class)
@@ -527,7 +527,7 @@ abstract class SunmiTransaction {
                 override fun onError(code: Int) {
                     try {
                         PosLogger.e(PosLib.TAG, "code::$code")
-                        posInstance().mEMVOptV2?.importPinInputStatus(mPinType, 3)
+                        cancelOperationWithMessage()
                     } catch (exe: RemoteException) {
                         PosLogger.e(PosLib.TAG, exe.message)
                         cancelOperationWithMessage()
