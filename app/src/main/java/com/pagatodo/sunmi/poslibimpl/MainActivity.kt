@@ -18,6 +18,7 @@ import com.pagatodo.sunmi.poslib.interfaces.SunmiTrxListener
 import com.pagatodo.sunmi.poslib.model.*
 import com.pagatodo.sunmi.poslib.util.*
 import com.sunmi.pay.hardware.aidl.AidlConstants
+import com.sunmi.pay.hardware.aidlv2.bean.EmvTermParamV2
 import com.sunmi.pay.hardware.aidlv2.pinpad.PinPadListenerV2
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
@@ -102,6 +103,10 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         gratuity = "00"
         sigmaOperation = "V"
         tagsEmv = EmvUtil.tagsDefault.toList()
+        terminalParams = EmvTermParamV2().apply {
+            bypassPin = false
+            bypassAllFlg = false
+        }
     }
 
     override fun pinMustBeForced(): Boolean {

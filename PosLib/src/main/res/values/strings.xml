@@ -18,7 +18,7 @@
     <string name="cancel_operation">Operación Cancelada.</string>
     <string name="trans_refused">Transacción Declinada.</string>
     <string name="sync_operation">Cancelando la Operación.</string>
-    <string name="magnetic_mode_not_support">Operación Denegada.</string>
+    <string name="magnetic_mode_not_support">Tarjeta No Soportada.</string>
     <string name="empty_pin">Por favor escriba su numero secreto.</string>
     <string name="secret_wrong">No. Secreto Erróneo</string>
     <string name="sync_operation_failed">Verifica la Conexión.</string>

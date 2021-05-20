@@ -299,7 +299,7 @@ abstract class SunmiTransaction {
             if (!isRequestPin && pinMustBeForced())
                 initPinPad(dataCard)
             else if (mCardType == AidlConstants.CardType.NFC)
-                checkAndRemoveCard(dataCard)
+                checkAndRemoveRfCard(dataCard)
             else
                 goOnlineProcess(dataCard)
         }
@@ -502,7 +502,7 @@ abstract class SunmiTransaction {
                             dataCard?.apply {
                                 this.pinBlock = if(mPinType == PinTypes.PIN_ONLINE.pinValue) ByteUtil.bytes2HexStr(hexStrPin) else null
                                 if (mCardType == AidlConstants.CardType.NFC)
-                                    checkAndRemoveCard(dataCard)
+                                    checkAndRemoveRfCard(dataCard)
                                 else
                                     goOnlineProcess(this@apply)
                             } ?: posInstance().mEMVOptV2?.importPinInputStatus(mPinType, 0)
@@ -540,9 +540,41 @@ abstract class SunmiTransaction {
         }
     }
 
-    private fun checkAndRemoveCard(dataCard: DataCard? = null) {
+    private fun checkAndRemoveRfCard(dataCard: DataCard? = null) {
         try {//Check and notify remove card
             val status = posInstance().mReadCardOptV2?.getCardExistStatus(mCardType.value)?.also {
+                if (it < 0) {
+                    onFailureTrx(PosResult.ErrorCheckPresentCard); return
+                }
+            }
+            PosLogger.e(PosLib.TAG, "status::$status")
+            when (status) {
+                AidlConstants.CardExistStatus.CARD_ABSENT -> {
+                    dataCard?.apply {
+                        goOnlineProcess(this)
+                        posInstance().mReadCardOptV2?.cardOff(AidlConstants.CardType.NFC.value)
+                    }
+                }
+                AidlConstants.CardExistStatus.CARD_PRESENT -> {
+                    onRemoveCard(dataCard)
+                    GlobalScope.launch(Dispatchers.IO) {
+                        delay(1000L)
+                        dataCard?.apply {
+                            goOnlineProcess(this)
+                            posInstance().mReadCardOptV2?.cardOff(AidlConstants.CardType.NFC.value)
+                        }
+                    }
+                }
+                else -> throw IllegalArgumentException("Unknown status $status.")
+            }
+        } catch (e: Exception) {
+            PosLogger.e(PosLib.TAG, e.message)
+        }
+    }
+
+    private fun checkAndRemoveCard(dataCard: DataCard? = null) {
+        try {//Check and notify remove card
+            val status = posInstance().mReadCardOptV2?.getCardExistStatus(AidlConstants.CardType.IC.value)?.also {
                 if (it < 0) {
                     onFailureTrx(PosResult.ErrorCheckPresentCard); return
                 }
