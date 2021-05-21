@@ -65,8 +65,10 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
         sunmiListener.onDismissRequestOnline()
         when (result) {
             PosResult.DoSyncOperation -> {
-                sunmiListener.onDialogProcessOnline(result.message)
-                sunmiListener.onSync(dataCard)
+                if(this::dataCard.isInitialized){
+                    sunmiListener.onDialogProcessOnline(result.message)
+                    sunmiListener.onSync(dataCard)
+                } else sunmiListener.onFailure(PosResult.ErrorCheckCard)
             }
             PosResult.ReplaceCard, PosResult.SeePhone, PosResult.CardNoSupported,
             PosResult.CardDenial, PosResult.NfcTerminated, PosResult.NextOperetion -> {
