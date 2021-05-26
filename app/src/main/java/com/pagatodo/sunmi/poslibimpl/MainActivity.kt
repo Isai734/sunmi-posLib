@@ -188,5 +188,5 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
 
     override fun isPossibleFallback(): Boolean = false
 
-    override fun requireSignature() = false
+    override fun requireSignature(dataCard: DataCard) = false
 }
