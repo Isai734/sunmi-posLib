@@ -249,7 +249,7 @@ abstract class SunmiTransaction {
                 mAppSelect = when {
                     isUnion -> 0
                     isVisa -> 1
-                    isMaster -> {// MasterCard(PayPass)
+                    isMaster -> {
                         val configId =
                             if (getTransactionData().transType == Constants.TransType.REFUND)
                                 DEVOLUCION
@@ -298,8 +298,6 @@ abstract class SunmiTransaction {
             val dataCard = getDataCard(mapTags)
             if (!isRequestPin && pinMustBeForced())
                 initPinPad(dataCard)
-            /*else if (mCardType == AidlConstants.CardType.NFC)
-                checkAndRemoveRfCard(dataCard)*/
             else
                 goOnlineProcess(dataCard)
         }
@@ -331,7 +329,7 @@ abstract class SunmiTransaction {
         @Throws(RemoteException::class)
         override fun onConfirmationCodeVerified() { //Only confirmation phone required
             val outData = ByteArray(512)
-            var strOutcomeMessage = ""
+            var strOutcomeMessage: String
             posInstance().mEMVOptV2?.getTlv(AidlConstants.EMV.TLVOpCode.OP_PAYPASS, "DF8129", outData)?.apply {
                 if (this > 0) {
                     val data = ByteArray(this)

@@ -94,7 +94,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
 
     override fun onApprovedTrx() {
         sunmiListener.onDismissRequestOnline()
-        if (isRequestSignature || VentaPCIUtils.emvRequestSignature(dataCard.tlvData))
+        if (isRequestSignature || VentaPCIUtils.emvRequestSignature(dataCard.tlvData) || sunmiListener.requireSignature())
             sunmiListener.onShowSingDialog(requestTransaction, dataCard)
         else
             sunmiListener.onShowTicketDialog(null, requestTransaction, dataCard)

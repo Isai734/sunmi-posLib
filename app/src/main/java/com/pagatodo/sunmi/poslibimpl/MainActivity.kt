@@ -103,10 +103,7 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         gratuity = "00"
         sigmaOperation = "V"
         tagsEmv = EmvUtil.tagsDefault.toList()
-        terminalParams = EmvTermParamV2().apply {
-            bypassPin = false
-            bypassAllFlg = false
-        }
+        terminalParams = EmvTermParamV2()
     }
 
     override fun pinMustBeForced(): Boolean {
@@ -190,4 +187,6 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
     }
 
     override fun isPossibleFallback(): Boolean = false
+
+    override fun requireSignature() = false
 }
