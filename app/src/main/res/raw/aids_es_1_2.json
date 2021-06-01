@@ -98,5 +98,20 @@
     "riskManData": "6CF0000000000000",
     "ttq": "36204000",
     "aidType": "00"
+  },
+  {
+    "_comment": "this aid for american express",
+    "aid": "A00000002501",
+    "cvmLmt": "000000002001",
+    "termClssLmt": "000000080000",
+    "termClssOfflineFloorLmt": "000000000000",
+    "termOfflineFloorLmt": "000000000000",
+    "floorLimit": "00000000",
+    "TACDenial": "0010000000",
+    "TACOnline": "DE00FC9800",
+    "TACDefault": "DC50FC9800",
+    "dDOL": "9F3704",
+    "version": "0001",
+    "aidType": "00"
   }
 ]

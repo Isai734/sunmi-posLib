@@ -108,7 +108,7 @@ data class Aid(
     val cvmLmt: String? = null,
 
     @Json(name = "aid")
-    val aid: String? = null,
+    val aid: String = "",
 
     @Json(name = "selFlag")
     val selFlag: String? = null,
@@ -116,6 +116,7 @@ data class Aid(
     @Json(name = "clsStatusCheck")
     val clsStatusCheck: String? = null
 ) {
+
     fun toAidV2(): AidV2 {
         val aidV2 = AidV2()
         cvmLmt?.apply {

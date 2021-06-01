@@ -37,7 +37,7 @@ enum class PosResult(var code: Int, var message: String) {
 
 fun getPosResult(code: Int, message: String?): PosResult {
     for (pr in PosResult.values())
-        if (pr.code == code)
+        if (pr != PosResult.Generic && pr.code == code)
             return pr
     return PosResult.Generic.apply {
         this.code = code
