@@ -39,13 +39,13 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
     fun initTransaction() {
         setTerminalParams()
         forceCheckCard = -1
-        sunmiListener.onDialogRequestCard()
+        sunmiListener.onDialogRequestCard(cardTypes = getCheckCardType())
         super.clearVars()
         super.startPayProcess()
     }
 
     private fun resendTransaction(title: String? = null) {
-        sunmiListener.onDialogRequestCard(title)
+        sunmiListener.onDialogRequestCard(title, getCheckCardType())
         super.startPayProcess()
     }
 
@@ -86,7 +86,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
                 sunmiListener.onFailure(result, listener = createAcceptListener(result.message))
             }
             PosResult.ErrorRepeatCall -> {
-                sunmiListener.onDialogRequestCard()
+                sunmiListener.onDialogRequestCard(cardTypes = getCheckCardType())
             }
             else -> sunmiListener.onFailure(result)
         }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="card_denial">Ingrese la Tarjeta por el Chip o Utilice Otra Tarjeta.</string>
-    <string name="other_interface">Por favor use chip.</string>
+    <string name="other_interface">Por favor inserte o deslice la tarjeta.</string>
     <string name="transaction_approved">Transacción aprovada.</string>
     <string name="card_present_wait">Por Favor Retire su Tarjeta.</string>
     <string name="replace_card">Por Favor Vuleva a Colocar su Tarjeta.</string>

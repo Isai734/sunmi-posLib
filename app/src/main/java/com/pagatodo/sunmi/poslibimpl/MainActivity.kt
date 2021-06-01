@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         }
     }
 
-    override fun onDialogRequestCard(message: String?) {
+    override fun onDialogRequestCard(message: String?, cardTypes: Int) {
         askForCard?.show()
     }
 
