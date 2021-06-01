@@ -3,14 +3,14 @@ package com.pagatodo.sunmi.poslib.util
 import com.pagatodo.sunmi.poslib.R
 import com.pagatodo.sunmi.poslib.requireContext
 
-enum class PosResult(var code: Int, var message: String) {
+enum class PosResult(var code: Int, var message: String, val tile:String? = null) {
     CardDenial(-33, getMessage(R.string.card_denial)),
     ErrorRepeatCall(-20001, getMessage(R.string.repeat_call)),
     NfcTerminated(-2520, getMessage(R.string.error_card_no_supported)),
     FallBack(-2800, getMessage(R.string.chip_fallback)),
     TransRefused(-4000, getMessage(R.string.trans_refused)),
     OtherInterface(-4001, getMessage(R.string.other_interface)),
-    TransTerminate(-4002, getMessage(R.string.card_no_supported)),
+    TransTerminate(-4002, getMessage(R.string.card_no_supported_msg), getMessage(R.string.card_no_supported_title)),
     SeePhone(-4003, getMessage(R.string.see_phone)),
     NoCommonAppNfc(-4106, getMessage(R.string.common_app_nfc)),
     FallBackCommonApp(-4107, getMessage(R.string.chip_fallback)),

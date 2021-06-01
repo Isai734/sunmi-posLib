@@ -71,7 +71,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
                 } else sunmiListener.onFailure(PosResult.ErrorCheckCard)
             }
             PosResult.ReplaceCard, PosResult.SeePhone, PosResult.CardNoSupported,
-            PosResult.CardDenial, PosResult.NfcTerminated, PosResult.NextOperetion -> {
+            PosResult.CardDenial, PosResult.NfcTerminated, PosResult.NextOperetion, PosResult.TransTerminate -> {
                 sunmiListener.onFailure(result, listener = createAcceptListener(result.message))
             }
             PosResult.FallBack, PosResult.FallBackCommonApp -> {
