@@ -230,17 +230,14 @@ abstract class SunmiTransaction {
         override fun onWaitAppSelect(list: List<EMVCandidateV2>, b: Boolean) {
             val candidateNames = getCandidateNames(list)
             PosLogger.e(PosLib.TAG, "onWaitAppSelect b->$b candidateNames: $candidateNames")
-            val appEmv = object : AppEmvSelectListener {
-                override fun onAppEmvSelected(position: Int) {
-                    try {
-                        PosLogger.e(PosLib.TAG, "onAppEmvSelected pos: $position")
-                        posInstance().mEMVOptV2?.importAppSelect(position)
-                    } catch (exe: RemoteException) {
-                        onFailure(PosResult.ErrorSelectApp)
-                    }
+            onSelectEmvApp(candidateNames) { position ->
+                try {
+                    PosLogger.e(PosLib.TAG, "onAppEmvSelected pos: $position")
+                    posInstance().mEMVOptV2?.importAppSelect(position)
+                } catch (exe: RemoteException) {
+                    onFailure(PosResult.ErrorSelectApp)
                 }
             }
-            onSelectEmvApp(candidateNames, appEmv)
         }
 
         @Throws(RemoteException::class)
@@ -598,7 +595,7 @@ abstract class SunmiTransaction {
 
     abstract fun onShowPinPad(pinPadListener: PinPadListenerV2.Stub, pinPadConfig: PinPadConfigV3)
 
-    abstract fun onSelectEmvApp(listEmvApps: List<String>, applicationEmv: AppEmvSelectListener)
+    abstract fun onSelectEmvApp(listEmvApps: List<String>, appSelect: (Int) -> Unit)
 
     abstract fun getTransactionData(): TransactionData
 

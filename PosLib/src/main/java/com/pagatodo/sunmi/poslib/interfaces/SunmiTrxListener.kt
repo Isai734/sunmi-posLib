@@ -25,10 +25,10 @@ interface SunmiTrxListener<E : Any> {
     fun onShowDniDialog(dataCard: DataCard)
     fun onShowZipDialog(dataCard: DataCard)
     fun onShowPinPadDialog(pinPadListener: PinPadListenerV2.Stub, pinPadConfig: PinPadConfigV3)
-    fun onShowSelectApp(listEmvApps: List<String>, applicationEmv: AppEmvSelectListener)
+    fun onShowSelectApp(listEmvApps: List<String>, appSelect: (Int) -> Unit)
     fun onSync(dataCard: DataCard)
-    fun onFailureEmv(error: PosResult, listener: OnClickAcceptListener? = null)
-    fun onFailureOnline(error: PosResult, listener: OnClickAcceptListener? = null)
+    fun onFailureEmv(error: PosResult, todo: (String) -> Unit)
+    fun onFailureOnline(error: PosResult)
     fun onPurchase(dataCard: DataCard)
     fun doOperationNext(nextOperation: OperacionSiguiente, nextOprResult: PosResult)
     fun getVmodelPCI(): SunmiViewModel<E>

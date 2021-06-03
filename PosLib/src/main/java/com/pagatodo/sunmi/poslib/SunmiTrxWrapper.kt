@@ -1,12 +1,10 @@
 package com.pagatodo.sunmi.poslib
 
-import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import com.pagatodo.sunmi.poslib.PosLib.Companion.TAG
 import com.pagatodo.sunmi.poslib.config.PinPadConfigV3
 import com.pagatodo.sunmi.poslib.interfaces.AppEmvSelectListener
-import com.pagatodo.sunmi.poslib.interfaces.OnClickAcceptListener
 import com.pagatodo.sunmi.poslib.interfaces.SunmiTrxListener
 import com.pagatodo.sunmi.poslib.model.DataCard
 import com.pagatodo.sunmi.poslib.model.Results
@@ -69,23 +67,23 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
                 if(this::dataCard.isInitialized){
                     sunmiListener.onDialogProcessOnline(result.message)
                     sunmiListener.onSync(dataCard)
-                } else sunmiListener.onFailureEmv(PosResult.ErrorCheckCard)
+                } else sunmiListener.onFailureEmv(PosResult.ErrorCheckCard){}
             }
             PosResult.ReplaceCard, PosResult.SeePhone, PosResult.CardNoSupported,
             PosResult.CardDenial, PosResult.NfcTerminated, PosResult.NextOperetion, PosResult.TransTerminate,
             PosResult.FinalSelectApp, PosResult.DataCardWithError, PosResult.NoCommonAppNfc -> {
-                sunmiListener.onFailureEmv(result, listener = createAcceptListener(result.message))
+                sunmiListener.onFailureEmv(result) { message -> resendTransaction(message) }
             }
             PosResult.FallBack, PosResult.FallBackCommonApp -> {
                 if(sunmiListener.isPossibleFallback()) {
                     allowFallback = true
                     forceCheckCard = mcrOnlyCheckCard
-                    sunmiListener.onFailureEmv(result, listener = createAcceptListener(result.message))
-                } else  sunmiListener.onFailureEmv(PosResult.ErrorCheckCard)
+                    sunmiListener.onFailureEmv(result) { message -> resendTransaction(message) }
+                } else  sunmiListener.onFailureEmv(PosResult.ErrorCheckCard){}
             }
             PosResult.OtherInterface -> {
                 forceCheckCard = rfOffCheckCard
-                sunmiListener.onFailureEmv(result, listener = createAcceptListener(result.message))
+                sunmiListener.onFailureEmv(result) { message -> resendTransaction(message) }
             }
             PosResult.ErrorRepeatCall -> {
                 sunmiListener.onDialogRequestCard(cardTypes = getCheckCardType())
@@ -93,7 +91,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
             PosResult.OnlineError -> {
                 sunmiListener.onFailureOnline(result)
             }
-            else -> sunmiListener.onFailureEmv(result)
+            else -> sunmiListener.onFailureEmv(result){}
         }
     }
 
@@ -127,9 +125,9 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
         sunmiListener.onShowPinPadDialog(pinPadListener, pinPadConfig)
     }
 
-    override fun onSelectEmvApp(listEmvApps: List<String>, applicationEmv: AppEmvSelectListener) {
+    override fun onSelectEmvApp(listEmvApps: List<String>, appSelect: (Int) -> Unit) {
         sunmiListener.onDismissRequestCard()
-        sunmiListener.onShowSelectApp(listEmvApps, applicationEmv)
+        sunmiListener.onShowSelectApp(listEmvApps, appSelect)
     }
 
     override fun getTransactionData() = mTransactionData
@@ -139,12 +137,6 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
     private fun doNextOpr(operacionSiguiente: OperacionSiguiente, nextOprResult: PosResult) {
         cancelProcessEmv()
         sunmiListener.doOperationNext(operacionSiguiente, nextOprResult)
-    }
-
-    private fun createAcceptListener(message: String? = null) = object : OnClickAcceptListener {
-        override fun onClickAccept(view: View?) {
-            resendTransaction(message)
-        }
     }
 
     private val pciObserver

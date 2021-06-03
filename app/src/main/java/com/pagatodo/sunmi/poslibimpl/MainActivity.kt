@@ -13,7 +13,6 @@ import com.pagatodo.sunmi.poslib.SunmiTrxWrapper
 import com.pagatodo.sunmi.poslib.config.PinPadConfigV3
 import com.pagatodo.sunmi.poslib.config.PosConfig
 import com.pagatodo.sunmi.poslib.interfaces.AppEmvSelectListener
-import com.pagatodo.sunmi.poslib.interfaces.OnClickAcceptListener
 import com.pagatodo.sunmi.poslib.interfaces.SunmiTrxListener
 import com.pagatodo.sunmi.poslib.model.*
 import com.pagatodo.sunmi.poslib.util.*
@@ -136,15 +135,15 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         transaction.add(android.R.id.content, pinPadDialog, pinPadDialog.tag).commit()
     }
 
-    override fun onShowSelectApp(listEmvApps: List<String>, applicationEmv: AppEmvSelectListener) {
-        applicationEmv.onAppEmvSelected(0)
+    override fun onShowSelectApp(listEmvApps: List<String>, appSelect: (Int) -> Unit) {
+        appSelect(0)
     }
 
     override fun onSync(dataCard: DataCard) {
         viewMPci.sync()
     }
 
-    override fun onFailureEmv(error: PosResult, listener: OnClickAcceptListener?) {
+    override fun onFailureEmv(error: PosResult, todo: (String) -> Unit) {
         GlobalScope.launch(Dispatchers.Main) {
             Toast.makeText(this@MainActivity, error.message, Toast.LENGTH_LONG).show()
         }
@@ -194,7 +193,7 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
 
     override fun requireSignature(dataCard: DataCard) = false
 
-    override fun onFailureOnline(error: PosResult, listener: OnClickAcceptListener?) {
+    override fun onFailureOnline(error: PosResult) {
         GlobalScope.launch(Dispatchers.Main) {
             Toast.makeText(this@MainActivity, "onFailureOnline.", Toast.LENGTH_SHORT).show()
         }
