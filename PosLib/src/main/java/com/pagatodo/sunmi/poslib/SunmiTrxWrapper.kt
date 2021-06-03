@@ -89,9 +89,15 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
                 sunmiListener.onDialogRequestCard(cardTypes = getCheckCardType())
             }
             PosResult.OnlineError -> {
-                sunmiListener.onFailureOnline(result)
+                onFailureOnline(result)
             }
             else -> sunmiListener.onFailureEmv(result){}
+        }
+    }
+
+    private fun onFailureOnline(result: PosResult){
+        sunmiListener.onFailureOnline(result) {
+            checkAndRemoveCard {}
         }
     }
 

@@ -193,7 +193,7 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
 
     override fun requireSignature(dataCard: DataCard) = false
 
-    override fun onFailureOnline(error: PosResult) {
+    override fun onFailureOnline(error: PosResult, doContinue: () -> Unit) {
         GlobalScope.launch(Dispatchers.Main) {
             Toast.makeText(this@MainActivity, "onFailureOnline.", Toast.LENGTH_SHORT).show()
         }
