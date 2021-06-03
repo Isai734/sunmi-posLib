@@ -18,7 +18,7 @@ import net.fullcarga.android.api.data.respuesta.RespuestaTrxCierreTurno
 import net.fullcarga.android.api.exc.SincronizacionRequeridaException
 import java.nio.charset.Charset
 
-class SunmiTrxWrapper(owner: LifecycleOwner) :
+class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
     SunmiTransaction() {
 
     private val mTransactionData by lazy { sunmiListener.createTransactionData() }
@@ -41,12 +41,12 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
         forceCheckCard = -1
         sunmiListener.onDialogRequestCard(cardTypes = getCheckCardType())
         super.clearVars()
-        super.startPayProcess()
+        super.startEmvProcess()
     }
 
     private fun resendTransaction(title: String? = null) {
         sunmiListener.onDialogRequestCard(title, getCheckCardType())
-        super.startPayProcess()
+        super.startEmvProcess()
     }
 
     fun getPin() {
@@ -60,44 +60,55 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
         sunmiListener.onPurchase(dataCard)
     }
 
-    override fun onFailureTrx(result: PosResult) {
+    override fun onFailure(result: PosResult) {
         sunmiListener.onDismissRequestCard()
         sunmiListener.onDismissRequestOnline()
+        BuzzerUtil.doBeep(result)
         when (result) {
-            PosResult.DoSyncOperation -> {
+            PosResult.DoSyncOperation, PosResult.ErrorCheckPresentCard -> {
                 if(this::dataCard.isInitialized){
                     sunmiListener.onDialogProcessOnline(result.message)
                     sunmiListener.onSync(dataCard)
-                } else sunmiListener.onFailure(PosResult.ErrorCheckCard)
+                } else sunmiListener.onFailureEmv(PosResult.ErrorCheckCard)
             }
             PosResult.ReplaceCard, PosResult.SeePhone, PosResult.CardNoSupported,
-            PosResult.CardDenial, PosResult.NfcTerminated, PosResult.NextOperetion, PosResult.TransTerminate -> {
-                sunmiListener.onFailure(result, listener = createAcceptListener(result.message))
+            PosResult.CardDenial, PosResult.NfcTerminated, PosResult.NextOperetion, PosResult.TransTerminate,
+            PosResult.FinalSelectApp, PosResult.DataCardWithError, PosResult.NoCommonAppNfc -> {
+                sunmiListener.onFailureEmv(result, listener = createAcceptListener(result.message))
             }
             PosResult.FallBack, PosResult.FallBackCommonApp -> {
                 if(sunmiListener.isPossibleFallback()) {
                     allowFallback = true
                     forceCheckCard = mcrOnlyCheckCard
-                    sunmiListener.onFailure(result, listener = createAcceptListener(result.message))
-                } else  sunmiListener.onFailure(PosResult.ErrorCheckCard)
+                    sunmiListener.onFailureEmv(result, listener = createAcceptListener(result.message))
+                } else  sunmiListener.onFailureEmv(PosResult.ErrorCheckCard)
             }
             PosResult.OtherInterface -> {
                 forceCheckCard = rfOffCheckCard
-                sunmiListener.onFailure(result, listener = createAcceptListener(result.message))
+                sunmiListener.onFailureEmv(result, listener = createAcceptListener(result.message))
             }
             PosResult.ErrorRepeatCall -> {
                 sunmiListener.onDialogRequestCard(cardTypes = getCheckCardType())
             }
-            else -> sunmiListener.onFailure(result)
+            PosResult.OnlineError -> {
+                sunmiListener.onFailureOnline(result)
+            }
+            else -> sunmiListener.onFailureEmv(result)
         }
     }
 
-    override fun onApprovedTrx() {
+    override fun onSuccessOnline() {
         sunmiListener.onDismissRequestOnline()
-        if (isRequestSignature || VentaPCIUtils.emvRequestSignature(dataCard.tlvData) || sunmiListener.requireSignature(dataCard))
-            sunmiListener.onShowSingDialog(requestTransaction, dataCard)
-        else
-            sunmiListener.onShowTicketDialog(null, requestTransaction, dataCard)
+        sunmiListener.onSuccessOnline {
+            checkAndRemoveCard {
+                if (isRequestSignature || VentaPCIUtils.emvRequestSignature(dataCard.tlvData) || sunmiListener.requireSignature(dataCard))
+                    sunmiListener.onShowSingDialog { sign ->
+                        sunmiListener.onShowTicketDialog(requestTransaction, dataCard, sign)
+                    }
+                else
+                    sunmiListener.onShowTicketDialog(requestTransaction, dataCard)
+            }
+        }
     }
 
     override fun getCheckCardType(): Int {
@@ -123,7 +134,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
 
     override fun getTransactionData() = mTransactionData
 
-    override fun onRemoveCard(dataCard: DataCard?) = sunmiListener.showRemoveCard(dataCard?: this.dataCard)
+    override fun onRemoveCard() = sunmiListener.showRemoveCard(dataCard)
 
     private fun doNextOpr(operacionSiguiente: OperacionSiguiente, nextOprResult: PosResult) {
         cancelProcessEmv()
@@ -140,23 +151,29 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
         get() = Observer<Results<Any>> {
             when (it) {
                 is Results.Success -> {
-                    if (it.data is RespuestaTrxCierreTurno) {
-                        requestTransaction = it.data
-                        if (it.data.isCorrecta) {
-                            if (validateNextOpr(it.data.operacionSiguiente)) {
-                                val resultNexOpr = PosResult.NextOperetion
-                                resultNexOpr.message = it.data.campo60.first()
-                                doNextOpr(it.data.operacionSiguiente, resultNexOpr)
-                            } else {
-                                val tags = String(it.data.campoTagsEmv, Charset.defaultCharset()).trim()
-                                finishOnlineProcessStatus(tlvString = tags, tlvResponse = Constants.TlvResponses.Approved)
+                    when {
+                        it.data is RespuestaTrxCierreTurno -> {
+                            requestTransaction = it.data
+                            when {
+                                hasNextOpr(it.data.operacionSiguiente) -> {
+                                    val resultNexOpr = PosResult.NextOperetion
+                                    resultNexOpr.message = it.data.campo60.first()
+                                    doNextOpr(it.data.operacionSiguiente, resultNexOpr)
+                                }
+                                it.data.isCorrecta -> {
+                                    val tags = String(it.data.campoTagsEmv, Charset.defaultCharset()).trim()
+                                    finishOnlineProcessStatus(tlvString = tags, tlvResponse = Constants.TlvResponses.Approved)
+                                }
+                                else -> finishOnlineProcessStatus(tlvResponse = Constants.TlvResponses.Decline)
                             }
-                        } else finishOnlineProcessStatus(tlvResponse = Constants.TlvResponses.Decline)
-                    } else finishOnlineProcessStatus(tlvResponse = Constants.TlvResponses.Approved)
+                        }
+                        test -> finishOnlineProcessStatus(tlvResponse = Constants.TlvResponses.Approved)
+                        else -> finishOnlineProcessStatus(tlvResponse = Constants.TlvResponses.Decline)
+                    }
                 }
                 is Results.Failure -> {
                     val msgError = if (it.exception is SincronizacionRequeridaException) {
-                        onFailureTrx(PosResult.DoSyncOperation)
+                        onFailure(PosResult.DoSyncOperation)
                         PosResult.DoSyncOperation.message
                     } else
                         it.exception.message
@@ -165,7 +182,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
             }
         }
 
-    private fun validateNextOpr(nxtOpr: OperacionSiguiente?): Boolean {
+    private fun hasNextOpr(nxtOpr: OperacionSiguiente?): Boolean {
         return nxtOpr?.let { it.procodIdNext > 0 } ?: false
     }
 
@@ -193,11 +210,11 @@ class SunmiTrxWrapper(owner: LifecycleOwner) :
                 is Results.Success -> {
                     if (it.data is RespuestaTrxCierreTurno) {
                         sunmiListener.onDismissRequestOnline()
-                        onFailureTrx(getPosResult(it.data.error, it.data.msjError))
-                    } else onFailureTrx(PosResult.SyncOperationSuccess)
+                        onFailure(getPosResult(it.data.error, it.data.msjError))
+                    } else onFailure(PosResult.SyncOperationSuccess)
                 }
                 is Results.Failure -> {
-                    onFailureTrx(PosResult.SyncOperationFailed)
+                    onFailure(PosResult.SyncOperationFailed)
                 }
             }
         }

@@ -18,9 +18,8 @@ object VentaPCIUtils {
     fun finTag(tags: String, tagFind: String): String {
         val index = tags.indexOf(tagFind, ignoreCase = true)
         return if (index != -1) {
-            val tag = tags.substring(index)
             val length = tags.substring(index + tagFind.length, index + tagFind.length + 2).toInt(16)
-            tags.substring(tag.length + 2, tag.length + 2 + (length * 2))
+            tags.substring(index + tagFind.length + 2, index + tagFind.length + 2 + (length * 2))
         } else
             return ""
     }

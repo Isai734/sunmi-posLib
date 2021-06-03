@@ -14,9 +14,12 @@ enum class PosResult(var code: Int, var message: String, val tile:String? = null
     SeePhone(-4003, getMessage(R.string.see_phone)),
     NoCommonAppNfc(-4106, getMessage(R.string.common_app_nfc)),
     FallBackCommonApp(-4107, getMessage(R.string.chip_fallback)),
+    DataCardWithError(-4108, getMessage(R.string.common_app_nfc)),
     DoSyncOperation(-4115, getMessage(R.string.sync_operation)),
     NoMagneticMode(-4122, getMessage(R.string.magnetic_mode_not_support)),
     CardNoSupported(-4125, getMessage(R.string.error_card_no_supported)),
+    OnlineError(-50024, getMessage(R.string.error_online_process)),
+    FinalSelectApp(-50026, getMessage(R.string.error_card_no_supported)),
 
     CardAbsentAproved(0, getMessage(R.string.transaction_approved)),
     OfflineDecline(2, getMessage(R.string.offline_declined)),

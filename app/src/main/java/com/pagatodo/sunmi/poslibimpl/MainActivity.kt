@@ -31,7 +31,7 @@ import net.fullcarga.android.api.data.respuesta.Respuesta
 class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
 
     private val viewMPci by lazy { ViewModelProvider(this)[ViewModelPci::class.java] }
-    private val trxManager by lazy { SunmiTrxWrapper(this) }
+    private val trxManager by lazy { SunmiTrxWrapper(this, test = true) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,8 +87,12 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         if (dialogProgress.isAdded) dialogProgress.dismiss()
     }
 
-    override fun onShowSingDialog(responseTrx: Respuesta?, dataCard: DataCard) {
-        Toast.makeText(this, "Mostrar dialogo de firma", Toast.LENGTH_LONG).show()
+    override fun onShowSingDialog(doContinue: (ByteArray) -> Unit) {
+        GlobalScope.launch(Dispatchers.Main) {
+            Toast.makeText(this@MainActivity, "Mostrar dialogo de firma", Toast.LENGTH_SHORT).show()
+            delay(1000L)
+            doContinue(ByteArray(0))
+        }
     }
 
     override fun createTransactionData() = TransactionData().apply {
@@ -107,14 +111,14 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
     }
 
     override fun pinMustBeForced(): Boolean {
-        return true
+        return false
     }
 
     override fun checkCardTypes(): Int {
         return AidlConstants.CardType.MAGNETIC.value or AidlConstants.CardType.IC.value or AidlConstants.CardType.NFC.value
     }
 
-    override fun onShowTicketDialog(singBytes: ByteArray?, responseTrx: Respuesta?, dataCard: DataCard) {
+    override fun onShowTicketDialog(responseTrx: Respuesta?, dataCard: DataCard, singBytes: ByteArray?) {
         GlobalScope.launch(Dispatchers.Main) {
             Toast.makeText(this@MainActivity, "Mostrar dialogo de ticket", Toast.LENGTH_LONG).show()
         }
@@ -140,7 +144,7 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         viewMPci.sync()
     }
 
-    override fun onFailure(error: PosResult, listener: OnClickAcceptListener?) {
+    override fun onFailureEmv(error: PosResult, listener: OnClickAcceptListener?) {
         GlobalScope.launch(Dispatchers.Main) {
             Toast.makeText(this@MainActivity, error.message, Toast.LENGTH_LONG).show()
         }
@@ -189,4 +193,18 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
     override fun isPossibleFallback(): Boolean = false
 
     override fun requireSignature(dataCard: DataCard) = false
+
+    override fun onFailureOnline(error: PosResult, listener: OnClickAcceptListener?) {
+        GlobalScope.launch(Dispatchers.Main) {
+            Toast.makeText(this@MainActivity, "onFailureOnline.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onSuccessOnline(doContinue: () -> Unit) {
+        GlobalScope.launch(Dispatchers.Main) {
+            Toast.makeText(this@MainActivity, "onSuccessOnline.", Toast.LENGTH_SHORT).show()
+            delay(2000L)
+            doContinue()
+        }
+    }
 }

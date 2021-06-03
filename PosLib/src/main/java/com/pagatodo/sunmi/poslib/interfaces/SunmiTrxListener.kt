@@ -14,19 +14,21 @@ interface SunmiTrxListener<E : Any> {
     fun onDismissRequestCard()
     fun onDialogProcessOnline(message: String? = null)
     fun onDismissRequestOnline()
-    fun onShowSingDialog(responseTrx: Respuesta?, dataCard: DataCard)
+    fun onShowSingDialog(doContinue: (ByteArray) -> Unit)
     fun createTransactionData(): TransactionData
     fun pinMustBeForced(): Boolean
     fun requireSignature(dataCard: DataCard): Boolean
     fun isPossibleFallback(): Boolean
     fun checkCardTypes(): Int
-    fun onShowTicketDialog(singBytes: ByteArray?, responseTrx: Respuesta?, dataCard: DataCard)
+    fun onShowTicketDialog(responseTrx: Respuesta?, dataCard: DataCard, singBytes: ByteArray? = null)
+    fun onSuccessOnline(doContinue: () -> Unit)
     fun onShowDniDialog(dataCard: DataCard)
     fun onShowZipDialog(dataCard: DataCard)
     fun onShowPinPadDialog(pinPadListener: PinPadListenerV2.Stub, pinPadConfig: PinPadConfigV3)
     fun onShowSelectApp(listEmvApps: List<String>, applicationEmv: AppEmvSelectListener)
     fun onSync(dataCard: DataCard)
-    fun onFailure(error: PosResult, listener: OnClickAcceptListener? = null)
+    fun onFailureEmv(error: PosResult, listener: OnClickAcceptListener? = null)
+    fun onFailureOnline(error: PosResult, listener: OnClickAcceptListener? = null)
     fun onPurchase(dataCard: DataCard)
     fun doOperationNext(nextOperation: OperacionSiguiente, nextOprResult: PosResult)
     fun getVmodelPCI(): SunmiViewModel<E>

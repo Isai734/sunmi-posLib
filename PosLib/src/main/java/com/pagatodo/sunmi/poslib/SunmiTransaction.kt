@@ -18,6 +18,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.fullcarga.android.api.data.DataOpTarjeta
+import net.fullcarga.android.api.data.respuesta.Respuesta
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
@@ -44,7 +45,7 @@ abstract class SunmiTransaction {
         EmvUtil.setTerminalParam(getTransactionData().terminalParams, this)
     }
 
-    fun startPayProcess() = try {
+    fun startEmvProcess() = try {
         val amount = setDecimalsAmount(getTransactionData().amount)
         posInstance().mEMVOptV2?.initEmvProcess()// Before check card, initialize emv process(clear all TLV)
         if (amount.toLong() > 0 || getTransactionData().transType == Constants.TransType.REFUND) {
@@ -83,22 +84,22 @@ abstract class SunmiTransaction {
         PosLogger.e(PosLib.TAG, "card update status code::$len")
         len?.also {  //Validar si esto aplica para MTIP 2.60 Refund
             if ((it == PosResult.DoSyncOperation.code || it == PosResult.TransRefused.code) && tlvResponse.status == 0) {
-                onFailureTrx(PosResult.DoSyncOperation)
+                onFailure(PosResult.DoSyncOperation)
                 customMessage = PosResult.DoSyncOperation.message
             } else if ((mCardType == AidlConstants.CardType.MAGNETIC || sendOnlineWithError) && tlvResponse.status == 0)
-                onApprovedTrx()
+                onSuccessOnline()
             else if (mCardType == AidlConstants.CardType.MAGNETIC || sendOnlineWithError)
-                onFailureTrx(getPosResult(AidlConstants.CardType.MAGNETIC.value, customMessage))
+                onFailure(getPosResult(AidlConstants.CardType.MAGNETIC.value, customMessage))
         }
     } catch (exe: Exception) {
         if (mCardType == AidlConstants.CardType.MAGNETIC)
-            onFailureTrx(PosResult.DoSyncOperation)
+            onFailure(PosResult.DoSyncOperation)
         else
             PosLogger.e(PosLib.TAG, exe.message)
     }
 
     private fun checkCard() = try {
-        posInstance().mReadCardOptV2?.checkCard(getCheckCardType(), mCheckCardCallback, 160)
+        posInstance().mReadCardOptV2?.checkCard(getCheckCardType(), mCheckCardCallback, 120)
     } catch (exe: Exception) {
         PosLogger.e(PosLib.TAG, exe.message)
         cancelProcessEmv()
@@ -183,7 +184,7 @@ abstract class SunmiTransaction {
                 dataCard.entryMode =
                     if (allowFallback) DataOpTarjeta.PosEntryMode.FALLBACK else DataOpTarjeta.PosEntryMode.BANDA
                 if (EmvUtil.isChipCard(dataCard.serviceCode) && !allowFallback) { //Tarjeta por chip no fallback
-                    GlobalScope.launch(Dispatchers.Main) { onFailureTrx(PosResult.CardDenial) }
+                    GlobalScope.launch(Dispatchers.Main) { onFailure(PosResult.CardDenial) }
                     cancelProcessEmv()
                 } else if (pinMustBeForced() || EmvUtil.requiredNip(dataCard.serviceCode))
                     initPinPad(dataCard)
@@ -191,7 +192,7 @@ abstract class SunmiTransaction {
                     goOnlineProcess(dataCard)
             } catch (e: Exception) {
                 PosLogger.e(PosLib.TAG, e.toString())
-                GlobalScope.launch(Dispatchers.Main) { onFailureTrx(PosResult.ErrorCheckCard) }
+                GlobalScope.launch(Dispatchers.Main) { onFailure(PosResult.ErrorCheckCard) }
             }
         }
 
@@ -206,7 +207,6 @@ abstract class SunmiTransaction {
         override fun findRFCard(uuid: String) {
             PosLogger.e(PosLib.TAG, "uuid:: $uuid")
             mCardType = AidlConstants.CardType.NFC
-            readingCard()
             transactProcess()
         }
 
@@ -214,7 +214,7 @@ abstract class SunmiTransaction {
         override fun onError(code: Int, message: String) {
             PosLogger.e(PosLib.TAG, "onError::$code message:: $message")
             GlobalScope.launch(Dispatchers.Main) {
-                onFailureTrx(getPosResult(code, PosResult.ErrorCheckCard.message))
+                onFailure(getPosResult(code, PosResult.ErrorCheckCard.message))
             }
         }
     }
@@ -236,7 +236,7 @@ abstract class SunmiTransaction {
                         PosLogger.e(PosLib.TAG, "onAppEmvSelected pos: $position")
                         posInstance().mEMVOptV2?.importAppSelect(position)
                     } catch (exe: RemoteException) {
-                        onFailureTrx(PosResult.ErrorSelectApp)
+                        onFailure(PosResult.ErrorSelectApp)
                     }
                 }
             }
@@ -271,12 +271,13 @@ abstract class SunmiTransaction {
                 }
                 PosLogger.e(PosLib.TAG, "detect $mAppSelect card")
                 posInstance().mEMVOptV2?.importAppFinalSelectStatus(0)
-            }
+            } else posInstance().mEMVOptV2?.importAppFinalSelectStatus(1)
         }
 
         @Throws(RemoteException::class)
         override fun onConfirmCardNo(cardNo: String) {
             PosLogger.e(PosLib.TAG, cardNo)
+            if(mCardType == AidlConstants.CardType.NFC) readingCard()
             mCardNo = cardNo
             posInstance().mEMVOptV2?.importCardNoStatus(0)
         }
@@ -327,12 +328,12 @@ abstract class SunmiTransaction {
                 onOnlineProc()
                 sendOnlineWithError = true
             } else if (code == PosResult.CardAbsentAproved.code)
-                checkAndRemoveCard()
+                onSuccessOnline()
             else{
                 customMessage?.apply {
                     if (this != PosResult.DoSyncOperation.message)
-                        onFailureTrx(getPosResult(code, this))
-                } ?: onFailureTrx(getPosResult(code, desc))
+                        onFailure(getPosResult(code, this))
+                } ?: onFailure(getPosResult(code, desc))
             }
         }
 
@@ -349,7 +350,7 @@ abstract class SunmiTransaction {
                 }
             }
             posInstance().mReadCardOptV2?.cardOff(mCardType.value) // card off
-            onFailureTrx(PosResult.SeePhone)
+            onFailure(PosResult.SeePhone)
         }
 
         @Throws(RemoteException::class)
@@ -405,9 +406,9 @@ abstract class SunmiTransaction {
 
     fun cancelOperationWithMessage() = try {
         cancelProcessEmv()
-        onFailureTrx(PosResult.OperationCanceled)
+        onFailure(PosResult.OperationCanceled)
     } catch (exe: Exception) {
-        onFailureTrx(PosResult.OperationCanceled)
+        onFailure(PosResult.OperationCanceled)
     }
 
     private fun getHexEmvTags(mapTags: Map<String, TLV?>) = StringBuilder().apply {
@@ -470,6 +471,7 @@ abstract class SunmiTransaction {
                 if (it > 0) {
                     val bytes = outData.copyOf(it)
                     val hexStr = ByteUtil.bytes2HexStr(bytes)
+                    PosLogger.i(PosLib.TAG, "nfcTlv ->$hexStr")
                     val tlvMap = TLVUtil.buildTLVMap(hexStr)
                     tlvMap["9F6E"]?.apply { map["9F6E"] = this }
                 }
@@ -553,25 +555,22 @@ abstract class SunmiTransaction {
         }
     }
 
-    private fun checkAndRemoveCard(dataCard: DataCard? = null) {
+    protected fun checkAndRemoveCard(cardAbsent: () -> Unit) {
         try {//Check and notify remove card
             val status = posInstance().mReadCardOptV2?.getCardExistStatus(AidlConstants.CardType.IC.value)?.also {
                 if (it < 0) {
-                    onFailureTrx(PosResult.ErrorCheckPresentCard); return
+                    onFailure(PosResult.ErrorCheckPresentCard); return
                 }
             }
             PosLogger.e(PosLib.TAG, "status::$status")
             when (status) {
                 AidlConstants.CardExistStatus.CARD_ABSENT -> {
-                    dataCard?.apply {
-                        if (mCardType == AidlConstants.CardType.NFC)
-                            goOnlineProcess(this)
-                    } ?: run { onApprovedTrx() }
+                    cardAbsent()
                 }
                 AidlConstants.CardExistStatus.CARD_PRESENT -> {
-                    onRemoveCard(dataCard)
+                    onRemoveCard()
                     posInstance().mBasicOptV2?.buzzerOnDevice(1, 2750, 200, 0)
-                    loopRemoveCard(dataCard)
+                    loopRemoveCard(cardAbsent)
                 }
                 else -> throw IllegalArgumentException("Unknown status $status.")
             }
@@ -580,16 +579,16 @@ abstract class SunmiTransaction {
         }
     }
 
-    private fun loopRemoveCard(dataCard: DataCard? = null) = GlobalScope.launch(Dispatchers.IO) {
+    private fun loopRemoveCard(cardAbsent: () -> Unit) = GlobalScope.launch(Dispatchers.IO) {
         delay(500)
-        checkAndRemoveCard(dataCard)
+        checkAndRemoveCard(cardAbsent)
     }
 
     protected abstract fun goOnlineProcess(dataCard: DataCard)
 
-    abstract fun onFailureTrx(result: PosResult)
+    abstract fun onFailure(result: PosResult)
 
-    abstract fun onApprovedTrx()
+    abstract fun onSuccessOnline()
 
     abstract fun getCheckCardType(): Int
 
@@ -603,5 +602,5 @@ abstract class SunmiTransaction {
 
     abstract fun getTransactionData(): TransactionData
 
-    abstract fun onRemoveCard(dataCard: DataCard?)
+    abstract fun onRemoveCard()
 }
