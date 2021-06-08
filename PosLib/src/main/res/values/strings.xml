@@ -4,10 +4,10 @@
     <string name="other_interface">Por favor inserte o deslice la tarjeta.</string>
     <string name="transaction_approved">Transacción aprovada.</string>
     <string name="card_present_wait">Por Favor Retire su Tarjeta.</string>
-    <string name="replace_card">Por Favor Vuleva a Colocar su Tarjeta.</string>
+    <string name="replace_card">Por Favor Vuelva a Colocar su Tarjeta.</string>
     <string name="see_phone">Por Favor Siga las Instrucciones del Teléfono.</string>
     <string name="offline_declined">Transacción Declinada Fuera de Línea.</string>
-    <string name="track2_error">Tarjeta No Soportada: Track2 Rechazado.</string>
+    <string name="track2_error">Tarjeta No Soportada: Track2 Rechazado.</string>|
     <string name="chip_fallback">Error, No se Puede Leer el Chip, Deslice la tajeta.</string>
     <string name="common_app_nfc">Inserte, Deslice o Pruebe con Otra Tajeta.</string>
     <string name="card_no_supported_title">Tarjeta no Compatible.</string>

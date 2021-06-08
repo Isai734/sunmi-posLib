@@ -6,11 +6,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.pagatodo.sunmi.poslibimpl.R
 
-class FixPasswordKeyboard @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
-) : LinearLayout(context, attrs, defStyleAttr) {
+class FixPasswordKeyboard @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : LinearLayout(context, attrs, defStyleAttr) {
     lateinit var key0: TextView
     private lateinit var key1: TextView
     private lateinit var key2: TextView

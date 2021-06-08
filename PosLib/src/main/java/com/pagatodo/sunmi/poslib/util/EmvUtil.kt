@@ -99,12 +99,24 @@ object EmvUtil {
         try {
             // save TMK
             val security = posInstance().posConfig.security
-            var result = mSecurityOptV2.savePlaintextKey(AidlConstants.Security.KEY_TYPE_TDK, security.plainDataKey, security.plainDataKcvKey, AidlConstants.Security.KEY_ALG_TYPE_3DES, security.keyDataIndex)
+            var result = mSecurityOptV2.savePlaintextKey(
+                AidlConstants.Security.KEY_TYPE_TDK,
+                security.plainDataKey,
+                security.plainDataKcvKey,
+                AidlConstants.Security.KEY_ALG_TYPE_3DES,
+                security.keyDataIndex
+            )
             if (result != 0) {
                 PosLogger.e(TAG, "save TDK fail: $result")
                 return
             }
-            result = mSecurityOptV2.savePlaintextKey(AidlConstants.Security.KEY_TYPE_PIK, security.plainPinKey, security.plainPinKcvKey, AidlConstants.Security.KEY_ALG_TYPE_3DES, security.keyPinIndex)
+            result = mSecurityOptV2.savePlaintextKey(
+                AidlConstants.Security.KEY_TYPE_PIK,
+                security.plainPinKey,
+                security.plainPinKcvKey,
+                AidlConstants.Security.KEY_ALG_TYPE_3DES,
+                security.keyPinIndex
+            )
             if (result != 0) {
                 PosLogger.e(TAG, "save PIK fail: $result")
                 return
@@ -180,6 +192,31 @@ object EmvUtil {
         cardInfo.cardNo = cardNumber
         cardInfo.expireDate = expiryDate
         cardInfo.serviceCode = serviceCode
+        return cardInfo
+    }
+
+    fun parseTrack1(mTrack1: String): DataCard {//Parse track2 data
+        val lastIndex = mTrack1.lastIndexOf("^")
+        val secondIndex = mTrack1.indexOf("^")
+        val firstIndex = mTrack1.indexOf("B")
+
+        val cardInfo = DataCard()
+        if (firstIndex == -1) {
+            return cardInfo
+        }
+        val cardNumber = mTrack1.substring(firstIndex + 1, secondIndex)
+        val expiryDate = mTrack1.substring(lastIndex).substring(1, 5)
+        val serviceCode = mTrack1.let {
+            if (lastIndex != -1) {
+                it.substring(lastIndex + 5, lastIndex + 8)
+            } else ""
+        }
+        val cardHolderName = mTrack1.substring(secondIndex + 1, lastIndex)
+        PosLogger.i(PosLib.TAG, "cardNumber: $cardNumber expireDate: $expiryDate serviceCode: $serviceCode")
+        cardInfo.cardNo = cardNumber
+        cardInfo.expireDate = expiryDate
+        cardInfo.serviceCode = serviceCode
+        cardInfo.holderName = cardHolderName
         return cardInfo
     }
 

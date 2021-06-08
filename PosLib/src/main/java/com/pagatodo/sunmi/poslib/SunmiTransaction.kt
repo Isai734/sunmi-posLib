@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.os.RemoteException
 import android.text.TextUtils
 import com.pagatodo.sunmi.poslib.config.PinPadConfigV3
-import com.pagatodo.sunmi.poslib.interfaces.AppEmvSelectListener
 import com.pagatodo.sunmi.poslib.model.*
 import com.pagatodo.sunmi.poslib.util.*
 import com.pagatodo.sunmi.poslib.util.Constants.DEVOLUCION
@@ -18,7 +17,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.fullcarga.android.api.data.DataOpTarjeta
-import net.fullcarga.android.api.data.respuesta.Respuesta
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
@@ -144,25 +142,14 @@ abstract class SunmiTransaction {
         val track1 = bundleTags.getString(Constants.track1) ?: ""
         val track2 = bundleTags.getString(Constants.track2) ?: ""
         val track3 = bundleTags.getString(Constants.track3) ?: ""
-        val name = track1.substring(track1.indexOf("^") + 1)
-        val cardHolderName = name.substring(0, name.indexOf("^"))
-        var serviceCode = ""
-        track2.apply {
-            val index = indexOf("=")
-            if (index != -1) {
-                mCardNo = substring(0, index)
-                serviceCode = substring(index + 5, index + 8)
-            }
-        }
-        return DataCard().apply {
-            this.cardNo = track1.run { substring(indexOf('B') + 1, indexOf('^')) }
+        return (if(track1.isNotEmpty())
+            EmvUtil.parseTrack1(track1)
+        else
+            EmvUtil.parseTrack2(track2)).apply {
             this.track1 = "%$track1?"
             this.track2 = ";$track2?"
             this.track3 = track3
-            this.holderName = cardHolderName
-            this.serviceCode = serviceCode
             this.pinBlock = if(mPinType == PinTypes.PIN_ONLINE.pinValue) ByteUtil.bytes2HexStr(hexStrPin) else null
-            this.expireDate = name.substring(name.indexOf("^")).substring(1, 5)
             PosLogger.e(PosLib.TAG, toString())
         }
     }

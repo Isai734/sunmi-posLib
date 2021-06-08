@@ -8,17 +8,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
+import android.widget.TextView
 import androidx.annotation.Nullable
 import androidx.fragment.app.DialogFragment
 import com.pagatodo.sunmi.poslib.config.PinPadConfigV3
 import com.pagatodo.sunmi.poslib.posInstance
-import com.sunmi.pay.hardware.aidlv2.bean.PinPadConfigV2
+import com.pagatodo.sunmi.poslibimpl.databinding.DialogPinPadCustomBinding
 import com.sunmi.pay.hardware.aidlv2.bean.PinPadDataV2
 import com.sunmi.pay.hardware.aidlv2.pinpad.PinPadListenerV2
-import kotlinx.android.synthetic.main.dialog_pin_pad_custom.*
-import kotlinx.android.synthetic.main.view_fix_password_keyboard.*
 
 class PinPadDialog : DialogFragment() {
+    private lateinit var binding :DialogPinPadCustomBinding
     private lateinit var pinPadListenerV2: PinPadListenerV2
     private var mWidth = 239
     private var mHeight = 130
@@ -37,16 +37,17 @@ class PinPadDialog : DialogFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, @Nullable container: ViewGroup?, @Nullable savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.dialog_pin_pad_custom, container, false)
+        binding = DialogPinPadCustomBinding.inflate(LayoutInflater.from(requireContext()), container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        passwordEditText.setNumberDigits(passwordLength)
-        passwordEditText.repaintDigit()
+        binding.passwordEditText.setNumberDigits(passwordLength)
+        binding.passwordEditText.repaintDigit()
 
-        btnPinPadAccept.text = textAccept
-        btnPinPadCancel.text = textCancel
+        binding.fixPasswordKeyboard.findViewById<TextView>(R.id.btnPinPadAccept).text = textAccept
+        binding.fixPasswordKeyboard.findViewById<TextView>(R.id.btnPinPadCancel).text = textCancel
 
         initView()
     }
@@ -105,12 +106,12 @@ class PinPadDialog : DialogFragment() {
             })
             Log.i(TAG, "result: $result")
             getKeyboardCoordinate(result)
-            fixPasswordKeyboard.keepScreenOn = true
-            fixPasswordKeyboard.setKeyBoard(result)
-            fixPasswordKeyboard.visibility = View.VISIBLE
+            binding.fixPasswordKeyboard.keepScreenOn = true
+            binding.fixPasswordKeyboard.setKeyBoard(result)
+            binding.fixPasswordKeyboard.visibility = View.VISIBLE
             customPinPadConfigV2?.informError?.apply {
-                pinError.visibility = View.VISIBLE
-                pinError.text = this
+                binding.pinError.visibility = View.VISIBLE
+                binding.pinError.text = this
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -118,11 +119,11 @@ class PinPadDialog : DialogFragment() {
     }
 
     private fun getKeyboardCoordinate(keyBoardText: String?) {
-        fixPasswordKeyboard.viewTreeObserver.addOnGlobalLayoutListener(
+        binding.fixPasswordKeyboard.viewTreeObserver.addOnGlobalLayoutListener(
                 object : OnGlobalLayoutListener {
                     override fun onGlobalLayout() {
-                        fixPasswordKeyboard.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                        val textView = fixPasswordKeyboard.key0
+                        binding.fixPasswordKeyboard.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                        val textView = binding.fixPasswordKeyboard.key0
                         textView.getLocationOnScreen(mKeyboardCoordinate)
                         mWidth = textView.width
                         mHeight = textView.height
@@ -162,10 +163,10 @@ class PinPadDialog : DialogFragment() {
             sb.append("*")
         }
         if(len==7){
-            passwordEditText.setNumberDigits(12)
-            passwordEditText.repaintDigit()
+            binding.passwordEditText.setNumberDigits(12)
+            binding.passwordEditText.repaintDigit()
         }
-        passwordEditText.text = sb.toString()
+        binding.passwordEditText.text = sb.toString()
     }
 
     fun setPasswordLength(length: Int) {

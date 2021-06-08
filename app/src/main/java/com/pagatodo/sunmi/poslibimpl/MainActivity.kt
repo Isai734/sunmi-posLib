@@ -12,14 +12,13 @@ import com.pagatodo.sunmi.poslib.PosLib
 import com.pagatodo.sunmi.poslib.SunmiTrxWrapper
 import com.pagatodo.sunmi.poslib.config.PinPadConfigV3
 import com.pagatodo.sunmi.poslib.config.PosConfig
-import com.pagatodo.sunmi.poslib.interfaces.AppEmvSelectListener
 import com.pagatodo.sunmi.poslib.interfaces.SunmiTrxListener
 import com.pagatodo.sunmi.poslib.model.*
 import com.pagatodo.sunmi.poslib.util.*
+import com.pagatodo.sunmi.poslibimpl.databinding.ActivityMainBinding
 import com.sunmi.pay.hardware.aidl.AidlConstants
 import com.sunmi.pay.hardware.aidlv2.bean.EmvTermParamV2
 import com.sunmi.pay.hardware.aidlv2.pinpad.PinPadListenerV2
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -29,16 +28,18 @@ import net.fullcarga.android.api.data.respuesta.Respuesta
 
 class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
 
+    private lateinit var binding : ActivityMainBinding
     private val viewMPci by lazy { ViewModelProvider(this)[ViewModelPci::class.java] }
     private val trxManager by lazy { SunmiTrxWrapper(this, test = true) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         setSupportActionBar(findViewById(R.id.toolbar))
         PosLib.createInstance(this)
-        btnAccept.setOnClickListener {
-            if (amountTxv.text.isNotEmpty() && amountTxv.text.isDigitsOnly())
+        binding.btnAccept.setOnClickListener {
+            if (binding.amountTxv.text.isNotEmpty() && binding.amountTxv.text.isDigitsOnly())
                 trxManager.initTransaction()
         }
     }
@@ -96,8 +97,8 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
 
     override fun createTransactionData() = TransactionData().apply {
         transType = Constants.TransType.PURCHASE
-        amount = amountTxv.text.toString()
-        totalAmount = amountTxv.text.toString()
+        amount = binding.amountTxv.text.toString()
+        totalAmount = binding.amountTxv.text.toString()
         otherAmount = "00"
         currencyCode = "0156"
         cashBackAmount = "00"
@@ -189,7 +190,7 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         }
     }
 
-    override fun isPossibleFallback(): Boolean = false
+    override fun isPossibleFallback(): Boolean = true
 
     override fun requireSignature(dataCard: DataCard) = false
 
