@@ -76,7 +76,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
             }
             PosResult.NextOperetion -> {
                 nextOperation?.apply {
-                    sunmiListener.doOperationNext(this, result) { message -> resendTransaction(message) }
+
                 }?: run { sunmiListener.onFailureEmv(result){} }
                 nextOperation = null
             }
@@ -146,6 +146,11 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
 
     override fun onRemoveCard() = sunmiListener.showRemoveCard(dataCard)
 
+    private fun doNxtOperation(response: RespuestaTrxCierreTurno){
+        nextOperation = response.operacionSiguiente
+        sunmiListener.doOperationNext(response.operacionSiguiente, response.campo60.first()) { doNextOperation(response.campo60.first()) }
+    }
+
     private val pciObserver
         get() = Observer<Results<Any>> {
             when (it) {
@@ -155,8 +160,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
                             requestTransaction = it.data
                             when {
                                 hasNextOpr(it.data.operacionSiguiente) -> {
-                                    nextOperation = it.data.operacionSiguiente
-                                    doNextOperation(it.data.campo60.first())
+                                    doNxtOperation(it.data)
                                 }
                                 it.data.isCorrecta -> {
                                     val tags = String(it.data.campoTagsEmv, Charset.defaultCharset()).trim()
