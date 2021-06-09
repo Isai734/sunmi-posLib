@@ -31,6 +31,7 @@ abstract class SunmiTransaction {
     protected var emvTags: HashMap<String, String> = HashMap()
     protected var mCardType: AidlConstants.CardType = AidlConstants.CardType.MAGNETIC
     protected var allowFallback = false
+    protected var isOperNext = false
     protected var mPinType: Int = 0 // 0-online pin, 1-offline pin
     private var mCardNo: String = ""
         get() {
@@ -106,6 +107,14 @@ abstract class SunmiTransaction {
     fun cancelProcessEmv() = try {
         posInstance().mReadCardOptV2?.cardOff(mCardType.value)
         posInstance().mReadCardOptV2?.cancelCheckCard()
+    } catch (exe: Exception) {
+        PosLogger.e(PosLib.TAG, exe.message)
+    }
+
+    fun doNextOperation(message: String? = null) = try {
+        isOperNext = true
+        customMessage = message
+        posInstance().mEMVOptV2?.abortTransactProcess()
     } catch (exe: Exception) {
         PosLogger.e(PosLib.TAG, exe.message)
     }
@@ -408,6 +417,7 @@ abstract class SunmiTransaction {
         hexStrPin = ByteArray(0)
         customMessage = null
         sendOnlineWithError = false
+        isOperNext = false
     }
 
     private fun getCandidateNames(candiList: List<EMVCandidateV2>): List<String> {

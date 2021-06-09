@@ -30,7 +30,7 @@ interface SunmiTrxListener<E : Any> {
     fun onFailureEmv(error: PosResult, todo: (String) -> Unit)
     fun onFailureOnline(error: PosResult, doContinue: () -> Unit)
     fun onPurchase(dataCard: DataCard)
-    fun doOperationNext(nextOperation: OperacionSiguiente, nextOprResult: PosResult)
+    fun doOperationNext(nextOperation: OperacionSiguiente, nextOprResult: PosResult, doContinue: (String) -> Unit)
     fun getVmodelPCI(): SunmiViewModel<E>
     fun showReading()
     fun showRemoveCard(dataCard: DataCard?)

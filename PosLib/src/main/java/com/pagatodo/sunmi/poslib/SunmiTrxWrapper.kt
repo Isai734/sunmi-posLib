@@ -23,6 +23,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
     private val sunmiListener: SunmiTrxListener<*>
     private var requestTransaction: RespuestaTrxCierreTurno? = null
     private var forceCheckCard: Int = -1
+    private var nextOperation: OperacionSiguiente? = null
 
     init {
         if (owner is SunmiTrxListener<*>)
@@ -69,9 +70,15 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
                 } else sunmiListener.onFailureEmv(PosResult.ErrorCheckCard){}
             }
             PosResult.ReplaceCard, PosResult.SeePhone, PosResult.CardNoSupported,
-            PosResult.CardDenial, PosResult.NfcTerminated, PosResult.NextOperetion, PosResult.TransTerminate,
+            PosResult.CardDenial, PosResult.NfcTerminated,  PosResult.TransTerminate,
             PosResult.FinalSelectApp, PosResult.DataCardWithError, PosResult.NoCommonAppNfc -> {
                 sunmiListener.onFailureEmv(result) { message -> resendTransaction(message) }
+            }
+            PosResult.NextOperetion -> {
+                nextOperation?.apply {
+                    sunmiListener.doOperationNext(this, result) { message -> resendTransaction(message) }
+                }?: run { sunmiListener.onFailureEmv(result){} }
+                nextOperation = null
             }
             PosResult.FallBack, PosResult.FallBackCommonApp -> {
                 if(sunmiListener.isPossibleFallback()) {
@@ -139,11 +146,6 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
 
     override fun onRemoveCard() = sunmiListener.showRemoveCard(dataCard)
 
-    private fun doNextOpr(operacionSiguiente: OperacionSiguiente, nextOprResult: PosResult) {
-        cancelProcessEmv()
-        sunmiListener.doOperationNext(operacionSiguiente, nextOprResult)
-    }
-
     private val pciObserver
         get() = Observer<Results<Any>> {
             when (it) {
@@ -153,9 +155,8 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
                             requestTransaction = it.data
                             when {
                                 hasNextOpr(it.data.operacionSiguiente) -> {
-                                    val resultNexOpr = PosResult.NextOperetion
-                                    resultNexOpr.message = it.data.campo60.first()
-                                    doNextOpr(it.data.operacionSiguiente, resultNexOpr)
+                                    nextOperation = it.data.operacionSiguiente
+                                    doNextOperation(it.data.campo60.first())
                                 }
                                 it.data.isCorrecta -> {
                                     val tags = String(it.data.campoTagsEmv, Charset.defaultCharset()).trim()
