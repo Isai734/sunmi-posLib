@@ -52,7 +52,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
     }
 
     override fun goOnlineProcess(dataCard: DataCard) {
-        sunmiListener.onDialogProcessOnline()
+        sunmiListener.onDialogProcessOnline(dataCard = dataCard)
         this.dataCard = dataCard.apply { PosLogger.d(TAG, this.toString()) }
         sunmiListener.onDismissRequestCard()
         sunmiListener.onPurchase(dataCard)
@@ -65,7 +65,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
         when (result) {
             PosResult.DoSyncOperation, PosResult.ErrorCheckPresentCard -> {
                 if(this::dataCard.isInitialized){
-                    sunmiListener.onDialogProcessOnline(result.message)
+                    sunmiListener.onDialogProcessOnline(result.message, dataCard)
                     sunmiListener.onSync(dataCard)
                 } else sunmiListener.onFailureEmv(PosResult.ErrorCheckCard){}
             }

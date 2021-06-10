@@ -12,7 +12,7 @@ import net.fullcarga.android.api.data.respuesta.Respuesta
 interface SunmiTrxListener<E : Any> {
     fun onDialogRequestCard(message: String? = null, cardTypes: Int = 0)
     fun onDismissRequestCard()
-    fun onDialogProcessOnline(message: String? = null)
+    fun onDialogProcessOnline(message: String? = null, dataCard: DataCard? = null)
     fun onDismissRequestOnline()
     fun onShowSingDialog(doContinue: (ByteArray) -> Unit)
     fun createTransactionData(): TransactionData

@@ -79,7 +79,7 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         askForCard?.dismiss()
     }
 
-    override fun onDialogProcessOnline(message: String?) {
+    override fun onDialogProcessOnline(message: String?, dataCard: DataCard?) {
         dialogProgress.show(supportFragmentManager, dialogProgress.tag)
     }
 
