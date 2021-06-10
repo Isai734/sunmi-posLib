@@ -76,7 +76,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
             }
             PosResult.NextOperetion -> {
                 nextOperation?.apply {
-                    sunmiListener.onFailureOnline(result) { resendTransaction(result.message) }
+                    sunmiListener.onFailureOnline(result) { message -> resendTransaction(message) }
                 }?: run { sunmiListener.onFailureOnline(result){} }
                 nextOperation = null
             }
