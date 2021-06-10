@@ -76,8 +76,8 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
             }
             PosResult.NextOperetion -> {
                 nextOperation?.apply {
-                    sunmiListener.doOperationNext(this, result.message) { resendTransaction(result.message) }
-                }?: run { sunmiListener.onFailureEmv(result){} }
+                    sunmiListener.onFailureOnline(result) { resendTransaction(result.message) }
+                }?: run { sunmiListener.onFailureOnline(result){} }
                 nextOperation = null
             }
             PosResult.FallBack, PosResult.FallBackCommonApp -> {
@@ -148,7 +148,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
 
     private fun doNxtOperation(response: RespuestaTrxCierreTurno){
         nextOperation = response.operacionSiguiente
-        sunmiListener.requestOperationNext(response.operacionSiguiente, response.campo60.first()) { doNextOperation(response.campo60.first()) }
+        sunmiListener.doOperationNext(response.operacionSiguiente, response.campo60.first()) { doNextOperation(response.campo60.first()) }
     }
 
     private val pciObserver
