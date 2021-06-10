@@ -74,12 +74,7 @@ abstract class SunmiTransaction {
         }
 
         val out = ByteArray(1024)
-        val len = posInstance().mEMVOptV2?.importOnlineProcStatus(
-            tlvResponse.status,
-            tags.toTypedArray(),
-            values.toTypedArray(),
-            out
-        )
+        val len = posInstance().mEMVOptV2?.importOnlineProcStatus(tlvResponse.status, tags.toTypedArray(), values.toTypedArray(), out)
         PosLogger.e(PosLib.TAG, "card update status code::$len")
         len?.also {  //Validar si esto aplica para MTIP 2.60 Refund
             if ((it == PosResult.DoSyncOperation.code || it == PosResult.TransRefused.code) && tlvResponse.status == 0) {
@@ -133,8 +128,7 @@ abstract class SunmiTransaction {
 
     private fun getDataCard(mapTags: Map<String, TLV?>): DataCard { //NOSONAR
         val dataCard = EmvUtil.parseTrack2(mapTags["57"]?.value)
-        dataCard.cardNo =
-            if (dataCard.cardNo.isNullOrEmpty()) mCardNo else dataCard.cardNo
+        dataCard.cardNo = if (dataCard.cardNo.isNullOrEmpty()) mCardNo else dataCard.cardNo
         dataCard.track1 = mapTags[Constants.TagsEmv.ENC_TRACK_1.tag]?.value ?: ""
         dataCard.track2 = mapTags[Constants.TagsEmv.ENC_TRACK_2.tag]?.value ?: ""
         dataCard.track3 = mapTags[Constants.TagsEmv.ENC_TRACK_3.tag]?.value ?: ""
