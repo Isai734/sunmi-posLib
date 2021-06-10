@@ -545,6 +545,10 @@ abstract class SunmiTransaction {
         }
     }
 
+    protected fun checkAndRemoveCard() {
+        checkAndRemoveCard {}
+    }
+
     protected fun checkAndRemoveCard(cardAbsent: () -> Unit) {
         try {//Check and notify remove card
             val status = posInstance().mReadCardOptV2?.getCardExistStatus(AidlConstants.CardType.IC.value)?.also {

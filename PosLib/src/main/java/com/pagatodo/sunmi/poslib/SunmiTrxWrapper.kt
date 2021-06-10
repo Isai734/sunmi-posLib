@@ -85,7 +85,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
                     allowFallback = true
                     forceCheckCard = mcrOnlyCheckCard
                     sunmiListener.onFailureEmv(result) { message -> resendTransaction(message) }
-                } else  sunmiListener.onFailureEmv(PosResult.ErrorCheckCard){}
+                } else  sunmiListener.onFailureEmv(PosResult.ErrorCheckCard){ checkAndRemoveCard() }
             }
             PosResult.OtherInterface -> {
                 forceCheckCard = rfOffCheckCard
@@ -97,13 +97,13 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
             PosResult.OnlineError -> {
                 onFailureOnline(result)
             }
-            else -> sunmiListener.onFailureEmv(result){}
+            else -> sunmiListener.onFailureEmv(result){ checkAndRemoveCard() }
         }
     }
 
     private fun onFailureOnline(result: PosResult){
         sunmiListener.onFailureOnline(result) {
-            checkAndRemoveCard {}
+            checkAndRemoveCard()
         }
     }
 
@@ -148,7 +148,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
 
     private fun doNxtOperation(response: RespuestaTrxCierreTurno){
         nextOperation = response.operacionSiguiente
-        sunmiListener.doOperationNext(response.operacionSiguiente, response.campo60.first()) { doNextOperation(response.campo60.first()) }
+        sunmiListener.doOperationNext(response.operacionSiguiente, response.campo60.first()) { message -> doNextOperation(message) }
     }
 
     private val pciObserver

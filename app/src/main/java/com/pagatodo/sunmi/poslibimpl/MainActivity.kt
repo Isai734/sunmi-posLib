@@ -154,8 +154,8 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         viewMPci.purchase()
     }
 
-    override fun doOperationNext(nextOperation: OperacionSiguiente, message: String, doContinue: () -> Unit) {
-        doContinue()
+    override fun doOperationNext(nextOperation: OperacionSiguiente, message: String, doContinue: (String) -> Unit) {
+        doContinue(message)
         Toast.makeText(this, "Operacion Siguiente", Toast.LENGTH_LONG).show()
     }
 
