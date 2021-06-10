@@ -76,7 +76,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
             }
             PosResult.NextOperetion -> {
                 nextOperation?.apply {
-
+                    resendTransaction(result.message)
                 }?: run { sunmiListener.onFailureEmv(result){} }
                 nextOperation = null
             }

@@ -324,7 +324,9 @@ abstract class SunmiTransaction {
                 onSuccessOnline()
             else{
                 customMessage?.apply {
-                    if (this != PosResult.DoSyncOperation.message)
+                    if(isOperNext)
+                        onFailure(PosResult.NextOperetion.also { it.message = this })
+                    else if (this != PosResult.DoSyncOperation.message)
                         onFailure(getPosResult(code, this))
                 } ?: onFailure(getPosResult(code, desc))
             }
