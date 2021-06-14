@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:layout_margin="8dp"
+    android:background="@android:color/white"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/tvTituloModal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="@dimen/gen_dimen_txt_24"
+        android:tooltipText="askfkgrtgr"
+        app:layout_constraintBottom_toTopOf="@id/ivIconoStatus"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/ivIconoStatus"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:scaleType="fitXY"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/rvOperaciones"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTituloModal" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvOperaciones"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/btnAceptEmvappp"
+        app:layout_constraintTop_toBottomOf="@id/ivIconoStatus"
+        tools:listitem="@layout/item_datos_agente" />
+
+    <com.pagatodo.sunmi.poslib.view.custom.ButtonSunmi
+        android:id="@+id/btnAceptEmvappp"
+        android:layout_width="@dimen/width_button_normal"
+        android:layout_height="@dimen/height_button_normal"
+        android:textAllCaps="false"
+        android:layout_marginTop="12sp"
+        app:background="@drawable/lb_btn_siguiente"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rvOperaciones"
+        app:text="Aceptar" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -22,10 +22,24 @@
     <string name="magnetic_mode_not_support">Tarjeta No Soportada.</string>
     <string name="empty_pin">Por favor escriba su numero secreto.</string>
     <string name="secret_wrong">No. Secreto Erróneo</string>
+    <string name="empty_sing">Es Necesario Terminar el Flujo de Firma para Poder Continuar.</string>
     <string name="sync_operation_failed">Verifica la Conexión.</string>
     <string name="sync_operation_success">Se canceló la operación.</string>
     <string name="error_check_present_card">Error al Validar la Tarjeta Presente.</string>
     <string name="error_card_no_supported">Error al Leer la Tarjeta, Intente de Nuevo.</string>
     <string name="error_online_process_title">Operación Denegada.</string>
     <string name="next_operation">Operacion Siguiente.</string>
+
+    <string name="seleccion_operacion">Seleccione Aplicación</string>
+    <string name="authorizing_pci">Espere por favor.</string>
+    <string name="sing_here">Firma del cliente</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="aceptar">Aceptar</string>
+    <string name="gen_desc">Imagen</string>
+    <string name="iniciando_operacion_banda">Desliza la Tarjeta</string>
+    <string name="iniciando_operacion_chip">Inserta la Tarjeta</string>
+    <string name="iniciando_operacion_banda_chip">Desliza o Inserta la Tarjeta</string>
+    <string name="iniciando_operacion_ctls_chip">Inserta o Acerca la Tarjeta</string>
+    <string name="iniciando_operacion_all">Desliza, Inserta o Acerca la Tarjeta</string>
+    <string name="iniciando_operacion">Desliza, Inserta o Acerca la Tarjeta</string>
 </resources>

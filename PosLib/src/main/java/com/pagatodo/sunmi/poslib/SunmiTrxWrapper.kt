@@ -74,7 +74,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
             PosResult.FinalSelectApp, PosResult.DataCardWithError, PosResult.NoCommonAppNfc -> {
                 sunmiListener.onFailureEmv(result) { message -> resendTransaction(message) }
             }
-            PosResult.NextOperetion -> {
+            PosResult.NextOperation -> {
                 nextOperation?.apply {
                     sunmiListener.onFailureOnline(result) { message -> resendTransaction(message) }
                 }?: run { sunmiListener.onFailureOnline(result){} }
@@ -111,7 +111,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
         sunmiListener.onDismissRequestOnline()
         sunmiListener.onSuccessOnline {
             checkAndRemoveCard {
-                if (isRequestSignature || VentaPCIUtils.emvRequestSignature(dataCard.tlvData) || sunmiListener.requireSignature(dataCard))
+                if (isRequestSignature || PciUtils.emvRequestSignature(dataCard.tlvData) || sunmiListener.requireSignature(dataCard))
                     sunmiListener.onShowSingDialog { sign ->
                         sunmiListener.onShowTicketDialog(requestTransaction, dataCard, sign)
                     }
@@ -144,7 +144,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
 
     override fun getTransactionData() = mTransactionData
 
-    override fun onRemoveCard() = sunmiListener.showRemoveCard(dataCard)
+    override fun onRemoveCard() = sunmiListener.showRemoveCard(if(this::dataCard.isInitialized) dataCard else null)
 
     private fun doNxtOperation(response: RespuestaTrxCierreTurno){
         nextOperation = response.operacionSiguiente

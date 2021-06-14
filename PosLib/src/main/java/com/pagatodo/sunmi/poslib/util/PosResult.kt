@@ -21,7 +21,7 @@ enum class PosResult(var code: Int, var message: String, val tile:String? = null
     OnlineError(-50024, "", getMessage(R.string.error_online_process_title)),
     FinalSelectApp(-50026, getMessage(R.string.error_card_no_supported)),
 
-    CardAbsentAproved(0, getMessage(R.string.transaction_approved)),
+    OnlineApproved(0, getMessage(R.string.transaction_approved)),
     OfflineDecline(2, getMessage(R.string.offline_declined)),
     ReplaceCard(4, getMessage(R.string.replace_card)),
     ErrorCheckCard(5, getMessage(R.string.check_card)),
@@ -32,9 +32,10 @@ enum class PosResult(var code: Int, var message: String, val tile:String? = null
     CardPresentWait(10, getMessage(R.string.card_present_wait)),
     SyncOperationFailed(11, getMessage(R.string.sync_operation_failed)),
     SyncOperationSuccess(12, getMessage(R.string.sync_operation_success)),
-    NextOperetion(13, getMessage(R.string.sync_operation)),
+    NextOperation(13, getMessage(R.string.sync_operation)),
     ErrorEmptyPin(14, getMessage(R.string.empty_pin)),
     NoSecretWrong(15, getMessage(R.string.secret_wrong)),
+    ErrorEmptySing(16, getMessage(R.string.empty_sing)),
     Generic(100, getMessage(R.string.generic));
 }
 

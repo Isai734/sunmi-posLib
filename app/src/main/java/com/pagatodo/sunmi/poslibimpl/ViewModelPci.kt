@@ -2,12 +2,13 @@ package com.pagatodo.sunmi.poslibimpl
 
 import androidx.lifecycle.viewModelScope
 import com.pagatodo.sunmi.poslib.model.Results
-import com.pagatodo.sunmi.poslib.viewmodel.SunmiViewModel
+import com.pagatodo.sunmi.poslib.viewmodel.AbstractViewModel
+import com.pagatodo.sunmi.poslib.viewmodel.EmvViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class ViewModelPci : SunmiViewModel<String>() {
+class ViewModelPci : AbstractViewModel<String>() {
 
     fun purchase() {
         viewModelScope.launch(Dispatchers.Main) {

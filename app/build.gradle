@@ -67,7 +67,7 @@ dependencies {
 
 /**
  * Uncomment for upload new version of PayLib
- * publishing {
+ *publishing {
     publications {
         bar(MavenPublication) {
             groupId 'com.pagatodo.sunmi'

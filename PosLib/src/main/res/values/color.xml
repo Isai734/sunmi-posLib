@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorGrey">#E0E0E0</color>
+    <color name="color_inputs">#46606a</color>
+    <color name="colorPrimaryDark">#00a1e1</color>
+    <color name="colorLineColor">#46606a</color>
+    <color name="colorBlueLightButton">#05d7f2</color>
+</resources>

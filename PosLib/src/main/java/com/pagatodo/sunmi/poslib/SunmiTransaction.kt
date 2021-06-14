@@ -314,12 +314,12 @@ abstract class SunmiTransaction {
             if (getTransactionData().transType == Constants.TransType.REFUND && code == PosResult.TransTerminate.code) {//transResult does not matter when transaction is a refund
                 onOnlineProc()
                 sendOnlineWithError = true
-            } else if (code == PosResult.CardAbsentAproved.code)
+            } else if (code == PosResult.OnlineApproved.code)
                 onSuccessOnline()
             else{
                 customMessage?.apply {
                     if(isOperNext)
-                        onFailure(PosResult.NextOperetion.also { it.message = this })
+                        onFailure(PosResult.NextOperation.also { it.message = this })
                     else if (this != PosResult.DoSyncOperation.message)
                         onFailure(getPosResult(code, this))
                 } ?: onFailure(getPosResult(code, desc))

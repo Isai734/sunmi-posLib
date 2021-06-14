@@ -15,6 +15,7 @@ import com.pagatodo.sunmi.poslib.config.PosConfig
 import com.pagatodo.sunmi.poslib.interfaces.SunmiTrxListener
 import com.pagatodo.sunmi.poslib.model.*
 import com.pagatodo.sunmi.poslib.util.*
+import com.pagatodo.sunmi.poslib.view.dialogs.PinPadDialog
 import com.pagatodo.sunmi.poslibimpl.databinding.ActivityMainBinding
 import com.sunmi.pay.hardware.aidl.AidlConstants
 import com.sunmi.pay.hardware.aidlv2.bean.EmvTermParamV2

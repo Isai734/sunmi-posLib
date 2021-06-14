@@ -2,6 +2,7 @@ package com.pagatodo.sunmi.poslib.util
 
 import android.os.Bundle
 import android.util.Log
+import com.pagatodo.sigmalib.EmvManager
 import com.pagatodo.sunmi.poslib.PosLib
 import com.pagatodo.sunmi.poslib.model.DataCard
 import com.pagatodo.sunmi.poslib.posInstance
@@ -10,81 +11,13 @@ import com.sunmi.pay.hardware.aidl.AidlConstants
 import com.sunmi.pay.hardware.aidlv2.bean.EmvTermParamV2
 import com.sunmi.pay.hardware.aidlv2.emv.EMVOptV2
 import com.sunmi.pay.hardware.aidlv2.security.SecurityOptV2
+import net.fullcarga.android.api.bd.sigma.generated.tables.pojos.PerfilesEmv
 import java.util.regex.Pattern
 
 object EmvUtil {
     private val TAG = EmvUtil::class.java.simpleName
-    val tagsDefault = arrayOf<String>(
-        "DF02",
-        "5F34",
-        "5F36",
-        "9F06",
-        "FF30",
-        "FF31",
-        "95",
-        "9B",
-        "9F36",
-        "9F26",
-        "9F27",
-        "DF31",
-        "5A",
-        "57",
-        "5F24",
-        "9F1A",
-        "9F33",
-        "9F35",
-        "9F39",
-        "9F40",
-        "9F03",
-        "9F10",
-        "9F37",
-        "9C",
-        "9A",
-        "9F02",
-        "9F0D",
-        "5F2A",
-        "82",
-        "9F34",
-        "9F1E",
-        "84",
-        "8E",
-        "47",
-        "4F",
-        "9F66",
-        "9F6C",
-        "9F09",
-        "9F41",
-        "9F63",
-        "5F20",
-        "5F30",
-        "9F12",
-        "50",
-        "DF13"
-    )
-    val payPassTags = arrayOf(
-        "DF811E",
-        "DF812C",
-        "DF8118",
-        "DF8119",
-        "DF811F",
-        "DF8117",
-        "DF8124",
-        "DF8125",
-        "DF8126",
-        "9F34",
-        "9F39",
-        "9F6D",
-        "9F6E",
-        "DF811B",
-        "9F53",
-        "DF810C",
-        "9F1D",
-        "DF8130",
-        "DF812D",
-        "DF811C",
-        "DF811D",
-        "9F7C"
-    )
+    val tagsDefault = arrayOf("DF02", "5F34", "5F36", "9F06", "FF30", "FF31", "95", "9B", "9F36", "9F26", "9F27", "DF31", "5A", "57", "5F24", "9F1A", "9F33", "9F35", "9F39", "9F40", "9F03", "9F10", "9F37", "9C", "9A", "9F02", "9F0D", "5F2A", "82", "9F34", "9F1E", "84", "8E", "47", "4F", "9F66", "9F6C", "9F09", "9F41", "9F63", "5F20", "5F30", "9F12", "50", "DF13")
+    val payPassTags = arrayOf("DF811E", "DF812C", "DF8118", "DF8119", "DF811F", "DF8117", "DF8124", "DF8125", "DF8126", "9F34", "9F39", "9F6D", "9F6E", "DF811B", "9F53", "DF810C", "9F1D", "DF8130", "DF812D", "DF811C", "DF811D", "9F7C")
 
     fun setTerminalParam(params: EmvTermParamV2?, emvOptV2: EMVOptV2) {
         try {

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="gen_dimen_txt_28">28sp</dimen>
+    <dimen name="gen_dimen_txt_24">24sp</dimen>
+    <dimen name="gen_dimen_txt_normal">16sp</dimen>
+    <dimen name="width_button_normal">126sp</dimen>
+    <dimen name="width_button_large">136sp</dimen>
+    <dimen name="height_button_normal">41.5sp</dimen>
+    <dimen name="height_button_large">46sp</dimen>
+    <dimen name="width_button_small">125dp</dimen>
+    <dimen name="height_button_small">41sp</dimen>
+</resources>

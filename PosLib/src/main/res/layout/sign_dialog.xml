@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="8sp"
+    app:cardElevation="6sp"
+    app:cardUseCompatPadding="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="10sp">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12sp"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center_horizontal"
+            android:lineSpacingExtra="3.5sp"
+            android:text="@string/sing_here"
+            android:textColor="@color/color_inputs"
+            android:textSize="19.5sp"
+            android:textStyle="normal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <RelativeLayout
+            android:id="@+id/firma_panel_firma"
+            android:layout_width="match_parent"
+            android:layout_height="300sp"
+            android:layout_marginTop="30sp"
+            android:layout_marginBottom="20sp"
+            app:layout_constraintBottom_toTopOf="@id/view"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textView" />
+
+        <Button
+            android:id="@+id/btn_limpiar_firma"
+            style="@style/Cancel_ButtonStyle"
+            android:layout_width="@dimen/width_button_small"
+            android:layout_height="@dimen/height_button_small"
+            android:layout_marginStart="15sp"
+            android:background="@drawable/lb_background_transparente"
+            android:text="Limpiar"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <com.pagatodo.sunmi.poslib.view.custom.ButtonSunmi
+            android:id="@+id/btn_finalizar"
+            style="@style/Accept_ButtonStyle"
+            android:layout_width="@dimen/width_button_small"
+            android:layout_height="@dimen/height_button_small"
+            android:layout_marginEnd="15sp"
+            android:paddingStart="18sp"
+            android:textAlignment="textStart"
+            app:background="@drawable/lb_btn_siguiente"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:text="@string/aceptar" />
+
+        <View
+            android:id="@+id/view"
+            android:layout_width="match_parent"
+            android:layout_height="1sp"
+            android:layout_marginBottom="16sp"
+            android:background="@color/colorPrimaryDark"
+            app:layout_constraintBottom_toTopOf="@id/btn_limpiar_firma" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>

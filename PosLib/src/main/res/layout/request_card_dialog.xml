@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:elevation="8sp"
+    app:cardCornerRadius="12sp"
+    app:cardUseCompatPadding="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/contentLeds"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:visibility="visible">
+
+                <RadioButton
+                    android:id="@+id/led01"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="12sp"
+                    android:checked="true"
+                    android:theme="@style/LedsRadioButton" />
+
+                <RadioButton
+                    android:id="@+id/led02"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="12sp"
+                    android:theme="@style/LedsRadioButton" />
+
+                <RadioButton
+                    android:id="@+id/led03"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="12sp"
+                    android:theme="@style/LedsRadioButton" />
+
+                <RadioButton
+                    android:id="@+id/led04"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="12sp"
+                    android:theme="@style/LedsRadioButton" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/amountRequestCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:fontFamily="@font/roboto_medium"
+                android:gravity="center"
+                android:textSize="@dimen/gen_dimen_txt_28"
+                android:textStyle="bold"
+                tools:text="34€" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/titleRequestCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:fontFamily="@font/roboto_medium"
+            android:gravity="center"
+            android:textSize="@dimen/gen_dimen_txt_24"
+            tools:text="Lorem Ipsum" />
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/requestCardAnim"
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:layout_gravity="center_horizontal"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.504"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.501"
+                app:lottie_autoPlay="false"
+                app:lottie_imageAssetsFolder="images/desliza_tarjeta/"
+                app:lottie_loop="true"
+                app:lottie_rawRes="@raw/desliza_tarjeta"
+                tools:ignore="MissingConstraints" />
+
+        </FrameLayout>
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

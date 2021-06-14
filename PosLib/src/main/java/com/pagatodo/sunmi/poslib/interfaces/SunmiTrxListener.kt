@@ -4,7 +4,8 @@ import com.pagatodo.sunmi.poslib.config.PinPadConfigV3
 import com.pagatodo.sunmi.poslib.model.DataCard
 import com.pagatodo.sunmi.poslib.model.TransactionData
 import com.pagatodo.sunmi.poslib.util.PosResult
-import com.pagatodo.sunmi.poslib.viewmodel.SunmiViewModel
+import com.pagatodo.sunmi.poslib.viewmodel.AbstractViewModel
+import com.pagatodo.sunmi.poslib.viewmodel.EmvViewModel
 import com.sunmi.pay.hardware.aidlv2.pinpad.PinPadListenerV2
 import net.fullcarga.android.api.data.respuesta.OperacionSiguiente
 import net.fullcarga.android.api.data.respuesta.Respuesta
@@ -31,7 +32,7 @@ interface SunmiTrxListener<E : Any> {
     fun onFailureOnline(error: PosResult, doContinue: (String) -> Unit)
     fun onPurchase(dataCard: DataCard)
     fun doOperationNext(nextOperation: OperacionSiguiente, message: String, doContinue: (String) -> Unit)
-    fun getVmodelPCI(): SunmiViewModel<E>
+    fun getVmodelPCI(): AbstractViewModel<E>
     fun showReading()
     fun showRemoveCard(dataCard: DataCard?)
 }
