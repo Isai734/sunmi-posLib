@@ -153,7 +153,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
 
     override fun onShowPinPadDialog(pinPadListener: PinPadListenerV2.Stub, pinPadConfig: PinPadConfigV3) {
         GlobalScope.launch(Dispatchers.Main) {
-            delay(700L)
+            delay(300L)
             val pinPadDialog = PinPadDialog.createInstance(pinPadConfig)
             pinPadDialog.setPasswordLength(6)
             pinPadDialog.setTextAccept("Aceptar")

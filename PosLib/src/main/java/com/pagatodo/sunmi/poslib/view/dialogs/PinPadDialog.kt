@@ -1,5 +1,6 @@
 package com.pagatodo.sunmi.poslib.view.dialogs
 
+import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
 import android.os.RemoteException
@@ -15,6 +16,7 @@ import com.pagatodo.sunmi.poslib.R
 import com.pagatodo.sunmi.poslib.config.PinPadConfigV3
 import com.pagatodo.sunmi.poslib.databinding.DialogPinPadCustomBinding
 import com.pagatodo.sunmi.poslib.posInstance
+import com.pagatodo.sunmi.poslib.setFullScreen
 import com.sunmi.pay.hardware.aidlv2.bean.PinPadDataV2
 import com.sunmi.pay.hardware.aidlv2.pinpad.PinPadListenerV2
 
@@ -32,6 +34,11 @@ class PinPadDialog : DialogFragment() {
     private var textCancel = "Cerrar"
     private var passwordLength = 4
     private var customPinPadConfigV2: PinPadConfigV3? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        requireActivity().setFullScreen()
+    }
 
     fun setPinPadListenerV2(pinPadListenerV2: PinPadListenerV2.Stub) {
         this.pinPadListenerV2 = pinPadListenerV2
