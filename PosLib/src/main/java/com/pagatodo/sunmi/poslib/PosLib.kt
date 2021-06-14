@@ -53,6 +53,7 @@ class PosLib private constructor(val activity: Activity) : SunmiServiceWrapper()
 
 internal fun requireContext() = PosLib.getInstance().activity
 
+@Suppress("DEPRECATION")
 fun Activity.setFullScreen(){
     val decorView = window.decorView
     decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE

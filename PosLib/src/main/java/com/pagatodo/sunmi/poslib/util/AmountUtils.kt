@@ -24,12 +24,12 @@ object AmountUtils {
     }
 
     private class TopAlignSuperscriptSpan//sets the shift percentage
-    internal constructor(shiftPercentage: Float) : SuperscriptSpan() {
+        (shiftPercentage: Float) : SuperscriptSpan() {
         //divide superscript by this number
-        protected var fontScale = 2
+        private var fontScale = 2
 
         //shift value, 0 to 1.0
-        protected var shiftPercentage = 0f
+        private var shiftPercentage = 0f
 
         init {
             if (shiftPercentage > 0.0 && shiftPercentage < 1.0) this.shiftPercentage = shiftPercentage
@@ -69,7 +69,7 @@ object AmountUtils {
     }
 
     fun cleanImporteInput(importe: String, numberFormat: NumberFormat): BigDecimal {
-        val cleanString: String = numbers(importe.replace(numberFormat.currency.symbol.toRegex(), "").replace(" ", ""))
+        val cleanString: String = numbers(importe.replace(numberFormat.currency?.symbol?.toRegex()!!, "").replace(" ", ""))
         return if (cleanString.isNotEmpty()) {
             if (numberFormat.maximumFractionDigits != 0) {
                 BigDecimal(cleanString).setScale(2, BigDecimal.ROUND_FLOOR)

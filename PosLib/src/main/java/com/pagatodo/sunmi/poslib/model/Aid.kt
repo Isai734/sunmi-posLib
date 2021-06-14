@@ -131,7 +131,7 @@ data class Aid(
         termOfflineFloorLmt?.apply {
             aidV2.termOfflineFloorLmt = ByteUtil.hexStr2Bytes(this)
         }
-        aid?.apply {
+        aid.apply {
             aidV2.aid = ByteUtil.hexStr2Bytes(this)
         }
         selFlag?.apply {

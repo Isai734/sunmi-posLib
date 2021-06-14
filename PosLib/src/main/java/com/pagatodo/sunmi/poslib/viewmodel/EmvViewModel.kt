@@ -14,7 +14,7 @@ open class EmvViewModel : AbstractViewModel<AbstractRespuesta>() {
     fun executeEmvOpr(operation: TipoOperacion, product: String, fields: List<String>, dataOpTarjeta: DataOpTarjeta) {
         viewModelScope.launch(Dispatchers.Main) {
             try {
-                RepositoryEmv.execOperationEmv(operation, product, fields, dataOpTarjeta) { pciViewModel.value = it }
+                RepositoryEmv.execOperationEmv(operation, product, fields, dataOpTarjeta) { pciViewModel.postValue(it) }
             } catch (e: Exception) {
                 pciViewModel.value = Results.Failure(e)
             }
@@ -24,7 +24,7 @@ open class EmvViewModel : AbstractViewModel<AbstractRespuesta>() {
     fun executeSync(operation: TipoOperacion, product: String, fields: List<String>, dataOpTarjeta: DataOpTarjeta, stan: Long) {
         viewModelScope.launch(Dispatchers.Main) {
             try {
-                RepositoryEmv.execOperationEmv(operation, product, fields, dataOpTarjeta, stan) { syncViewModel.value = it }
+                RepositoryEmv.execOperationEmv(operation, product, fields, dataOpTarjeta, stan) { syncViewModel.postValue(it) }
             } catch (e: Exception) {
                 syncViewModel.value = Results.Failure(e)
             }

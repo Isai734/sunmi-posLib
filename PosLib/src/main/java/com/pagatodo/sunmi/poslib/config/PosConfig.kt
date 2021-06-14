@@ -49,7 +49,7 @@ class PosConfig {
         private fun findByAid(brand: String): Aid {
             var fAid = Aid()
             for (aid in aids) {
-                aid.aid?.apply {
+                aid.aid.apply {
                     if (startsWith(brand) && aid.aidType == contactLess)
                         fAid = aid
                 }
