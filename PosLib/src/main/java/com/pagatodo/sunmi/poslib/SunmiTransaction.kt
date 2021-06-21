@@ -23,7 +23,7 @@ import kotlin.collections.HashMap
 
 abstract class SunmiTransaction {
     private var hexStrPin: ByteArray = ByteArray(0)
-    private var isRequestPin = false
+    protected var isRequestPin = false
     private var mAppSelect = 0
     private var customMessage: String? = null
     protected var isRequestSignature = false
@@ -58,6 +58,7 @@ abstract class SunmiTransaction {
 
     protected fun getPin(dataCard: DataCard) {
         PosLogger.e(PosLib.TAG, "getPin (dataCard != null required): $dataCard")
+        isRequestPin = true
         initPinPad(dataCard)
     }
 

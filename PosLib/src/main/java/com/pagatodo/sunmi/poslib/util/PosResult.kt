@@ -20,6 +20,7 @@ enum class PosResult(var code: Int, var message: String, val tile:String? = null
     CardNoSupported(-4125, getMessage(R.string.error_card_no_supported)),
     OnlineError(-50024, "", getMessage(R.string.error_online_process_title)),
     FinalSelectApp(-50026, getMessage(R.string.error_card_no_supported)),
+    PinTimeOut(-60001, getMessage(R.string.error_time_out)),
 
     OnlineApproved(0, getMessage(R.string.transaction_approved)),
     OfflineDecline(2, getMessage(R.string.offline_declined)),
@@ -35,7 +36,8 @@ enum class PosResult(var code: Int, var message: String, val tile:String? = null
     NextOperation(13, getMessage(R.string.sync_operation)),
     ErrorEmptyPin(14, getMessage(R.string.empty_pin)),
     NoSecretWrong(15, getMessage(R.string.secret_wrong)),
-    ErrorEmptySing(16, getMessage(R.string.empty_sing)),
+    InfoPinOk(16, getMessage(R.string.pin_ok)),
+    ErrorEmptySing(17, getMessage(R.string.empty_sing)),
     Generic(100, getMessage(R.string.generic));
 }
 

@@ -12,14 +12,14 @@ class ViewModelPci : AbstractViewModel<String>() {
 
     fun purchase() {
         viewModelScope.launch(Dispatchers.Main) {
-            delay(2500L)
+            delay(1500L)
             pciViewModel.value = Results.Success("Venta Exitosa!")
         }
     }
 
     fun sync() {
         viewModelScope.launch(Dispatchers.Main) {
-            delay(2500L)
+            delay(1500L)
             syncViewModel.value = Results.Success("Sync Exitosa!")
         }
     }

@@ -21,12 +21,14 @@
     <string name="sync_operation">Cancelando la Operación.</string>
     <string name="magnetic_mode_not_support">Tarjeta No Soportada.</string>
     <string name="empty_pin">Por favor escriba su numero secreto.</string>
+    <string name="pin_ok">No. Secreto Correcto</string>
     <string name="secret_wrong">No. Secreto Erróneo</string>
     <string name="empty_sing">Es Necesario Terminar el Flujo de Firma para Poder Continuar.</string>
     <string name="sync_operation_failed">Verifica la Conexión.</string>
     <string name="sync_operation_success">Se canceló la operación.</string>
     <string name="error_check_present_card">Error al Validar la Tarjeta Presente.</string>
     <string name="error_card_no_supported">Error al Leer la Tarjeta, Intente de Nuevo.</string>
+    <string name="error_time_out">Tiempo de Espera Agotado.</string>
     <string name="error_online_process_title">Operación Denegada.</string>
     <string name="next_operation">Operacion Siguiente.</string>
 

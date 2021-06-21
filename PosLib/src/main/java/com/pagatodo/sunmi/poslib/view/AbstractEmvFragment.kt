@@ -53,12 +53,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
     private var forceCheckCardType: Int = -1
     private var isAllowCancelEmvProcess = true
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setDataInit()
-    }
-
-    private fun setDataInit(){
+    protected fun setDataInit(){
         val dataInitPci = createDataInit()
         operacion = dataInitPci.operacion
         producto = dataInitPci.producto
@@ -75,7 +70,8 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
     }
 
     override fun onPurchase(dataCard: DataCard) {
-        if (validateCard(fullProfile.perfilesEmv, dataCard)) if (PciUtils.haveCuotas(fullProfile.perfilesEmv, dataCard.cardNo))
+        if (validateCard(fullProfile.perfilesEmv, dataCard))
+            if (PciUtils.haveCuotas(fullProfile.perfilesEmv, dataCard.cardNo))
             showCoutasDialog(
                 object : DialogPayments.OnCuotasSelectListener {
                     override fun onItemCuotaSelected(cuota: Int) {
@@ -118,13 +114,17 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
 
     override fun onFailureEmv(error: PosResult, todo: (String) -> Unit) {
         GlobalScope.launch(Dispatchers.Main) {
-            if(error == PosResult.SeePhone)
-                TemporaryDialog.create(requireContext(), error).show()
-            else
-                TemporaryDialog.create(requireContext(), error).show {
+            when (error) {
+                PosResult.InfoPinOk -> {
+                    TemporaryDialog.create(requireContext(), error).show()
+                    todo(error.message)
+                }
+                PosResult.SeePhone -> TemporaryDialog.create(requireContext(), error).show()
+                else -> TemporaryDialog.create(requireContext(), error).show {
                     requireActivity().setFullScreen()
                     todo(it)
                 }
+            }
         }
     }
 
@@ -308,7 +308,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
 
     override fun onSync(dataCard: DataCard) {
         GlobalScope.launch(Dispatchers.Main) {
-            viewModelPci.executeSync(TipoOperacion.PCI_SINCRONIZACION, producto.codigo, PciUtils.fillFields(params, form),
+            viewModelPci.executeSync(producto.codigo, PciUtils.fillFields(params, form),
                 createDataOpTarjeta(dataCard), ApiData.APIDATA.datosSesion.datosTPV.stanProvider.ultimo)
         }
     }

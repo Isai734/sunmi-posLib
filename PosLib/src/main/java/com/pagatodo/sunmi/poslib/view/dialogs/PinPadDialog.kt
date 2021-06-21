@@ -87,7 +87,6 @@ class PinPadDialog : DialogFragment() {
             val result = posInstance().mPinPadOptV2?.initPinPad(customPinPadConfigV2, object : PinPadListenerV2.Stub() {
                 override fun onPinLength(i: Int) {
                     activity?.runOnUiThread { showPasswordView(i) }
-
                     pinPadListenerV2.onPinLength(i)
                 }
 

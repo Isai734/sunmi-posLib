@@ -2,6 +2,7 @@ package com.pagatodo.sunmi.poslib.util
 
 import android.os.Bundle
 import android.util.Log
+import androidx.core.content.ContextCompat
 import com.pagatodo.sigmalib.EmvManager
 import com.pagatodo.sunmi.poslib.PosLib
 import com.pagatodo.sunmi.poslib.model.DataCard

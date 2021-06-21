@@ -1,6 +1,5 @@
 package com.pagatodo.sunmi.poslib.model.repository
 
-import androidx.lifecycle.MutableLiveData
 import com.pagatodo.sigmalib.transacciones.AbstractTransaccion
 import com.pagatodo.sigmalib.transacciones.TransaccionFactory
 import com.pagatodo.sunmi.poslib.model.Results
