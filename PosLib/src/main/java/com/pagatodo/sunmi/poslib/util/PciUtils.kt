@@ -39,11 +39,14 @@ object PciUtils {
         return tagList.toList()//
     }
 
-    fun getOperation(operation: Operaciones): TipoOperacion {
-        for(opr in TipoOperacion.values())
-            if(operation.operacion == opr.tipo)
-                return opr
-        throw Exception("Operación invalida.")
+    fun getOperation(operacion: Operaciones): TipoOperacion {
+        return when (operacion.operacion) {
+            TipoOperacion.PCI_VENTA.tipo -> TipoOperacion.PCI_VENTA
+            TipoOperacion.PCI_CONSULTA_X.tipo -> TipoOperacion.PCI_CONSULTA_X
+            TipoOperacion.PCI_CONSULTA_Z.tipo -> TipoOperacion.PCI_CONSULTA_Z
+            TipoOperacion.PCI_DEVOLUCION.tipo -> TipoOperacion.PCI_DEVOLUCION
+            else -> throw Exception("Operación invalida.")
+        }
     }
 
     fun valueForParams(parametros: List<Parametro>, param: CamposPCI): BigDecimal {
