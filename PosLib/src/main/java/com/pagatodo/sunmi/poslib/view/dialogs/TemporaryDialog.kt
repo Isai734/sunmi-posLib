@@ -45,6 +45,7 @@ class TemporaryDialog private constructor(context: Context, val result: PosResul
             PosResult.SeePhone -> R.drawable.see_phone
             PosResult.OnlineError -> R.drawable.error_online
             PosResult.OnlineApproved -> R.drawable.success_online
+            PosResult.InfoPinOk -> R.drawable.success_online
             else -> R.drawable.ic_new_error
         })
 

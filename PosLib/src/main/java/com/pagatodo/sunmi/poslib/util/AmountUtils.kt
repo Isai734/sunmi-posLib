@@ -18,7 +18,7 @@ object AmountUtils {
     fun formatAmount(amount: BigDecimal, decimals: Int, currency: String = ""): SpannableString {//With currency
         val nAmount = "$currency ${numberFormat.format(amount)}"
         val spannableString = SpannableString(nAmount)
-        spannableString.setSpan(TopAlignSuperscriptSpan(0.5.toFloat()), 0, 2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        //spannableString.setSpan(TopAlignSuperscriptSpan(0.5.toFloat()), 0, 2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         spannableString.setSpan(TopAlignSuperscriptSpan(0.15.toFloat()), nAmount.length - (decimals + 1), nAmount.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         return spannableString
     }
