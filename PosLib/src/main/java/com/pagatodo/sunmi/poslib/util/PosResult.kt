@@ -43,10 +43,10 @@ enum class PosResult(var code: Int, var message: String, val tile:String? = null
 
 fun getPosResult(code: Int, message: String?): PosResult {
     for (pr in PosResult.values()){
-        if (pr != PosResult.Generic && pr.code == code)
-            return pr
         if (pr == PosResult.OnlineError && pr.code == code)
             return pr.apply { this.message = message ?: ""  }
+        else if (pr != PosResult.Generic && pr.code == code)
+            return pr
     }
 
     return PosResult.Generic.apply {
