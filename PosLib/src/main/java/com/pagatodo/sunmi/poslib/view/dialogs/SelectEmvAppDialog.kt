@@ -46,7 +46,7 @@ class SelectEmvAppDialog : DialogFragment() {
         binding.rvOperaciones.layoutManager = llm
         binding.rvOperaciones.adapter = adapter
         binding.btnAceptEmvappp.setOnClickListener {
-            if(position != 1) {
+            if(position != -1) {
                 dismiss()
                 appSelect(position)
             }
