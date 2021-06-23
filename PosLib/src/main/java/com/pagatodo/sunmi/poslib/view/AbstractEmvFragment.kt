@@ -162,9 +162,11 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
     }
 
     override fun onShowSelectApp(listEmvApps: List<String>, appSelect: (Int) -> Unit) {
-        val selectAppEmvDialog = SelectEmvAppDialog()
-        selectAppEmvDialog.setAplicaciones(listEmvApps, appSelect)
-        selectAppEmvDialog.show(requireActivity().supportFragmentManager, selectAppEmvDialog.tag)
+        GlobalScope.launch(Dispatchers.Main) {
+            val selectAppEmvDialog = SelectEmvAppDialog()
+            selectAppEmvDialog.setAplicaciones(listEmvApps, appSelect)
+            selectAppEmvDialog.show(requireActivity().supportFragmentManager, selectAppEmvDialog.tag)
+        }
     }
 
     private fun showCoutasDialog(listener: DialogPayments.OnCuotasSelectListener, onCancel: View.OnClickListener) {
