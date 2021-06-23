@@ -24,6 +24,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
     private var requestTransaction: RespuestaTrxCierreTurno? = null
     private var forceCheckCard: Int = -1
     private var nextOperation: OperacionSiguiente? = null
+    private var listenerPinOk: SunmiTrxListener<*>? = null
 
     init {
         if (owner is SunmiTrxListener<*>)
@@ -53,8 +54,9 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
 
     override fun goOnlineProcess(dataCard: DataCard) {
         if(isRequestPin && mPinType == 1){
-            sunmiListener.onFailureEmv(PosResult.InfoPinOk){ sunmiListener.onDialogProcessOnline(dataCard = dataCard) }
-        }else
+            listenerPinOk = sunmiListener//to avoid show dialog process on error oline
+            sunmiListener.onFailureEmv(PosResult.InfoPinOk){ listenerPinOk?.onDialogProcessOnline(dataCard = dataCard) }
+        } else
             sunmiListener.onDialogProcessOnline(dataCard = dataCard)
         this.dataCard = dataCard.apply { PosLogger.d(TAG, this.toString()) }
         sunmiListener.onDismissRequestCard()
@@ -105,6 +107,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
     }
 
     private fun onFailureOnline(result: PosResult){
+        listenerPinOk = null
         sunmiListener.onFailureOnline(result) {
             checkAndRemoveCard()
         }
