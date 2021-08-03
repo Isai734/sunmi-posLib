@@ -198,7 +198,7 @@ object PciUtils {
             try {
                 if (expireDate.length == 4) expireDate = "20$expireDate"
                 if (simpleDateFormat.parse(expireDate).before(Date())) {
-                    throw EmvException(EmvException.VALIDATION_ERROR.ERROR_EXPIRY_DATE)
+                    throw EmvException(EmvException.ValidationError.ERROR_EXPIRY_DATE)
                 }
             } catch (exception: ParseException) {
                 PosLogger.e(PosLib.TAG, "Error al Obtener la Fecha de Vencimiento")
@@ -209,7 +209,7 @@ object PciUtils {
     @Throws(EmvException::class)
     fun validateFallback(perfilesEmv: PerfilesEmv, dataCard: DataCard) {
         if (perfilesEmv.chkPermiteFallback == 0 && dataCard.entryMode == DataOpTarjeta.PosEntryMode.FALLBACK) {
-            throw EmvException(EmvException.VALIDATION_ERROR.ERROR_FALLBACK)
+            throw EmvException(EmvException.ValidationError.ERROR_FALLBACK)
         }
     }
 
@@ -226,7 +226,7 @@ object PciUtils {
                 }
             }
             if (!coincidencia) {
-                throw EmvException(EmvException.VALIDATION_ERROR.ERROR_BINES)
+                throw EmvException(EmvException.ValidationError.ERROR_BINES)
             }
         }
     }

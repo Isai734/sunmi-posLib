@@ -64,6 +64,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
     }
 
     override fun onFailure(result: PosResult) {
+        PosLogger.d(TAG, "onFailure: $result")
         sunmiListener.onDismissRequestCard()
         sunmiListener.onDismissRequestOnline()
         BuzzerUtil.doBeep(result)
@@ -217,12 +218,16 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
             when (it) {
                 is Results.Success -> {
                     if (it.data is RespuestaTrxCierreTurno) {
+                        PosLogger.d(TAG, "Success")
                         sunmiListener.onDismissRequestOnline()
                         onFailure(getPosResult(it.data.error, it.data.msjError))
                     } else onFailure(PosResult.SyncOperationSuccess)
                 }
                 is Results.Failure -> {
-                    onFailure(PosResult.SyncOperationFailed)
+                    if(it.exception.message?.trim().equals("La operacion esta anulada"))
+                        onFailure(PosResult.SyncOperationSuccess)
+                    else
+                        onFailure(PosResult.SyncOperationFailed)
                 }
             }
         }
