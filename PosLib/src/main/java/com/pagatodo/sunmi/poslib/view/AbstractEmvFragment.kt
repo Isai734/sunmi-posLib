@@ -1,6 +1,5 @@
 package com.pagatodo.sunmi.poslib.view
 
-import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
@@ -245,7 +244,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
         val inImpuesto = PciUtils.valueForParams(params, CamposPCI.IMPUESTO).toDouble()
         val inPropina = PciUtils.valueForParams(params, CamposPCI.PROPINA).toDouble()
         val inRetiroEfectivo = PciUtils.valueForParams(params, CamposPCI.CASHBACK).toDouble()
-        val inCosto = fullProfile.perfilesEmv.costo.toDouble()
+        val inCosto = fullProfile.perfilesEmv.costo?.toDouble() ?: 0.0
 
         val totalAmt = PciUtils.checkAmtBitmap(fullProfile.perfilesEmv.importeBitmap, inImporte, inRetiroEfectivo, inPropina, inImpuesto, inCosto)
         val cashBackAmt = PciUtils.checkAmtBitmap(fullProfile.perfilesEmv.importe2Bitmap, inImporte, inRetiroEfectivo, inPropina, inImpuesto, inCosto)
