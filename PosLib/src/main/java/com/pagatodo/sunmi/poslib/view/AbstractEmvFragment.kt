@@ -257,7 +257,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
             this.taxes = ApiData.APIDATA.datosSesion.datosTPV.rellenarImporte(inImpuesto.toString())
             this.comisions = ApiData.APIDATA.datosSesion.datosTPV.rellenarImporte(inCosto.toString())
             this.sigmaOperation = operacion.operacion
-            this.tagsEmv = PciUtils.orderTags(EmvManager.getTagsPerfil(producto.perfilEmv))
+            this.tagsEmv = producto?.perfilEmv?.let { PciUtils.orderTags(EmvManager.getTagsPerfil(it)) } ?: LinkedList()
             this.terminalParams = createParamV2()
         }
     }
