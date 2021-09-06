@@ -244,8 +244,8 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
         val inRetiroEfectivo = PciUtils.valueForParams(params, CamposPCI.CASHBACK).toDouble()
         val inCosto = fullProfile.perfilesEmv?.costo?.toDouble() ?: 0.0
 
-        val totalAmt = fullProfile.perfilesEmv?.let { PciUtils.checkAmtBitmap(it.importeBitmap, inImporte, inRetiroEfectivo, inPropina, inImpuesto, inCosto) } ?: 0.0
-        val cashBackAmt = fullProfile.perfilesEmv?.let { PciUtils.checkAmtBitmap(it.importe2Bitmap, inImporte, inRetiroEfectivo, inPropina, inImpuesto, inCosto) } ?: 0
+        val totalAmt = fullProfile.perfilesEmv?.let { PciUtils.checkAmtBitmap(it.importeBitmap, inImporte, inRetiroEfectivo, inPropina, inImpuesto, inCosto) } ?: inImporte
+        val cashBackAmt = fullProfile.perfilesEmv?.let { PciUtils.checkAmtBitmap(it.importe2Bitmap, inImporte, inRetiroEfectivo, inPropina, inImpuesto, inCosto) } ?: 0.0
 
         return TransactionData().apply {
             this.totalAmount = PciUtils.roundAmount(totalAmt.toString())
