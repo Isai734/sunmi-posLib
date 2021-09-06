@@ -25,6 +25,7 @@ class RequestCardDialog(context: Context) : AlertDialog(context) {
     var amount: String? = null
     var dismissable = true
     var showRfReading = false
+    var showAmt = true
 
     @SuppressLint("ClickableViewAccessibility")
     override fun show() {
@@ -34,6 +35,7 @@ class RequestCardDialog(context: Context) : AlertDialog(context) {
         binding.titleRequestCard.text = mensaje
         val nAmt =  amount?.let {ApiData.APIDATA.datosSesionPCI.datosTPV.convertirImporte(it)} ?: BigDecimal.ZERO
         binding.amountRequestCard.setText(AmountUtils.formatAmount(nAmt, 2), TextView.BufferType.SPANNABLE)
+        binding.amountRequestCard.visibility = if(showAmt) View.VISIBLE else View.GONE
         binding.requestCardAnim.playAnimation()
         if (!showRfReading) {
             binding.contentLeds.visibility = View.GONE

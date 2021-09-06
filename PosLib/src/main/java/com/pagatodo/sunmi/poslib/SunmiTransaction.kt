@@ -485,7 +485,8 @@ abstract class SunmiTransaction {
     private fun initPinPad(dataCard: DataCard? = null, messageError: String? = null) {//dataCard must be different null for a manual pin
         try {
             val pinPadConfig = PinPadConfigV3()
-            val panBytes = mCardNo.substring(mCardNo.length - 13, mCardNo.length - 1).toByteArray(charset("US-ASCII"))
+            val cardNo = dataCard?.cardNo ?: mCardNo
+            val panBytes = cardNo.substring(cardNo.length - 13, cardNo.length - 1).toByteArray(charset("US-ASCII"))
             pinPadConfig.pinPadType = 1 //0: Default 1:Custom
             pinPadConfig.pinType = mPinType
             pinPadConfig.isOrderNumKey = true

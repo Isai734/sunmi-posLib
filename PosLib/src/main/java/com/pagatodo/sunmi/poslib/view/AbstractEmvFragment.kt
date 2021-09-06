@@ -92,7 +92,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
 
     override fun onDialogRequestCard(message: String?, cardTypes: Int) {
         GlobalScope.launch(Dispatchers.Main) {
-            requestCardDialog(message ?: getString(PciUtils.getStringIdTitle(producto)), createTransactionData().totalAmount, cardTypes)
+            requestCardDialog(message ?: getString(PciUtils.getStringIdTitle(producto)), createTransactionData().totalAmount, cardTypes, fullProfile.perfilesEmv != null)
         }
     }
 
@@ -176,10 +176,11 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
 
     override fun getVmodelPCI() = viewModelPci
 
-    private fun requestCardDialog(message: String?, formatedAmount: String, cardTypes: Int = 0) {
+    private fun requestCardDialog(message: String?, formatedAmount: String, cardTypes: Int = 0, showAmount:Boolean = true) {
         requestCardDialog.mensaje = message
         requestCardDialog.amount = formatedAmount
         requestCardDialog.showRfReading = (cardTypes >= AidlConstants.CardType.NFC.value)
+        requestCardDialog.showAmt = showAmount
         requestCardDialog.setOnDismissListener {
             if (isAllowCancelEmvProcess) {
                 sunmiTransaction.cancelProcess()
