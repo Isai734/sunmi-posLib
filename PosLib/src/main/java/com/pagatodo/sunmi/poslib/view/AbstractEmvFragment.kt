@@ -251,7 +251,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
             this.totalAmount = PciUtils.roundAmount(totalAmt.toString())
             this.transType = if ((operacion.operacion ?: "") == TipoOperacion.PCI_VENTA.tipo) Constants.TransType.PURCHASE else Constants.TransType.REFUND
             this.cashBackAmount = PciUtils.roundAmount(cashBackAmt.toString())
-            this.decimals = fullProfile.emvMonedas.decimales
+            this.decimals = fullProfile?.emvMonedas?.decimales ?: 0
             this.amount = ApiData.APIDATA.datosSesion.datosTPV.rellenarImporte(inImporte.toString())
             this.gratuity = ApiData.APIDATA.datosSesion.datosTPV.rellenarImporte(inPropina.toString())
             this.taxes = ApiData.APIDATA.datosSesion.datosTPV.rellenarImporte(inImpuesto.toString())
@@ -284,7 +284,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
         addCapability = UtilCapabilities.additionalTerminalCapabilitiesCode()
         currencyCode = String.format("%04d", fullProfile.perfilesEmv?.let { fullProfile.emvMonedas.codigoMoneda.toInt() } ?: 0)
         countryCode = ApiData.APIDATA.paisCode
-        "0${fullProfile.emvMonedas.exponente}".also { currencyExp = it }
+        currencyExp = "0${fullProfile.emvMonedas?.exponente ?: "0"}"
         TTQ = UtilCapabilities.createTTQ(fullProfile)
     }
 
