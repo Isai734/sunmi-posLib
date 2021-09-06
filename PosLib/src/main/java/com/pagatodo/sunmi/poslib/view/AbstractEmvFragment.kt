@@ -71,15 +71,13 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
     override fun onPurchase(dataCard: DataCard) {
         if (validateCard(fullProfile.perfilesEmv, dataCard))
             if (PciUtils.haveCuotas(fullProfile.perfilesEmv, dataCard.cardNo))
-            showCoutasDialog(
-                object : DialogPayments.OnCuotasSelectListener {
-                    override fun onItemCuotaSelected(cuota: Int) {
-                        dataCard.monthlyPayments = cuota
-                        viewModelPci.executeEmvOpr(PciUtils.getOperation(operacion), producto.codigo, PciUtils.fillFields(params, form), createDataOpTarjeta(dataCard),)
-                    }
-                }) {
-                sunmiTransaction.cancelProcess()
-            }
+                showCoutasDialog(
+                    object : DialogPayments.OnCuotasSelectListener {
+                        override fun onItemCuotaSelected(cuota: Int) {
+                            dataCard.monthlyPayments = cuota
+                            viewModelPci.executeEmvOpr(PciUtils.getOperation(operacion), producto.codigo, PciUtils.fillFields(params, form), createDataOpTarjeta(dataCard),)
+                        }
+                    }) { sunmiTransaction.cancelProcess() }
         else
             viewModelPci.executeEmvOpr(PciUtils.getOperation(operacion), producto.codigo, PciUtils.fillFields(params, form), createDataOpTarjeta(dataCard))
     }
@@ -244,10 +242,10 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
         val inImpuesto = PciUtils.valueForParams(params, CamposPCI.IMPUESTO).toDouble()
         val inPropina = PciUtils.valueForParams(params, CamposPCI.PROPINA).toDouble()
         val inRetiroEfectivo = PciUtils.valueForParams(params, CamposPCI.CASHBACK).toDouble()
-        val inCosto = fullProfile.perfilesEmv.costo?.toDouble() ?: 0.0
+        val inCosto = fullProfile.perfilesEmv?.costo?.toDouble() ?: 0.0
 
-        val totalAmt = PciUtils.checkAmtBitmap(fullProfile.perfilesEmv.importeBitmap, inImporte, inRetiroEfectivo, inPropina, inImpuesto, inCosto)
-        val cashBackAmt = PciUtils.checkAmtBitmap(fullProfile.perfilesEmv.importe2Bitmap, inImporte, inRetiroEfectivo, inPropina, inImpuesto, inCosto)
+        val totalAmt = fullProfile.perfilesEmv?.let { PciUtils.checkAmtBitmap(it.importeBitmap, inImporte, inRetiroEfectivo, inPropina, inImpuesto, inCosto) } ?: 0.0
+        val cashBackAmt = fullProfile.perfilesEmv?.let { PciUtils.checkAmtBitmap(it.importe2Bitmap, inImporte, inRetiroEfectivo, inPropina, inImpuesto, inCosto) } ?: 0
 
         return TransactionData().apply {
             this.totalAmount = PciUtils.roundAmount(totalAmt.toString())
@@ -328,7 +326,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
         TemporaryDialog.create(requireContext(), PosResult.Generic.apply { message = throwable?.message ?: "" })
     }
 
-    private fun validateCard(perfilesEmv: PerfilesEmv, dataCard: DataCard): Boolean {
+    private fun validateCard(perfilesEmv: PerfilesEmv?, dataCard: DataCard): Boolean {
         return try {
             PciUtils.validateFallback(perfilesEmv, dataCard)
             PciUtils.validateDateOfExpiry(perfilesEmv, dataCard.expireDate)

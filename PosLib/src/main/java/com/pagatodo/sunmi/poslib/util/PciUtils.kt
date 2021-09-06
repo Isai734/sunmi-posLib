@@ -177,7 +177,8 @@ object PciUtils {
             return ""
     }
 
-    fun haveCuotas(perfilesEmv: PerfilesEmv, pan: String): Boolean {
+    fun haveCuotas(perfilesEmv: PerfilesEmv?, pan: String): Boolean {
+        perfilesEmv ?: return false
         val rangoCuotas = EmvManager.getRangoCuotas(perfilesEmv.lstCuotasMes)
         if (rangoCuotas.isNotEmpty()) {
             for (cuota in rangoCuotas) {
@@ -192,7 +193,8 @@ object PciUtils {
     @Throws(EmvException::class)
     fun validateDateOfExpiry(perfilesEmv: PerfilesEmv?, expireDate: String) {
         var expireDate = expireDate
-        if (perfilesEmv != null && perfilesEmv.chkFechaCaducidad == 1 && !expireDate.isEmpty()) {
+        perfilesEmv ?: return
+        if (perfilesEmv.chkFechaCaducidad == 1 && expireDate.isNotEmpty()) {
             val simpleDateFormat = SimpleDateFormat("yyyyMM", Locale.getDefault())
             simpleDateFormat.isLenient = false
             try {
@@ -207,14 +209,16 @@ object PciUtils {
     }
 
     @Throws(EmvException::class)
-    fun validateFallback(perfilesEmv: PerfilesEmv, dataCard: DataCard) {
+    fun validateFallback(perfilesEmv: PerfilesEmv?, dataCard: DataCard) {
+        perfilesEmv ?: return
         if (perfilesEmv.chkPermiteFallback == 0 && dataCard.entryMode == DataOpTarjeta.PosEntryMode.FALLBACK) {
             throw EmvException(EmvException.ValidationError.ERROR_FALLBACK)
         }
     }
 
     @Throws(EmvException::class)
-    fun validateBinCuotas(perfilesEmv: PerfilesEmv, pan: String) {
+    fun validateBinCuotas(perfilesEmv: PerfilesEmv?, pan: String) {
+        perfilesEmv ?: return
         if (perfilesEmv.lstCuotasMes < 0) return
         var coincidencia = false
         val rangoCuotas = EmvManager.getRangoCuotas(perfilesEmv.lstCuotasMes)
