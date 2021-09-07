@@ -69,7 +69,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
     }
 
     override fun onPurchase(dataCard: DataCard) {
-        if (validateCard(fullProfile.perfilesEmv, dataCard))
+        if (validateCard(fullProfile.perfilesEmv, dataCard)) {
             if (PciUtils.haveCuotas(fullProfile.perfilesEmv, dataCard.cardNo))
                 showCoutasDialog(
                     object : DialogPayments.OnCuotasSelectListener {
@@ -78,8 +78,9 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
                             viewModelPci.executeEmvOpr(PciUtils.getOperation(operacion), producto.codigo, PciUtils.fillFields(params, form), createDataOpTarjeta(dataCard),)
                         }
                     }) { sunmiTransaction.cancelProcess() }
-        else
-            viewModelPci.executeEmvOpr(PciUtils.getOperation(operacion), producto.codigo, PciUtils.fillFields(params, form), createDataOpTarjeta(dataCard))
+            else
+                viewModelPci.executeEmvOpr(PciUtils.getOperation(operacion), producto.codigo, PciUtils.fillFields(params, form), createDataOpTarjeta(dataCard))
+        }
     }
 
     override fun onDialogProcessOnline(message: String?, dataCard: DataCard?) {
