@@ -60,9 +60,8 @@ object AmountUtils {
     private fun numbers(importe: String): String {
         val numbers = StringBuilder()
         for (element in importe) {
-            val caracter = element
-            if (isNumeric(caracter)) {
-                numbers.append(caracter)
+            if (isNumeric(element)) {
+                numbers.append(element)
             }
         }
         return numbers.toString()

@@ -1,7 +1,6 @@
 package com.pagatodo.sunmi.poslib.keychain
 
 import android.os.RemoteException
-import com.pagatodo.sunmi.poslib.PosLib
 import com.pagatodo.sunmi.poslib.posInstance
 import com.pagatodo.sunmi.poslib.util.Constants
 import com.sunmi.pay.hardware.aidl.AidlConstants

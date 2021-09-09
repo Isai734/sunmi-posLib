@@ -21,11 +21,6 @@ class SingDialog : DialogFragment(), View.OnClickListener {
         fun onCancel()
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setStyle(STYLE_NO_TITLE, R.style.FillHorizontalDialogStyleClient)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val vista: View = inflater.inflate(R.layout.sign_dialog, container, false)
         asociarLayout(vista)

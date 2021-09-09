@@ -28,7 +28,7 @@ class DialogProgress(context: Context) : Dialog(context) {
 
     init {
         setCancelable(false)
-        window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        //window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
     }
 
     override fun hide() {

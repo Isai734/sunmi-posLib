@@ -36,26 +36,4 @@ object ByteUtil {
     fun hexStr2Byte(hexStr: String): Byte {
         return hexStr.toInt(16).toByte()
     }
-
-    /**
-     * 将int转换成byte数组，大端模式(高位在前)
-     */
-    fun int2BytesBE(src: Int): ByteArray {
-        val result = ByteArray(4)
-        for (i in 0..3) {
-            result[i] = (src shr (3 - i) * 8).toByte()
-        }
-        return result
-    }
-
-    /**
-     * 将int转换成byte数组，小端模式(低位在前)
-     */
-    fun int2BytesLE(src: Int): ByteArray {
-        val result = ByteArray(4)
-        for (i in 0..3) {
-            result[i] = (src shr i * 8).toByte()
-        }
-        return result
-    }
 }

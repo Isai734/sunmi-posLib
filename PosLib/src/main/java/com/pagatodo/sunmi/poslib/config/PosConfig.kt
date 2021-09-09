@@ -5,11 +5,11 @@ import com.pagatodo.sunmi.poslib.model.Aid
 import com.pagatodo.sunmi.poslib.model.Capk
 import com.pagatodo.sunmi.poslib.model.Drl
 import com.pagatodo.sunmi.poslib.util.ByteUtil
+import com.pagatodo.sunmi.poslib.util.Constants.DEVOLUCION
 import com.pagatodo.sunmi.poslib.util.Constants.MAESTRO
 import com.pagatodo.sunmi.poslib.util.Constants.MASTERCARD
-import com.pagatodo.sunmi.poslib.util.Constants.forRefund
-import com.pagatodo.sunmi.poslib.util.Constants.DEVOLUCION
 import com.pagatodo.sunmi.poslib.util.Constants.contactLess
+import com.pagatodo.sunmi.poslib.util.Constants.forRefund
 import java.util.*
 
 class PosConfig {
