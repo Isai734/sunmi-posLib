@@ -57,7 +57,7 @@
             android:background="@drawable/lb_background_transparente"
             android:text="Limpiar"
             android:visibility="visible"
-            android:layout_marginEnd="12sp"
+            android:layout_marginEnd="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/btn_finalizar"
             app:layout_constraintStart_toStartOf="parent" />

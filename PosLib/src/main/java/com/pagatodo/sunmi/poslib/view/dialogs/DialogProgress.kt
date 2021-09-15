@@ -2,8 +2,6 @@ package com.pagatodo.sunmi.poslib.view.dialogs
 
 import android.app.Dialog
 import android.content.Context
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.widget.TextView
 import com.pagatodo.sunmi.poslib.R

@@ -123,7 +123,7 @@ object EmvUtil {
             PosLib.TAG,
             "cardNumber: $cardNumber expireDate: $expiryDate serviceCode: $serviceCode"
         )
-        cardInfo.cardNo = cardNumber
+        cardInfo.cardNo = cardNumber.replace(Regex("[\\s+]"),"")
         cardInfo.expireDate = expiryDate
         cardInfo.serviceCode = serviceCode
         return cardInfo
@@ -147,7 +147,7 @@ object EmvUtil {
         }
         val cardHolderName = mTrack1.substring(secondIndex + 1, lastIndex)
         PosLogger.i(PosLib.TAG, "cardNumber: $cardNumber expireDate: $expiryDate serviceCode: $serviceCode")
-        cardInfo.cardNo = cardNumber
+        cardInfo.cardNo = cardNumber.replace(Regex("[\\s+]"),"")
         cardInfo.expireDate = expiryDate
         cardInfo.serviceCode = serviceCode
         cardInfo.holderName = cardHolderName

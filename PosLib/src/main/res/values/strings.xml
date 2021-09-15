@@ -9,6 +9,7 @@
     <string name="offline_declined">Transacción Declinada Fuera de Línea.</string>
     <string name="track2_error">Tarjeta No Soportada: Track2 Rechazado.</string>|
     <string name="chip_fallback">Error, No se Puede Leer el Chip, Deslice la tajeta.</string>
+    <string name="blocked_app">Tarjeta Bloqueada.</string>
     <string name="common_app_nfc">Inserte, Deslice o Pruebe con Otra Tajeta.</string>
     <string name="card_no_supported_title">Tarjeta no Compatible.</string>
     <string name="card_no_supported_msg">Inserte, deslice o Pruebe con otra Tarjeta.</string>

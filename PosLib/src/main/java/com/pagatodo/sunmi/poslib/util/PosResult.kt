@@ -12,6 +12,7 @@ enum class PosResult(var code: Int, var message: String, val tile:String? = null
     OtherInterface(-4001, getMessage(R.string.other_interface)),
     TransTerminate(-4002, getMessage(R.string.card_no_supported_msg), getMessage(R.string.card_no_supported_title)),
     SeePhone(-4003, getMessage(R.string.see_phone)),
+    BlockedApp(-4105, getMessage(R.string.blocked_app)),
     NoCommonAppNfc(-4106, getMessage(R.string.common_app_nfc)),
     FallBackCommonApp(-4107, getMessage(R.string.chip_fallback)),
     DataCardWithError(-4108, getMessage(R.string.common_app_nfc)),

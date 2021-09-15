@@ -70,8 +70,8 @@ object UtilCapabilities {
                 }
                 if (perfilesEmv.perfilesEmv.cvmFirma == 1) {
                     result += CVM_TYPE.SIGNATURE.cvmtype()
-                } /* NO CVM  SOLO  CUANDO LOS DEMAS VALORES ESTAN DESHABILITADOS */
-                if (perfilesEmv.perfilesEmv.cvmPinOnline == 0 && perfilesEmv.perfilesEmv.cvmPinOffline == 0 && perfilesEmv.perfilesEmv.cvmFirma == 0) {
+                }
+                if (perfilesEmv.perfilesEmv.cvmNocvm == 1){
                     result += CVM_TYPE.NOCVM.cvmtype()
                 }
                 /*AGREGAMOS EL CODIGO DE LA VALIDACION DE PIN */
