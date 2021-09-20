@@ -131,8 +131,8 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
                         doContinue("Pase por contacto.")
                     if(producto.tarjetaBanda == 0 && producto.tarjetaEmvcl == 1 && producto.tarjetaEmv == 0)
                         doContinue("Vuelva a Presentar la Tarjeta.")
-                    else doContinue(error.message)
-                } else doContinue(error.message)
+                    else doContinue(error.tile)
+                } else doContinue(error.tile)
             }
         }
     }
