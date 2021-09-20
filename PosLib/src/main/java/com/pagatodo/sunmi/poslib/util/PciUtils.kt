@@ -126,9 +126,9 @@ object PciUtils {
         form?.apply {
             for (param in form.parametros) {
                 if (param.formato.tipo == Formato.Tipo.COSTO) {
-                    fields.add(ApiData.APIDATA.datosSesion.datosTPV.rellenarImporte(if(param.value.isNullOrEmpty()) "0.00" else param.value))
+                    fields.add(ApiData.APIDATA.datosSesion.datosTPV.rellenarImporte(AmountUtils.cleanImporteInput(param.value, AmountUtils.numberFormat)))
                 } else if (param.formato.tipo == Formato.Tipo.IMPORTE || param.formato.tipo == Formato.Tipo.IMPORTE_SIN_VAL) {
-                    fields.add(ApiData.APIDATA.datosSesion.datosTPV.rellenarImporte(valueForParams(params, CamposPCI.IMPORTE)))
+                    fields.add(ApiData.APIDATA.datosSesion.datosTPV.rellenarImporte(AmountUtils.cleanImporteInput(param.value, AmountUtils.numberFormat)))
                 } else if (param.formato.tipo == Formato.Tipo.FORMATO_OCULTO ) {//SCA requested pin
                     fields.add((param.formato as FormatoOculto).valor)
                 } else if (param.formato.tipo == Formato.Tipo.IMPORTES_EMV ) {//SCA requested pin
