@@ -3,7 +3,7 @@ package com.pagatodo.sunmi.poslib.util
 import com.pagatodo.sunmi.poslib.R
 import com.pagatodo.sunmi.poslib.requireContext
 
-enum class PosResult(var code: Int, var message: String, val tile:String? = null) {
+enum class PosResult(var code: Int, val tile:String, var message: String? = null ) {
     CardDenial(-33, getMessage(R.string.card_denial)),
     ErrorRepeatCall(-20001, getMessage(R.string.repeat_call)),
     NfcTerminated(-2520, getMessage(R.string.error_card_no_supported)),
@@ -19,7 +19,7 @@ enum class PosResult(var code: Int, var message: String, val tile:String? = null
     DoSyncOperation(-4115, getMessage(R.string.sync_operation)),
     NoMagneticMode(-4122, getMessage(R.string.magnetic_mode_not_support)),
     CardNoSupported(-4125, getMessage(R.string.error_card_no_supported)),
-    OnlineError(-50024, "", getMessage(R.string.error_online_process_title)),
+    OnlineError(-50024,  getMessage(R.string.error_online_process_title)),
     FinalSelectApp(-50026, getMessage(R.string.error_card_no_supported)),
     PinTimeOut(-60001, getMessage(R.string.error_time_out)),
 
