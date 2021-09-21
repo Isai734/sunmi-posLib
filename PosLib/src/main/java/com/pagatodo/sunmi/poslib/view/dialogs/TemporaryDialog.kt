@@ -5,15 +5,18 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import com.pagatodo.sunmi.poslib.R
+import com.pagatodo.sunmi.poslib.requireContext
 import com.pagatodo.sunmi.poslib.util.PosResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
 
 class TemporaryDialog private constructor(
     context: Context,
@@ -41,6 +44,7 @@ class TemporaryDialog private constructor(
         title.text = result.tile
         result.message?.apply {
             subTitle.text = this
+            title.textSize = spToPx(26f, requireContext())
         } ?: run { subTitle.visibility = View.GONE }
 
         imageView.setImageResource(
@@ -77,4 +81,9 @@ class TemporaryDialog private constructor(
         setCancelable(false)
         window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
     }
+
+    private fun spToPx(sp: Float, context: Context): Float {
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, context.resources.displayMetrics)
+    }
+
 }

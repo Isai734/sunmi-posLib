@@ -139,7 +139,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
 
     override fun onSuccessOnline(doContinue: () -> Unit) {
         GlobalScope.launch(Dispatchers.Main) {
-            TemporaryDialog.create(requireContext(), PosResult.OnlineApproved,).show {
+            TemporaryDialog.create(requireContext(), PosResult.OnlineApproved).show {
                 doContinue()
             }
         }
