@@ -53,14 +53,15 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
     }
 
     override fun goOnlineProcess(dataCard: DataCard) {
-        if(isRequestPin && mPinType == 1){
-            listenerPinOk = sunmiListener//to avoid show dialog process on error oline
-            sunmiListener.onFailureEmv(PosResult.InfoPinOk){ listenerPinOk?.onDialogProcessOnline(dataCard = dataCard) }
-        } else
-            sunmiListener.onDialogProcessOnline(dataCard = dataCard)
         this.dataCard = dataCard.apply { PosLogger.d(TAG, this.toString()) }
         sunmiListener.onDismissRequestCard()
-        sunmiListener.onPurchase(dataCard)
+        if(isRequestPin && mPinType == 1){
+            listenerPinOk = sunmiListener//to avoid show dialog process on error oline
+            sunmiListener.onFailureEmv(PosResult.InfoPinOk){
+                sunmiListener.onPurchase(dataCard){ listenerPinOk?.onDialogProcessOnline(dataCard = dataCard) }
+            }
+        } else
+            sunmiListener.onPurchase(dataCard){ sunmiListener.onDialogProcessOnline(dataCard = dataCard) }
     }
 
     override fun onFailure(result: PosResult) {
