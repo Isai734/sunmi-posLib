@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="8sp"
-    app:cardUseCompatPadding="true">
+    android:background="@drawable/bg_radius_corner">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:padding="12sp">
+        android:padding="16sp">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -38,13 +37,14 @@
             android:layout_marginStart="26sp"
             android:layout_marginEnd="26sp" />
 
-        <LinearLayout
+        <FrameLayout
             android:id="@+id/content_botton_btns"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
             android:layout_marginTop="12sp">
 
-            <com.pagatodo.sunmi.poslib.view.custom.ButtonSunmi
+            <Button
                 android:id="@+id/bntCanceltCuota"
                 android:layout_width="@dimen/width_button_small"
                 android:layout_height="@dimen/height_button_small"
@@ -53,22 +53,22 @@
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="13.5sp"
                 android:visibility="visible"
-                app:background="@drawable/lb_background_transparente"
-                app:text="@string/cancelar" />
+                android:layout_gravity="start"
+                android:background="@drawable/lb_background_transparente"
+                android:text="@string/cancelar" />
 
             <com.pagatodo.sunmi.poslib.view.custom.ButtonSunmi
                 android:id="@+id/bntAceptCuota"
                 android:layout_width="@dimen/width_button_small"
                 android:layout_height="@dimen/height_button_small"
-                android:gravity="start|center"
-                android:paddingStart="22sp"
+                android:layout_gravity="end"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 android:textSize="13.5sp"
                 app:background="@drawable/lb_btn_siguiente"
                 app:text="@string/aceptar" />
 
-        </LinearLayout>
+        </FrameLayout>
 
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+</FrameLayout>

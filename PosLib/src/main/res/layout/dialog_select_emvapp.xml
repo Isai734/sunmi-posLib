@@ -6,10 +6,10 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center_horizontal"
     android:layout_margin="8dp"
-    android:background="@android:color/white"
+    android:background="@drawable/bg_radius_corner"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="8dp">
+    android:padding="12sp">
 
     <TextView
         android:id="@+id/tvTituloModal"

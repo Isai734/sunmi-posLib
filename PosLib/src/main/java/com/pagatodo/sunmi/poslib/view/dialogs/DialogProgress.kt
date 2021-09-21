@@ -2,6 +2,8 @@ package com.pagatodo.sunmi.poslib.view.dialogs
 
 import android.app.Dialog
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.widget.TextView
 import com.pagatodo.sunmi.poslib.R
@@ -26,7 +28,7 @@ class DialogProgress(context: Context) : Dialog(context) {
 
     init {
         setCancelable(false)
-        //window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
     }
 
     override fun hide() {

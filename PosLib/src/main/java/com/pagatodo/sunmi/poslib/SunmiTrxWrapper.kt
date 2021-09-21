@@ -71,7 +71,6 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
         when (result) {
             PosResult.DoSyncOperation, PosResult.ErrorCheckPresentCard -> {
                 if(this::dataCard.isInitialized){
-                    sunmiListener.onDialogProcessOnline(result.message, dataCard)
                     sunmiListener.onSync(dataCard)
                 } else sunmiListener.onFailureEmv(PosResult.ErrorCheckCard){}
             }
