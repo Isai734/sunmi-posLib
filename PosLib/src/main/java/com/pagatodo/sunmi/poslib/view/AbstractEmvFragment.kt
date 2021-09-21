@@ -75,11 +75,11 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
                 showCoutasDialog(
                     object : DialogPayments.OnCuotasSelectListener {
                         override fun onItemCuotaSelected(cuota: Int) {
+                            onDialogProcessOnline(dataCard = dataCard)
                             dataCard.monthlyPayments = cuota
                             viewModelPci.executeEmvOpr(PciUtils.getOperation(operacion), producto.codigo, PciUtils.fillFields(params, form), createDataOpTarjeta(dataCard),)
                         }
                     }) {
-                            onDialogProcessOnline(dataCard = dataCard)
                             sunmiTransaction.cancelProcess()
                         }
             } else
