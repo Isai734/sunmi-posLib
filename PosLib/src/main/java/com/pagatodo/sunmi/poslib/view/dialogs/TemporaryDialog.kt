@@ -44,7 +44,7 @@ class TemporaryDialog private constructor(
         title.text = result.tile
         result.message?.apply {
             subTitle.text = this
-            title.textSize = spToPx(26f, requireContext())
+            title.textSize = spToPx(11f, requireContext())
         } ?: run { subTitle.visibility = View.GONE }
 
         imageView.setImageResource(

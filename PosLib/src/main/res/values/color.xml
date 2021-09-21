@@ -5,4 +5,8 @@
     <color name="colorPrimaryDark">#00a1e1</color>
     <color name="colorLineColor">#46606a</color>
     <color name="colorBlueLightButton">#05d7f2</color>
+
+    <color name="slate">#46606a</color>
+
+
 </resources>

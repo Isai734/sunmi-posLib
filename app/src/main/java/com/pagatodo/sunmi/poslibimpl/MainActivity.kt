@@ -17,6 +17,7 @@ import com.pagatodo.sunmi.poslib.interfaces.SunmiTrxListener
 import com.pagatodo.sunmi.poslib.model.*
 import com.pagatodo.sunmi.poslib.util.*
 import com.pagatodo.sunmi.poslib.view.dialogs.PinPadDialog
+import com.pagatodo.sunmi.poslib.view.dialogs.TemporaryDialog
 import com.pagatodo.sunmi.poslibimpl.databinding.ActivityMainBinding
 import com.sunmi.pay.hardware.aidl.AidlConstants
 import com.sunmi.pay.hardware.aidlv2.bean.EmvTermParamV2
@@ -44,6 +45,8 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
             if (binding.amountTxv.text.isNotEmpty() && binding.amountTxv.text.isDigitsOnly())
                 trxManager.initTransaction()
         }
+
+        TemporaryDialog.create(this, PosResult.TransTerminate, TemporaryDialog.LONG_SHOW).show()
     }
 
     override fun onStart() {
