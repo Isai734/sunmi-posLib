@@ -11,6 +11,7 @@ class TransactionData {
     var sigmaOperation: String? = null
     var decimals: Int? = null
     var totalAmount: String = "0"
+    var cashBackLector: String = "0"
     var cashBackAmount: String = "0"
     var gratuity: String = "0"
     var taxes: String = "0"

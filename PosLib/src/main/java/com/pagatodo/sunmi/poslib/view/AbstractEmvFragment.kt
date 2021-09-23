@@ -1,6 +1,5 @@
 package com.pagatodo.sunmi.poslib.view
 
-import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProvider
@@ -263,12 +262,12 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
         val inCosto = fullProfile.perfilesEmv?.costo?.toDouble() ?: 0.0
 
         val totalAmt = fullProfile.perfilesEmv?.let { PciUtils.checkAmtBitmap(it.importeBitmap, inImporte, inRetiroEfectivo, inPropina, inImpuesto, inCosto) } ?: inImporte
-        val cashBackAmt = fullProfile.perfilesEmv?.let { PciUtils.checkAmtBitmap(it.importe2Bitmap, inImporte, inRetiroEfectivo, inPropina, inImpuesto, inCosto) } ?: 0.0
+        val cashBackAmtLector = fullProfile.perfilesEmv?.let { PciUtils.checkAmtBitmap(it.importe2Bitmap, inImporte, inRetiroEfectivo, inPropina, inImpuesto, inCosto) } ?: 0.0
 
         return TransactionData().apply {
             this.totalAmount = PciUtils.roundAmount(totalAmt.toString())
             this.transType = if ((operacion.operacion ?: "") == TipoOperacion.PCI_VENTA.tipo) Constants.TransType.PURCHASE else Constants.TransType.REFUND
-            this.cashBackAmount = PciUtils.roundAmount(cashBackAmt.toString())
+            this.cashBackAmount = ApiData.APIDATA.datosSesion.datosTPV.rellenarImporte(inRetiroEfectivo.toString())
             this.decimals = fullProfile?.emvMonedas?.decimales ?: 0
             this.amount = ApiData.APIDATA.datosSesion.datosTPV.rellenarImporte(inImporte.toString())
             this.gratuity = ApiData.APIDATA.datosSesion.datosTPV.rellenarImporte(inPropina.toString())
@@ -277,6 +276,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
             this.sigmaOperation = operacion.operacion
             this.tagsEmv = producto?.perfilEmv?.let { PciUtils.orderTags(EmvManager.getTagsPerfil(it)) } ?: LinkedList()
             this.terminalParams = createParamV2()
+            this.cashBackLector = PciUtils.roundAmount(cashBackAmtLector.toString())
         }
     }
 
