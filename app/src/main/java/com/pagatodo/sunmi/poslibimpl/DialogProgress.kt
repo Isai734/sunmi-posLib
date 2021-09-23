@@ -18,7 +18,7 @@ class DialogProgress : DialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         dialog!!.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        return inflater.inflate(R.layout.dialog_progress_show, container, false)
+        return inflater.inflate(R.layout.dialog_progress_showm, container, false)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

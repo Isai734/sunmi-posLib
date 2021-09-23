@@ -241,7 +241,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
             dataCard.pinEncrypt,
             dataCard.entryMode,
             ApiData.APIDATA.datosSesion.datosTPV.convertirImporte(createTransactionData().totalAmount),
-            ApiData.APIDATA.datosSesion.datosTPV.convertirImporte(createTransactionData().cashBackAmount),
+            ApiData.APIDATA.datosSesion.datosTPV.convertirImporte(createTransactionData().cashBackLector),
             createTransactionData().terminalParams.currencyCode,
             createTransactionData().decimals,
             ApiData.APIDATA.datosSesion.datosTPV.convertirImporte(createTransactionData().amount),

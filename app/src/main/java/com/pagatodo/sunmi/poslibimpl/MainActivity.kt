@@ -5,7 +5,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.text.isDigitsOnly
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProvider
@@ -17,9 +16,7 @@ import com.pagatodo.sunmi.poslib.interfaces.SunmiTrxListener
 import com.pagatodo.sunmi.poslib.model.*
 import com.pagatodo.sunmi.poslib.util.*
 import com.pagatodo.sunmi.poslib.view.dialogs.CidDialog
-import com.pagatodo.sunmi.poslib.view.dialogs.DialogPayments
 import com.pagatodo.sunmi.poslib.view.dialogs.PinPadDialog
-import com.pagatodo.sunmi.poslib.view.dialogs.TemporaryDialog
 import com.pagatodo.sunmi.poslibimpl.databinding.ActivityMainBinding
 import com.sunmi.pay.hardware.aidl.AidlConstants
 import com.sunmi.pay.hardware.aidlv2.bean.EmvTermParamV2
@@ -36,6 +33,9 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
     private lateinit var binding : ActivityMainBinding
     private val viewMPci by lazy { ViewModelProvider(this)[ViewModelPci::class.java] }
     private val trxManager by lazy { SunmiTrxWrapper(this, test = true) }
+    private val dlgo by lazy {
+        com.pagatodo.sunmi.poslib.view.dialogs.DialogProgress(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,9 +46,11 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         binding.btnAccept.setOnClickListener {
             if (binding.amountTxv.text.isNotEmpty() && binding.amountTxv.text.isDigitsOnly())
                 trxManager.initTransaction()
+            dlgo.setTitle("Hola cono estas?")
+            dlgo.setCancelable(true)
+            dlgo.show()
         }
 
-        cidDialog()
     }
 
     private fun cidDialog(){

@@ -12,6 +12,10 @@
         <item name="android:colorControlHighlight">#9DD858</item>
     </style>
 
+    <style name="AppTheme.AppCompat.Dialog.Alert.NoFloating" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowIsFloating">false</item>
+    </style>
+
     <style name="AnimacionModal" parent="@android:style/Animation.Activity">
         <item name="android:layout_width">600dp</item>
         <item name="android:windowEnterAnimation">@anim/agrandar</item>
