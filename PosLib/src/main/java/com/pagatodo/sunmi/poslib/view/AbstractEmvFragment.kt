@@ -177,6 +177,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
         if (PciUtils.haveCuotas(fullProfile.perfilesEmv, dataCard.cardNo)) {
             val dialogCuotas = DialogPayments.newInstance(fullProfile.perfilesEmv)
             dialogCuotas.setCuotasListener{
+                onDialogProcessOnline(dataCard = dataCard)
                 dataCard.monthlyPayments = it.tag as Int
                 viewModelPci.executeEmvOpr(PciUtils.getOperation(operacion), producto.codigo, PciUtils.fillFields(params, form), createDataOpTarjeta(dataCard))
             }
@@ -186,6 +187,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
             }
             dialogCuotas.show(requireActivity().supportFragmentManager, dialogCuotas.tag)
         } else {
+            onDialogProcessOnline(dataCard = dataCard)
             viewModelPci.executeEmvOpr(PciUtils.getOperation(operacion), producto.codigo, PciUtils.fillFields(params, form), createDataOpTarjeta(dataCard))
         }
     }
