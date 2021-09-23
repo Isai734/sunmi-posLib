@@ -66,7 +66,7 @@ class DialogPayments : DialogFragment() {
                 max = rangeQuotes.cuotasmax
                 inc = rangeQuotes.cuotasinc
             }
-            listMonths.add("0")// 0 or 1 ??
+            listMonths.add("1")// 0 or 1 ??
             for (mo in min..max step inc)
                 listMonths.add("$mo")
             binding.pickerQuotas.displayedValues = listMonths.toTypedArray()
