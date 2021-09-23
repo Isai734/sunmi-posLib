@@ -15,12 +15,12 @@ import kotlin.collections.ArrayList
 
 class DialogPayments : DialogFragment() {
     private lateinit var binding: DialogCuotasSelectBinding
-    private lateinit var cuotasListener: OnCuotasSelectListener
+    private lateinit var cuotasListener: View.OnClickListener
     private lateinit var cancelListener: View.OnClickListener
     private val listMonths = ArrayList<String>()
     private val perfilesEmv: PerfilesEmv? by lazy { arguments?.getSerializable(PARAM_PERFIL) as PerfilesEmv }
 
-    fun setCuotasListener(cuotasListener: OnCuotasSelectListener) {
+    fun setCuotasListener(cuotasListener: View.OnClickListener) {
         this.cuotasListener = cuotasListener
     }
 
@@ -41,7 +41,7 @@ class DialogPayments : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.bntAceptCuota.setOnClickListener {
             dismiss()
-            cuotasListener.onItemCuotaSelected(listMonths[binding.pickerQuotas.value].toInt())
+            cuotasListener.onClick(it.apply { tag = listMonths[binding.pickerQuotas.value].toInt()})
         }
         binding.bntCanceltCuota.setOnClickListener {
             dismiss()
@@ -66,6 +66,7 @@ class DialogPayments : DialogFragment() {
                 max = rangeQuotes.cuotasmax
                 inc = rangeQuotes.cuotasinc
             }
+            listMonths.add("0")// 0 or 1 ??
             for (mo in min..max step inc)
                 listMonths.add("$mo")
             binding.pickerQuotas.displayedValues = listMonths.toTypedArray()
@@ -73,10 +74,6 @@ class DialogPayments : DialogFragment() {
             binding.pickerQuotas.minValue = 0
             binding.pickerQuotas.maxValue = listMonths.size -1
         }
-    }
-
-    interface OnCuotasSelectListener {
-        fun onItemCuotaSelected(cuota: Int)
     }
 
     companion object {

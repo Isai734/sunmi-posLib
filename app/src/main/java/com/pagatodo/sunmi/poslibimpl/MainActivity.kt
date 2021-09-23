@@ -16,6 +16,8 @@ import com.pagatodo.sunmi.poslib.config.PosConfig
 import com.pagatodo.sunmi.poslib.interfaces.SunmiTrxListener
 import com.pagatodo.sunmi.poslib.model.*
 import com.pagatodo.sunmi.poslib.util.*
+import com.pagatodo.sunmi.poslib.view.dialogs.CidDialog
+import com.pagatodo.sunmi.poslib.view.dialogs.DialogPayments
 import com.pagatodo.sunmi.poslib.view.dialogs.PinPadDialog
 import com.pagatodo.sunmi.poslib.view.dialogs.TemporaryDialog
 import com.pagatodo.sunmi.poslibimpl.databinding.ActivityMainBinding
@@ -46,7 +48,18 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
                 trxManager.initTransaction()
         }
 
-        TemporaryDialog.create(this, PosResult.TransTerminate, TemporaryDialog.LONG_SHOW).show()
+        cidDialog()
+    }
+
+    private fun cidDialog(){
+        val dialogCuotas = CidDialog.newInstance()
+        dialogCuotas.setOkListener{
+            Toast.makeText(this@MainActivity, it.tag as String, Toast.LENGTH_LONG).show()
+        }
+        dialogCuotas.isCancelable = false
+        dialogCuotas.setCancelListener{
+        }
+        dialogCuotas.show(supportFragmentManager, dialogCuotas.tag)
     }
 
     override fun onStart() {
@@ -156,8 +169,7 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         }
     }
 
-    override fun onPurchase(dataCard: DataCard, todo: (DataCard) -> Unit) {
-        todo(dataCard)
+    override fun onPurchase(dataCard: DataCard) {
         viewMPci.purchase()
     }
 

@@ -68,24 +68,26 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
         sunmiTransaction.initTransaction()
     }
 
-    override fun onPurchase(dataCard: DataCard, todo: (DataCard) -> Unit) {
+    override fun onPurchase(dataCard: DataCard) {
         if (validateCard(fullProfile.perfilesEmv, dataCard)) {
-            if (PciUtils.haveCuotas(fullProfile.perfilesEmv, dataCard.cardNo)) {
-                showCoutasDialog(
-                    object : DialogPayments.OnCuotasSelectListener {
-                        override fun onItemCuotaSelected(cuota: Int) {
-                            dataCard.monthlyPayments = cuota
-                            todo(dataCard)
-                            viewModelPci.executeEmvOpr(PciUtils.getOperation(operacion), producto.codigo, PciUtils.fillFields(params, form), createDataOpTarjeta(dataCard),)
-                        }
-                    }) {
-                            sunmiTransaction.cancelProcess()
-                        }
-            } else {
-                todo(dataCard)
-                viewModelPci.executeEmvOpr(PciUtils.getOperation(operacion), producto.codigo, PciUtils.fillFields(params, form), createDataOpTarjeta(dataCard))
-            }
+            if (dataCard.entryMode === DataOpTarjeta.PosEntryMode.BANDA &&
+                dataCard.cardNo.startsWith("3") && dataCard.cardNo.length == 15) {
+                forwardCidDialog(dataCard)
+            } else forwardPymtsDialog(dataCard)
         }
+    }
+
+    private fun forwardCidDialog(dataCard: DataCard) {
+        val dialogCuotas = CidDialog.newInstance()
+        dialogCuotas.setOkListener{
+            dataCard.cvv = it.tag.toString().toInt()
+            forwardPymtsDialog(dataCard)
+        }
+        dialogCuotas.isCancelable = false
+        dialogCuotas.setCancelListener{
+            sunmiTransaction.cancelProcess()
+        }
+        dialogCuotas.show(requireActivity().supportFragmentManager, dialogCuotas.tag)
     }
 
     override fun onDialogProcessOnline(message: String?, dataCard: DataCard?) {
@@ -172,12 +174,21 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
         }
     }
 
-    private fun showCoutasDialog(listener: DialogPayments.OnCuotasSelectListener, onCancel: View.OnClickListener) {
-        val dialogCuotas = DialogPayments.newInstance(fullProfile.perfilesEmv)
-        dialogCuotas.setCuotasListener(listener)
-        dialogCuotas.isCancelable = false
-        dialogCuotas.setCancelListener(onCancel)
-        dialogCuotas.show(requireActivity().supportFragmentManager, dialogCuotas.tag)
+    private fun forwardPymtsDialog(dataCard: DataCard) {
+        if (PciUtils.haveCuotas(fullProfile.perfilesEmv, dataCard.cardNo)) {
+            val dialogCuotas = DialogPayments.newInstance(fullProfile.perfilesEmv)
+            dialogCuotas.setCuotasListener{
+                dataCard.monthlyPayments = it.tag as Int
+                viewModelPci.executeEmvOpr(PciUtils.getOperation(operacion), producto.codigo, PciUtils.fillFields(params, form), createDataOpTarjeta(dataCard))
+            }
+            dialogCuotas.isCancelable = false
+            dialogCuotas.setCancelListener {
+                sunmiTransaction.cancelProcess()
+            }
+            dialogCuotas.show(requireActivity().supportFragmentManager, dialogCuotas.tag)
+        } else {
+            viewModelPci.executeEmvOpr(PciUtils.getOperation(operacion), producto.codigo, PciUtils.fillFields(params, form), createDataOpTarjeta(dataCard))
+        }
     }
 
     override fun getVmodelPCI() = viewModelPci
@@ -240,7 +251,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
             dataCard.monthlyPayments,
             dataCard.daysDeferred,
             createTransactionData().zipCode,
-            null
+            dataCard.cvv
         )
     }
 

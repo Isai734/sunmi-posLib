@@ -9,4 +9,5 @@
     <dimen name="height_button_large">46sp</dimen>
     <dimen name="width_button_small">126sp</dimen>
     <dimen name="height_button_small">41sp</dimen>
+    <dimen name="gen_dimen_txt_16">16sp</dimen>
 </resources>
