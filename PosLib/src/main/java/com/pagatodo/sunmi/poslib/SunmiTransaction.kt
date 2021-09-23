@@ -8,7 +8,6 @@ import com.pagatodo.sunmi.poslib.model.*
 import com.pagatodo.sunmi.poslib.util.*
 import com.pagatodo.sunmi.poslib.util.Constants.DEVOLUCION
 import com.sunmi.pay.hardware.aidl.AidlConstants
-import com.sunmi.pay.hardware.aidlv2.AidlConstantsV2
 import com.sunmi.pay.hardware.aidlv2.bean.EMVCandidateV2
 import com.sunmi.pay.hardware.aidlv2.emv.EMVListenerV2
 import com.sunmi.pay.hardware.aidlv2.pinpad.PinPadListenerV2
@@ -178,7 +177,7 @@ abstract class SunmiTransaction {
                 if (EmvUtil.isChipCard(dataCard.serviceCode) && !allowFallback) { //Tarjeta por chip no fallback
                     GlobalScope.launch(Dispatchers.Main) { onFailure(PosResult.CardDenial) }
                     cancelProcessEmv()
-                } else if (pinMustBeForced() || EmvUtil.requiredNip(dataCard.serviceCode))
+                } else if (pinMustBeForced() || (EmvUtil.requiredNip(dataCard.serviceCode) && verifyServiceCode()))
                     initPinPad(dataCard)
                 else
                     goOnlineProcess(dataCard)
@@ -586,6 +585,8 @@ abstract class SunmiTransaction {
     abstract fun onFailure(result: PosResult)
 
     abstract fun onSuccessOnline()
+
+    abstract fun verifyServiceCode(): Boolean
 
     abstract fun getCheckCardType(): Int
 

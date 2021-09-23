@@ -133,6 +133,8 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
             forceCheckCard
     }
 
+    override fun verifyServiceCode() = sunmiListener.verifyServiceCode()
+
     override fun pinMustBeForced() = sunmiListener.pinMustBeForced()
 
     override fun readingCard() = sunmiListener.showReading()

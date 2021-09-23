@@ -11,6 +11,7 @@ class PosLib private constructor(val activity: Activity) : SunmiServiceWrapper()
 
     var posConfig = PosConfig()
     lateinit var encryptUtil: CryptUtil
+    var user: String? = null
 
     init {
         connectPayService(activity)

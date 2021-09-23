@@ -229,4 +229,6 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
             doContinue()
         }
     }
+
+    override fun verifyServiceCode() = true
 }

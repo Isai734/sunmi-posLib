@@ -35,4 +35,5 @@ interface SunmiTrxListener<E : Any> {
     fun getVmodelPCI(): AbstractViewModel<E>
     fun showReading()
     fun showRemoveCard(dataCard: DataCard?)
+    fun verifyServiceCode(): Boolean
 }
