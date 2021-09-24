@@ -227,4 +227,8 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
     }
 
     override fun verifyServiceCode() = true
+
+    override fun possibleCancelCheckCard(isPossible: Boolean) {
+
+    }
 }

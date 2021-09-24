@@ -34,6 +34,7 @@ interface SunmiTrxListener<E : Any> {
     fun doOperationNext(nextOperation: OperacionSiguiente, message: String, doContinue: (String) -> Unit)
     fun getVmodelPCI(): AbstractViewModel<E>
     fun showReading()
+    fun possibleCancelCheckCard(isPossible: Boolean)
     fun showRemoveCard(dataCard: DataCard?)
     fun verifyServiceCode(): Boolean
 }

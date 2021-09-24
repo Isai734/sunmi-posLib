@@ -51,6 +51,10 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
     private var forceCheckCardType: Int = -1
     private var isAllowCancelEmvProcess = true
 
+    override fun possibleCancelCheckCard(isPossible: Boolean) {
+        isAllowCancelEmvProcess = isPossible
+    }
+
     protected fun setDataInit(){
         val dataInitPci = createDataInit()
         operacion = dataInitPci.operacion

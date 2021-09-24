@@ -45,6 +45,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
 
     private fun resendTransaction(title: String? = null) {
         sunmiListener.onDialogRequestCard(title, getCheckCardType())
+        sunmiListener.possibleCancelCheckCard(true)
         super.startEmvProcess()
     }
 

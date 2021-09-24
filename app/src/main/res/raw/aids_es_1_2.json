@@ -100,10 +100,10 @@
     "aidType": "00"
   },
   {
-    "_comment": "this aid for american express",
+    "_comment": "this aid for AMEX",
     "aid": "A00000002501",
-    "cvmLmt": "000000002001",
-    "termClssLmt": "000000080000",
+    "cvmLmt": "000000001000",
+    "termClssLmt": "000000001500",
     "termClssOfflineFloorLmt": "000000000000",
     "termOfflineFloorLmt": "000000000000",
     "floorLimit": "00000000",
@@ -112,6 +112,11 @@
     "TACDefault": "DC50FC9800",
     "dDOL": "9F3704",
     "version": "0001",
-    "aidType": "00"
+    "riskManData": "6C00000000000000",
+    "aidType": "00",
+    "readerCapabilityAE": "C0",
+    "drlSetsAE": "060000000007000000000002000000000000000B000000000300000000000200000000000000",
+    "enhcdReaderCapabilityAE": "D8F00080",
+    "capabilityAE": "60B8C8"
   }
 ]
