@@ -80,7 +80,7 @@ abstract class SunmiTransaction {
         len?.also {  //Validar si esto aplica para MTIP 2.60 Refund
             if ((it == PosResult.DoSyncOperation.code || it == PosResult.TransRefused.code) && tlvResponse.status == 0) {
                 onFailure(PosResult.DoSyncOperation)
-                customMessage = PosResult.DoSyncOperation.message
+                customMessage = PosResult.DoSyncOperation.tile
             } else if ((mCardType == AidlConstants.CardType.MAGNETIC || sendOnlineWithError) && tlvResponse.status == 0)
                 onSuccessOnline()
             else if (mCardType == AidlConstants.CardType.MAGNETIC || sendOnlineWithError)
@@ -205,7 +205,7 @@ abstract class SunmiTransaction {
         override fun onError(code: Int, message: String) {
             PosLogger.e(PosLib.TAG, "onError::$code message:: $message")
             GlobalScope.launch(Dispatchers.Main) {
-                onFailure(getPosResult(code, PosResult.ErrorCheckCard.message))
+                onFailure(getPosResult(code, PosResult.ErrorCheckCard.tile))
             }
         }
     }
@@ -278,7 +278,7 @@ abstract class SunmiTransaction {
             if(remainTime == -1)
                 initPinPad()
             else
-                initPinPad(messageError = PosResult.NoSecretWrong.message + ", $remainTime Intento(s) Restante(s).")
+                initPinPad(messageError = PosResult.NoSecretWrong.tile + ", $remainTime Intento(s) Restante(s).")
         }
 
         @Throws(RemoteException::class)
@@ -321,8 +321,8 @@ abstract class SunmiTransaction {
             else{
                 customMessage?.apply {
                     if(isOperNext)
-                        onFailure(PosResult.NextOperation.also { it.message = this })
-                    else if (this != PosResult.DoSyncOperation.message)
+                        onFailure(PosResult.NextOperation.also { it.tile = this })
+                    else if (this != PosResult.DoSyncOperation.tile)
                         onFailure(getPosResult(code, this))
                 } ?: onFailure(getPosResult(code, desc))
             }
@@ -515,7 +515,7 @@ abstract class SunmiTransaction {
                                 goOnlineProcess(this@apply)
                             } ?: posInstance().mEMVOptV2?.importPinInputStatus(mPinType, 0)
                         } ?: run {
-                            initPinPad(dataCard, PosResult.ErrorEmptyPin.message)
+                            initPinPad(dataCard, PosResult.ErrorEmptyPin.tile)
                         }
                     } catch (exe: RemoteException) {
                         PosLogger.e(PosLib.TAG, exe.message)

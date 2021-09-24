@@ -162,7 +162,7 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
 
     override fun onFailureEmv(error: PosResult, todo: (String) -> Unit) {
         GlobalScope.launch(Dispatchers.Main) {
-            Toast.makeText(this@MainActivity, error.message, Toast.LENGTH_LONG).show()
+            Toast.makeText(this@MainActivity, error.tile, Toast.LENGTH_LONG).show()
             todo(error.tile)
         }
     }

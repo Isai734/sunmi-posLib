@@ -348,7 +348,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
     }
 
     override fun onFailure(throwable: Throwable?) {
-        TemporaryDialog.create(requireContext(), PosResult.Generic.apply { message = throwable?.message ?: "" })
+        TemporaryDialog.create(requireContext(), PosResult.Generic.apply { tile = throwable?.message ?: "" })
     }
 
     private fun validateCard(perfilesEmv: PerfilesEmv?, dataCard: DataCard): Boolean {
@@ -359,7 +359,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
             true
         } catch (exception: EmvException) {
             val resultError = PosResult.Generic
-            resultError.message = exception.message!!
+            resultError.tile = exception.message!!
             sunmiTransaction.onFailure(resultError)
             sunmiTransaction.cancelProcess()
             false

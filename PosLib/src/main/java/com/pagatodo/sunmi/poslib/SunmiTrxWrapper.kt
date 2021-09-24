@@ -184,7 +184,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
                 is Results.Failure -> {
                     val msgError = if (it.exception is SincronizacionRequeridaException) {
                         onFailure(PosResult.DoSyncOperation)
-                        PosResult.DoSyncOperation.message
+                        PosResult.DoSyncOperation.tile
                     } else
                         it.exception.message
                     finishOnlineProcessStatus(tlvResponse = Constants.TlvResponses.Decline, message = msgError)

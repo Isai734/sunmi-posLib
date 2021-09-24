@@ -3,7 +3,7 @@ package com.pagatodo.sunmi.poslib.util
 import com.pagatodo.sunmi.poslib.R
 import com.pagatodo.sunmi.poslib.requireContext
 
-enum class PosResult(var code: Int, val tile:String, var message: String? = null ) {
+enum class PosResult(var code: Int, var tile:String, var message: String? = null ) {
     CardDenial(-33, getMessage(R.string.card_denial)),
     ErrorRepeatCall(-20001, getMessage(R.string.repeat_call)),
     NfcTerminated(-2520, getMessage(R.string.error_card_no_supported)),
@@ -45,14 +45,14 @@ enum class PosResult(var code: Int, val tile:String, var message: String? = null
 fun getPosResult(code: Int, message: String?): PosResult {
     for (pr in PosResult.values()){
         if (pr == PosResult.OnlineError && pr.code == code)
-            return pr.apply { this.message = message ?: ""  }
+            return pr.apply { this.tile = message ?: ""  }
         else if (pr != PosResult.Generic && pr.code == code)
             return pr
     }
 
     return PosResult.Generic.apply {
         this.code = code
-        this.message = message ?: ""
+        this.tile = message ?: ""
     }
 }
 
