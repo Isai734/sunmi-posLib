@@ -386,7 +386,7 @@ abstract class SunmiTransaction {
 
     private fun setAmexConfig(aid: String) = try {
         // set AMEX(AmericanExpress) tlv data
-        val aidAmex = posInstance().posConfig.aids.find { aid.startsWith(aid, true)}
+        val aidAmex = posInstance().posConfig.aids.find { it.aid.startsWith(aid.substring(0,12), true)}
         val termParms = getTransactionData().terminalParams
         val tagsAE = arrayOf("9F6D",   "9F6E",          "9F33",       "9F35", "DF8168", "DF8167", "DF8169", "DF8170")
         val valuesAE = arrayOf(aidAmex?.readerCapabilityAE, aidAmex?.enhcdReaderCapabilityAE, termParms.capability, "22",    "00",     aidAmex?.drlSetsAE,     "00",     "60")
