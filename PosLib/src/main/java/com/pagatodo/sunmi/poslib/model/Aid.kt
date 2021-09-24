@@ -20,6 +20,9 @@ data class Aid(
     @Json(name = "enhcdReaderCapabilityAE")
     val enhcdReaderCapabilityAE: String? = null,
 
+    @Json(name = "capabilityAE")
+    val capabilityAE: String? = null,
+
     @Json(name = "drlSetsAE")
     val drlSetsAE: String? = null,
 
