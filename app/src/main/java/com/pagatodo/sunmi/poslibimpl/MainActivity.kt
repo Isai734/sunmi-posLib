@@ -46,11 +46,7 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         binding.btnAccept.setOnClickListener {
             if (binding.amountTxv.text.isNotEmpty() && binding.amountTxv.text.isDigitsOnly())
                 trxManager.initTransaction()
-            dlgo.setTitle("Hola cono estas?")
-            dlgo.setCancelable(true)
-            dlgo.show()
         }
-
     }
 
     private fun cidDialog(){

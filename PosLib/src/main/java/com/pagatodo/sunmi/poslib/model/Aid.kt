@@ -14,6 +14,15 @@ data class Aid(
     @Json(name = "cvmCapability")
     val cvmCapability: String? = null,
 
+    @Json(name = "readerCapabilityAE")
+    val readerCapabilityAE: String? = null,
+
+    @Json(name = "enhcdReaderCapabilityAE")
+    val enhcdReaderCapabilityAE: String? = null,
+
+    @Json(name = "drlSetsAE")
+    val drlSetsAE: String? = null,
+
     @Json(name = "merchCateCode")
     val merchCateCode: String? = null,
 

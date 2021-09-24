@@ -312,6 +312,7 @@ abstract class SunmiTransaction {
         @Throws(RemoteException::class)
         override fun onTransResult(code: Int, desc: String?) { //when has finalized process online
             PosLogger.e(PosLib.TAG, "code: $code desc: $desc")
+            if(code == -50021) return //El error del pin se informa en onError
             if (getTransactionData().transType == Constants.TransType.REFUND && code == PosResult.TransTerminate.code) {//transResult does not matter when transaction is a refund
                 onOnlineProc()
                 sendOnlineWithError = true
@@ -388,7 +389,7 @@ abstract class SunmiTransaction {
         val aidAmex = posInstance().posConfig.aids.find { aid.startsWith(aid, true)}
         val termParms = getTransactionData().terminalParams
         val tagsAE = arrayOf("9F6D",   "9F6E",          "9F33",       "9F35", "DF8168", "DF8167", "DF8169", "DF8170")
-        val valuesAE = arrayOf("C8", "D8E04000", termParms.capability, "22",    "00",     "00",     "00",     "60")
+        val valuesAE = arrayOf(aidAmex?.readerCapabilityAE, aidAmex?.enhcdReaderCapabilityAE, termParms.capability, "22",    "00",     aidAmex?.drlSetsAE,     "00",     "60")
         posInstance().mEMVOptV2?.setTlvList(AidlConstants.EMV.TLVOpCode.OP_AE, tagsAE, valuesAE)
     } catch (e: RemoteException) {
         PosLogger.e(PosLib.TAG, e.message)

@@ -69,7 +69,8 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
 
     override fun onPurchase(dataCard: DataCard) {
         if (validateCard(fullProfile.perfilesEmv, dataCard)) {
-            if (dataCard.entryMode === DataOpTarjeta.PosEntryMode.BANDA &&
+            if ((dataCard.entryMode === DataOpTarjeta.PosEntryMode.BANDA ||
+                        dataCard.entryMode === DataOpTarjeta.PosEntryMode.FALLBACK) &&
                 dataCard.cardNo.startsWith("3") && dataCard.cardNo.length == 15) {
                 forwardCidDialog(dataCard)
             } else forwardPymtsDialog(dataCard)
