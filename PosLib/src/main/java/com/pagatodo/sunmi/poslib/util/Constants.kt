@@ -52,7 +52,7 @@ object Constants {
 
     enum class TlvResponses(val response: String, val status: Int) {
         Empty("", 0),
-        Decline("8A023035", 2),
+        Decline("8A023035", 1),
         Approved("8A023030", 0),
     }
 }
