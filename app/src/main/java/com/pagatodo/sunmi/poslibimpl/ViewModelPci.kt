@@ -7,13 +7,14 @@ import com.pagatodo.sunmi.poslib.viewmodel.EmvViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.lang.Exception
 
 class ViewModelPci : AbstractViewModel<String>() {
 
     fun purchase() {
         viewModelScope.launch(Dispatchers.Main) {
             delay(1500L)
-            pciViewModel.value = Results.Success("Venta Exitosa!")
+            pciViewModel.value = Results.Failure(Exception("Error intentionally!"))
         }
     }
 
