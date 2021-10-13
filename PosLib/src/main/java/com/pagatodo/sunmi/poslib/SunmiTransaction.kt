@@ -348,6 +348,10 @@ abstract class SunmiTransaction {
         override fun onRequestDataExchange(s: String) {
             PosLogger.e(PosLib.TAG, "onRequestDataExchange s: $s")
         }
+
+        override fun onTermRiskManagement() {
+            PosLogger.e(PosLib.TAG, "onTermRiskManagement()")
+        }
     }
 
     private val cardNoFromKernel: String
