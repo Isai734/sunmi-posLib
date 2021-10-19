@@ -287,7 +287,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
         }
     }
 
-    override fun onShowSingDialog(doContinue: (ByteArray) -> Unit) {
+    override fun onShowSingDialog(ref: String, doContinue: (ByteArray) -> Unit) {
         val listener = object : SingDialog.SignatureListener {
             override fun onSingSuccess(singBytes: ByteArray) {
                 doContinue(singBytes)
@@ -295,11 +295,11 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
 
             override fun onCancel() {
                 TemporaryDialog.create(requireContext(), PosResult.ErrorEmptySing).show {
-                    onShowSingDialog(doContinue)
+                    onShowSingDialog(ref, doContinue)
                 }
             }
         }
-        val firmaDialogo = SingDialog.newInstance(listener)
+        val firmaDialogo = SingDialog.newInstance(listener, ref)
         firmaDialogo.isCancelable = false
         firmaDialogo.show(requireActivity().supportFragmentManager, firmaDialogo.tag)
     }

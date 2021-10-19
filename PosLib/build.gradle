@@ -60,6 +60,7 @@ dependencies {
 
     // Lottie Animation Lottie
     implementation 'com.airbnb.android:lottie:3.4.1'
+    implementation "com.huangyz0918:androidwm-light:0.1.2"
 
     //Pagatodo
     implementation 'net.fullcarga.android:ApiAndroid:1.10.7056'

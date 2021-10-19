@@ -1,6 +1,7 @@
 package com.pagatodo.sunmi.poslib.view.dialogs
 
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.graphics.Matrix
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,11 +11,16 @@ import android.widget.RelativeLayout
 import androidx.fragment.app.DialogFragment
 import com.pagatodo.sunmi.poslib.R
 import com.pagatodo.sunmi.poslib.view.custom.SigningView
+import com.watermark.androidwm_light.WatermarkBuilder
+import com.watermark.androidwm_light.bean.WatermarkText
 import java.io.ByteArrayOutputStream
+import java.text.SimpleDateFormat
+import java.util.*
 
 class SingDialog : DialogFragment(), View.OnClickListener {
     private lateinit var signingView: SigningView
     private var signListe: SignatureListener? = null
+    private var refLocal: String? = null
 
     interface SignatureListener {
         fun onSingSuccess(singBytes: ByteArray)
@@ -70,8 +76,8 @@ class SingDialog : DialogFragment(), View.OnClickListener {
         val maxSize = 500 //Max Size
         val outWidth: Int
         val outHeight: Int
-        val inWidth: Int = myBitmap.getWidth()
-        val inHeight: Int = myBitmap.getHeight()
+        val inWidth: Int = myBitmap.width
+        val inHeight: Int = myBitmap.height
         if (inWidth > inHeight) {
             outWidth = maxSize
             outHeight = inHeight * maxSize / inWidth
@@ -82,7 +88,8 @@ class SingDialog : DialogFragment(), View.OnClickListener {
         val matrix = Matrix()
         matrix.postRotate(0f)
         val scaledBitmap: Bitmap = Bitmap.createScaledBitmap(myBitmap, outWidth, outHeight, false)
-        return Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true)
+        val waterMark = setWatermark(scaledBitmap)
+        return Bitmap.createBitmap(waterMark, 0, 0, waterMark.width, waterMark.height, matrix, true)
     }
 
     private fun getByteArray(bitmap: Bitmap): ByteArray {
@@ -91,9 +98,16 @@ class SingDialog : DialogFragment(), View.OnClickListener {
         return bos.toByteArray()
     }
 
+    private fun setWatermark(src: Bitmap): Bitmap {
+        val sdf = SimpleDateFormat("dd/MMM/yyyy hh:mm:ss", Locale.getDefault())
+        val fecha = sdf.format(Date())
+        return WatermarkBuilder.create(this.context, src).loadWatermarkText(WatermarkText("$fecha $refLocal - ").setTextSize(14.0).setTextColor(Color.BLACK).setTextAlpha(150)).setTileMode(true).watermark.outputImage
+    }
+
     companion object {
-        fun newInstance(listener: SignatureListener): SingDialog {
+        fun newInstance(listener: SignatureListener, refLocal: String): SingDialog {
             val firmaDialogo = SingDialog()
+            firmaDialogo.refLocal = refLocal
             firmaDialogo.setSignListe(listener)
             return firmaDialogo
         }

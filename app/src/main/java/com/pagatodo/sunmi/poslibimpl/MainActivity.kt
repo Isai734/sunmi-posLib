@@ -103,7 +103,7 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         if (dialogProgress.isAdded) dialogProgress.dismiss()
     }
 
-    override fun onShowSingDialog(doContinue: (ByteArray) -> Unit) {
+    override fun onShowSingDialog(ref: String, doContinue: (ByteArray) -> Unit) {
         GlobalScope.launch(Dispatchers.Main) {
             Toast.makeText(this@MainActivity, "Mostrar dialogo de firma", Toast.LENGTH_SHORT).show()
             delay(1000L)

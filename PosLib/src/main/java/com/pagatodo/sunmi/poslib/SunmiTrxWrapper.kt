@@ -118,7 +118,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
         sunmiListener.onSuccessOnline {
             checkAndRemoveCard {
                 if (isRequestSignature || PciUtils.emvRequestSignature(dataCard.tlvData) || sunmiListener.requireSignature(dataCard))
-                    sunmiListener.onShowSingDialog { sign ->
+                    sunmiListener.onShowSingDialog(requestTransaction?.camposCierreTurno?.refLocal ?: "") { sign ->
                         sunmiListener.onShowTicketDialog(requestTransaction, dataCard, sign)
                     }
                 else

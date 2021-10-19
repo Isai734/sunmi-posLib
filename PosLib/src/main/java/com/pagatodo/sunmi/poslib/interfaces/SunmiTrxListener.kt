@@ -15,7 +15,7 @@ interface SunmiTrxListener<E : Any> {
     fun onDismissRequestCard()
     fun onDialogProcessOnline(message: String? = null, dataCard: DataCard? = null)
     fun onDismissRequestOnline()
-    fun onShowSingDialog(doContinue: (ByteArray) -> Unit)
+    fun onShowSingDialog(ref:String, doContinue: (ByteArray) -> Unit)
     fun createTransactionData(): TransactionData
     fun pinMustBeForced(): Boolean
     fun requireSignature(dataCard: DataCard): Boolean
