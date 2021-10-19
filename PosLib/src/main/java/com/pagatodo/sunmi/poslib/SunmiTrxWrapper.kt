@@ -38,6 +38,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
     fun initTransaction() {
         setTerminalParams()
         forceCheckCard = -1
+        requestTransaction = null
         sunmiListener.onDialogRequestCard(cardTypes = getCheckCardType())
         super.clearVars()
         super.startEmvProcess()
@@ -70,7 +71,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
         BuzzerUtil.doBeep(result)
         when (result) {
             PosResult.DoSyncOperation, PosResult.ErrorCheckPresentCard -> {
-                if(this::dataCard.isInitialized){
+                if(requestTransaction != null){
                     sunmiListener.onSync(dataCard)
                 } else sunmiListener.onFailureEmv(PosResult.ErrorCheckCard){}
             }
