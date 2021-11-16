@@ -2,7 +2,7 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-kapt'
-    //id 'maven-publish' Uncomment for upload new version of PayLib
+    id 'maven-publish'
 }
 
 android {
@@ -67,26 +67,25 @@ dependencies {
     implementation 'com.pagatodo.sunmi:PayLib:1.4.49'
 }
 
-/**
- * Uncomment for upload new version of PayLib
- *publishing {
-    publications {
-        bar(MavenPublication) {
-            groupId 'com.pagatodo.sunmi'
-            artifactId 'PayLib'
-            version '1.4.49'
-            artifact("libs/PayLib-release-1.4.49.aar")
-        }
-    }
-    repositories {
-        maven {
-            name = "mSecureRepository"
-            credentials{
-                username "$mavenUser"
-                password "$mavenPassword"
+afterEvaluate {
+    publishing {
+        publications {
+            bar(MavenPublication) {
+                groupId 'com.pagatodo.sunmi'
+                artifactId 'PayLib'
+                version '1.4.49'
+                artifact("libs/PayLib-release-1.4.49.aar")
             }
-            url "$mavenInternalUrl"
+        }
+        repositories {
+            maven {
+                name = "mSecureRepository"
+                credentials {
+                    username "$mavenUser"
+                    password "$mavenPassword"
+                }
+                url "$mavenInternalUrl"
+            }
         }
     }
-}*/
-
+}

@@ -74,19 +74,23 @@ abstract class SunmiTransaction {
             values.add(tlvMap[tag]?.value ?: "")
         }
 
-        val out = ByteArray(1024)
-        val len = posInstance().mEMVOptV2?.importOnlineProcStatus(tlvResponse.status, tags.toTypedArray(), values.toTypedArray(), out)
-        PosLogger.e(PosLib.TAG, "card update status code::$len")
-        len?.also {  //Validar si esto aplica para MTIP 2.60 Refund
-            if ((it == PosResult.DoSyncOperation.code || it == PosResult.TransRefused.code) && tlvResponse.status == 0) {
-                onFailure(PosResult.DoSyncOperation)
-                customMessage = PosResult.DoSyncOperation.tile
-            } else if ((mCardType == AidlConstants.CardType.MAGNETIC || sendOnlineWithError) && tlvResponse.status == 0)
-                onSuccessOnline()
-            else if (mCardType == AidlConstants.CardType.MAGNETIC || sendOnlineWithError)
-                onFailure(getPosResult(AidlConstants.CardType.MAGNETIC.value, customMessage))
+        if ((mCardType == AidlConstants.CardType.MAGNETIC || sendOnlineWithError) && tlvResponse.status == 0)
+            onSuccessOnline()
+        else if (mCardType == AidlConstants.CardType.MAGNETIC || sendOnlineWithError)
+            onFailure(getPosResult(AidlConstants.CardType.MAGNETIC.value, customMessage))
+        else {
+            val out = ByteArray(1024)
+            val len = posInstance().mEMVOptV2?.importOnlineProcStatus(tlvResponse.status, tags.toTypedArray(), values.toTypedArray(), out)
+            PosLogger.e(PosLib.TAG, "card update status code::$len")
+            len?.also {  //Validar si esto aplica para MTIP 2.60 Refund
+                if ((it == PosResult.DoSyncOperation.code || it == PosResult.TransRefused.code) && tlvResponse.status == 0) {
+                    onFailure(PosResult.DoSyncOperation)
+                    customMessage = PosResult.DoSyncOperation.tile
+                }
+            }
         }
     } catch (exe: Exception) {
+        exe.printStackTrace()
         if (mCardType == AidlConstants.CardType.MAGNETIC)
             onFailure(PosResult.DoSyncOperation)
         else

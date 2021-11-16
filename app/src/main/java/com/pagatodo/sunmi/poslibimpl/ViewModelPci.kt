@@ -14,7 +14,7 @@ class ViewModelPci : AbstractViewModel<String>() {
     fun purchase() {
         viewModelScope.launch(Dispatchers.Main) {
             delay(1500L)
-            pciViewModel.value = Results.Failure(Exception("Error intentionally!"))
+            pciViewModel.value = Results.Success("Venta precesada correctamente!")
         }
     }
 
