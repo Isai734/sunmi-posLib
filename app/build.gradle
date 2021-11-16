@@ -80,11 +80,11 @@ afterEvaluate {
         repositories {
             maven {
                 name = "mSecureRepository"
-                credentials {
+                /*credentials {
                     username "$mavenUser"
                     password "$mavenPassword"
                 }
-                url "$mavenInternalUrl"
+                url "$mavenInternalUrl"*/
             }
         }
     }
