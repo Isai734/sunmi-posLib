@@ -2,6 +2,7 @@ package com.pagatodo.sunmi.poslib
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
+import com.pagatodo.sigmalib.SigmaBdManager
 import com.pagatodo.sunmi.poslib.PosLib.Companion.TAG
 import com.pagatodo.sunmi.poslib.config.PinPadConfigV3
 import com.pagatodo.sunmi.poslib.interfaces.SunmiTrxListener
@@ -194,7 +195,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
         }
 
     private fun hasNextOpr(nxtOpr: OperacionSiguiente?): Boolean {
-        return nxtOpr?.let { it.procodIdNext > 0 } ?: false
+        return SigmaBdManager.getProductoxId(nxtOpr?.procodIdNext ?: 0){} == null
     }
 
     fun cancelProcess() {
