@@ -195,7 +195,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
         }
 
     private fun hasNextOpr(nxtOpr: OperacionSiguiente?): Boolean {
-        return SigmaBdManager.getProductoxId(nxtOpr?.procodIdNext ?: 0){} == null
+        return SigmaBdManager.getProductoxId(nxtOpr?.procodIdNext ?: 0){} != null
     }
 
     fun cancelProcess() {
