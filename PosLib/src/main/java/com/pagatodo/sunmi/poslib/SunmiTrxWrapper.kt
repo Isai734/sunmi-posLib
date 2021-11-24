@@ -176,7 +176,10 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
                                     val tags = String(it.data.campoTagsEmv, Charset.defaultCharset()).trim()
                                     finishOnlineProcessStatus(tlvString = tags, tlvResponse = Constants.TlvResponses.Approved)
                                 }
-                                else -> finishOnlineProcessStatus(tlvResponse = Constants.TlvResponses.Decline)
+                                else -> finishOnlineProcessStatus(
+                                    tlvResponse = Constants.TlvResponses.Decline,
+                                    message = it.data.campo60.getOrElse(0){ "Transacción Declinada." }
+                                )
                             }
                         }
                         test -> finishOnlineProcessStatus(tlvResponse = Constants.TlvResponses.Approved)
