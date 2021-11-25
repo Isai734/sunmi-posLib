@@ -397,7 +397,7 @@ abstract class SunmiTransaction {
         val aidAmex = posInstance().posConfig.aids.find { it.aid.startsWith(aid.substring(0,12), true)}
         val termParms = getTransactionData().terminalParams
         val tagsAE = arrayOf("9F6D",   "9F6E",          "9F33",       "9F35", "DF8168", "DF8167", "DF8169", "DF8170")
-        val ercae = if(setDecimalsAmount(getTransactionData().amount).toDouble() <= aidAmex?.cvmLmt?.toInt() ?: 0) "C8000080" else aidAmex?.enhcdReaderCapabilityAE
+        val ercae = if(setDecimalsAmount(getTransactionData().amount).toDouble() <= aidAmex?.cvmLmt?.toInt() ?: 0) "D8800000" else aidAmex?.enhcdReaderCapabilityAE
         val valuesAE = arrayOf(aidAmex?.readerCapabilityAE, ercae, termParms.capability, "22",    "00",     aidAmex?.drlSetsAE,     "00",     "60")
         posInstance().mEMVOptV2?.setTlvList(AidlConstants.EMV.TLVOpCode.OP_AE, tagsAE, valuesAE)
     } catch (e: RemoteException) {
