@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -20,8 +21,18 @@
             android:gravity="center"
             android:text="Por favor insert, deslice o acerque la tarjeta."
             android:textAlignment="center"
-            android:textColor="@color/colorLineColor"
-            android:textSize="24sp"></TextView>
+            android:textColor="@color/colorLineColor" />
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/requestCardAnim"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:layout_gravity="center_horizontal"
+            android:visibility="visible"
+            app:lottie_autoPlay="false"
+            app:lottie_imageAssetsFolder="images/animacion_deslizar_tarjeta_01/"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/animacion_deslizar_tarjeta_01" />
     </LinearLayout>
 
 </RelativeLayout>

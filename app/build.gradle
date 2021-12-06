@@ -57,6 +57,10 @@ dependencies {
     implementation 'android.arch.lifecycle:viewmodel:1.1.1'
     implementation 'android.arch.lifecycle:extensions:1.1.1'
 
+    // Lottie Animation Lottie
+    implementation 'com.airbnb.android:lottie:3.4.1'
+    implementation "com.huangyz0918:androidwm-light:0.1.2"
+
     //noinspection LifecycleAnnotationProcessorWithJava8
     annotationProcessor 'android.arch.lifecycle:compiler:1.1.1'
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1"

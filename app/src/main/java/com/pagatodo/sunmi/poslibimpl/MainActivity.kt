@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
     }
 
     override fun onDialogRequestCard(message: String?, cardTypes: Int) {
-        askForCard?.show()
+        askForCard?.show(supportFragmentManager, askForCard?.tag)
     }
 
     override fun onDismissRequestCard() {
@@ -182,11 +182,7 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         DialogProgress().apply { isCancelable = false }
     }
 
-    private val askForCard: AlertDialog? by lazy {
-        val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-        builder.setMessage("Por favor inserta, desliza o acerca la tarjeta.")
-        builder.create()
-    }
+    private val askForCard: AskCardDialog? by lazy { AskCardDialog()}
 
     override fun onShowDniDialog(dataCard: DataCard) {
         TODO("Not yet implemented")
