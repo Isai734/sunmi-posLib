@@ -10,6 +10,19 @@ import androidx.fragment.app.DialogFragment
 import com.pagatodo.sunmi.poslib.databinding.RequestCardDialogBinding
 import com.pagatodo.sunmi.poslibimpl.databinding.ActivityMainBinding
 import com.pagatodo.sunmi.poslibimpl.databinding.DialogAskForCardBinding
+import java.util.*
+import kotlin.collections.ArrayList
+
+fun main(){
+    val list = listOf("Isai", "Castro", "Alvarado").iterator()
+    load(list)
+}
+
+fun load(lis: Iterator<Any>){
+    if(!lis.hasNext()) return
+    println(lis.next().toString())
+    load(lis)
+}
 
 class AskCardDialog : DialogFragment() {
 
@@ -29,3 +42,4 @@ class AskCardDialog : DialogFragment() {
         binding.requestCardAnim.playAnimation()
     }
 }
+

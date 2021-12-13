@@ -18,6 +18,7 @@ interface SunmiTrxListener<E : Any> {
     fun onShowSingDialog(ref:String, doContinue: (ByteArray) -> Unit)
     fun createTransactionData(): TransactionData
     fun pinMustBeForced(): Boolean
+    fun getPinLength(): Int
     fun requireSignature(dataCard: DataCard): Boolean
     fun isPossibleFallback(): Boolean
     fun checkCardTypes(): Int

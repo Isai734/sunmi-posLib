@@ -12,43 +12,47 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import kotlin.math.abs
 
-class PasswordEditText constructor(context: Context,attributeSet: AttributeSet):LinearLayout(context,attributeSet) {
-    private var paint= Paint()
-    private var paintVertical=Paint()
+class PasswordEditText constructor(context: Context, attributeSet: AttributeSet) :
+    LinearLayout(context, attributeSet) {
+    private var paint = Paint()
+    private var paintVertical = Paint()
 
-    private var maxDigit = 12
-    private var numberDigits = 6
+    private var numberDigits = 4
     private var inputSB: StringBuilder? = null
-    private var  listText: ArrayList<TextView> = arrayListOf()
-    var text=""
-    set(value) {
-        field = value
-        if(value.isEmpty()){
-            listText.clear()
-            numberDigits =6
-            repaintDigit()
-            return
-        }
-        field.forEachIndexed { index, c ->
-            if(listText.size <= index){
-                return@forEachIndexed
+    private var listText: ArrayList<TextView> = arrayListOf()
+    var text = ""
+        set(value) {
+            field = value
+            if (value.isEmpty()) {
+                listText.clear()
+                numberDigits = 4
+                repaintDigit()
+                return
             }
-            listText[index].text = c.toString()
+            field.forEachIndexed { index, c ->
+                if (listText.size <= index) {
+                    return@forEachIndexed
+                }
+                listText[index].text = c.toString()
+            }
         }
-    }
 
     init {
         init()
     }
-    
-    fun repaintDigit(){
-        var r = numberDigits-listText.count()
-        r = abs(r- maxDigit )
+
+    fun repaintDigit() {
+        var r = numberDigits// - listText.count()
+        //r = abs(r - maxDigit)
         removeAllViews()
-        if(r>=0){
+        if (r >= 0) {
             for (i in 0 until r) {
                 listText.add(TextView(context).apply {
-                    layoutParams = LayoutParams((width / numberDigits)-3, ViewGroup.LayoutParams.MATCH_PARENT, 1f)
+                    layoutParams = LayoutParams(
+                        (width / numberDigits) - 3,
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        1f
+                    )
                     textAlignment = TEXT_ALIGNMENT_CENTER
                     visibility = View.VISIBLE
                     id = generateViewId()
@@ -60,9 +64,10 @@ class PasswordEditText constructor(context: Context,attributeSet: AttributeSet):
                 })
             }
         }
-        listText.forEachIndexed {index,view->
-            view.layoutParams = LayoutParams((width / numberDigits)-3, ViewGroup.LayoutParams.MATCH_PARENT, 1f)
-            addView(view,index)
+        listText.forEachIndexed { index, view ->
+            view.layoutParams =
+                LayoutParams((width / numberDigits) - 3, ViewGroup.LayoutParams.MATCH_PARENT, 1f)
+            addView(view, index)
         }
     }
 
@@ -82,15 +87,27 @@ class PasswordEditText constructor(context: Context,attributeSet: AttributeSet):
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         background = null
-        canvas.drawLine(0f, this.height - 10.toFloat(), this.width - 1.toFloat(), this.height - 10.toFloat(), paint)
-        val xi = (this.measuredWidth /numberDigits)
+        canvas.drawLine(
+            0f,
+            this.height - 10.toFloat(),
+            this.width - 1.toFloat(),
+            this.height - 10.toFloat(),
+            paint
+        )
+        val xi = (this.measuredWidth / numberDigits)
         for (i in 1 until numberDigits) {
-            canvas.drawLine(xi * i.toFloat(), 5f, xi * i.toFloat(), this.height - 15.toFloat(), paintVertical)
+            canvas.drawLine(
+                xi * i.toFloat(),
+                5f,
+                xi * i.toFloat(),
+                this.height - 15.toFloat(),
+                paintVertical
+            )
         }
     }
 
     fun setNumberDigits(passwordLength: Int) {
         this.numberDigits = passwordLength
     }
-    
+
 }

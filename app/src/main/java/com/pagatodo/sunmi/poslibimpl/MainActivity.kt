@@ -142,7 +142,7 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
 
     override fun onShowPinPadDialog(pinPadListener: PinPadListenerV2.Stub, pinPadConfig: PinPadConfigV3) {
         val pinPadDialog = PinPadDialog.createInstance(pinPadConfig)
-        pinPadDialog.setPasswordLength(6)
+        pinPadDialog.setPasswordLength(getPinLength())
         pinPadDialog.setTextAccept("Aceptar")
         pinPadDialog.setTextCancel("Cancelar")
         pinPadDialog.setPinPadListenerV2(pinPadListener)
@@ -227,4 +227,6 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
     override fun possibleCancelCheckCard(isPossible: Boolean) {
 
     }
+
+    override fun getPinLength() = 4
 }

@@ -160,7 +160,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
         GlobalScope.launch(Dispatchers.Main) {
             delay(300L)
             val pinPadDialog = PinPadDialog.createInstance(pinPadConfig)
-            pinPadDialog.setPasswordLength(6)
+            pinPadDialog.setPasswordLength(getPinLength())
             pinPadDialog.setTextAccept("Aceptar")
             pinPadDialog.setTextCancel("Cancelar")
             pinPadDialog.setPinPadListenerV2(pinPadListener)

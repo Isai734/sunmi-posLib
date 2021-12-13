@@ -169,10 +169,6 @@ class PinPadDialog : DialogFragment() {
         for (i in 0 until len) {
             sb.append("*")
         }
-        if(len==7){
-            binding.passwordEditText.setNumberDigits(12)
-            binding.passwordEditText.repaintDigit()
-        }
         binding.passwordEditText.text = sb.toString()
     }
 
