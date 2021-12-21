@@ -49,8 +49,8 @@ class TemporaryDialog private constructor(
 
         imageView.setImageResource(
             when (result) {
-                PosResult.CardPresentWait -> R.drawable.card_present
-                PosResult.SeePhone -> R.drawable.see_phone
+                PosResult.CardPresentWait -> R.drawable.ic_alerta_i
+                PosResult.SeePhone -> R.drawable.ic_alerta_i
                 PosResult.OnlineError -> R.drawable.ic_alerta_i
                 PosResult.OnlineApproved -> R.drawable.icono_exitoso
                 PosResult.InfoPinOk -> R.drawable.icono_exitoso

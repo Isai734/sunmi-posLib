@@ -18,13 +18,13 @@
 
         <ImageView
             android:id="@+id/imageVerifyCard"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
             android:layout_gravity="center"
             android:layout_marginBottom="16dp"
             android:adjustViewBounds="true"
             android:contentDescription="TODO"
-            android:src="@drawable/card_present" />
+            android:src="@drawable/ic_alerta_i" />
 
         <TextView
             android:id="@+id/titleTempDialog"
