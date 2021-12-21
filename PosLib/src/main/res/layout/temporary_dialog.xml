@@ -18,12 +18,12 @@
 
         <ImageView
             android:id="@+id/imageVerifyCard"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
             android:layout_marginBottom="16dp"
             android:adjustViewBounds="true"
             android:contentDescription="TODO"
-            android:gravity="center"
             android:src="@drawable/card_present" />
 
         <TextView

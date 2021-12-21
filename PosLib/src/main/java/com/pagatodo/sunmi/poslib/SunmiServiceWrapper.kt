@@ -39,6 +39,8 @@ open class SunmiServiceWrapper {
         }
     }
 
+
+
     fun screenMonopoly() {
         try {
             mBasicOptV2?.setScreenMode(-1)
