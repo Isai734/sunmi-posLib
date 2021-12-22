@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
     }
 
     private fun cidDialog(){
-        TemporaryDialog.create(this, PosResult.OnlineApproved).show{
+        TemporaryDialog.create(this, PosResult.OnlineApproved, duration = TemporaryDialog.LONG_SHOW).show{
             Toast.makeText(this@MainActivity, "TemporaryDialog Dismiss", Toast.LENGTH_SHORT).show()
         }
     }

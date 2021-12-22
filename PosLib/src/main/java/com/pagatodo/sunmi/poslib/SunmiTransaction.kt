@@ -77,7 +77,7 @@ abstract class SunmiTransaction {
         if ((mCardType == AidlConstants.CardType.MAGNETIC || sendOnlineWithError) && tlvResponse.status == 0)
             onSuccessOnline()
         else if (mCardType == AidlConstants.CardType.MAGNETIC || sendOnlineWithError)
-            onFailure(getPosResult(AidlConstants.CardType.MAGNETIC.value, customMessage))
+            onFailure(getPosResult(PosResult.OnlineError.code, customMessage))
         else {
             val out = ByteArray(1024)
             val len = posInstance().mEMVOptV2?.importOnlineProcStatus(tlvResponse.status, tags.toTypedArray(), values.toTypedArray(), out)
