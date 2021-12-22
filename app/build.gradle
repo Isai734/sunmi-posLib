@@ -68,6 +68,7 @@ dependencies {
     implementation "com.huangyz0918:androidwm-light:0.1.2"
 
     implementation project(path: ':PosLib')
+    //implementation 'com.github.Isai734:sunmi-posLib:v0.9.9'
     implementation 'com.pagatodo.sunmi:PayLib:1.4.49'
 }
 

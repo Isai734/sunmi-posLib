@@ -6,6 +6,10 @@
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
+    <style name="TempDialogStyle" parent="Base.Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
     <style name="LedsRadioButton" parent="Widget.AppCompat.CompoundButton.RadioButton">
         <item name="android:colorControlNormal">#7a7a7a</item>
         <item name="android:colorControlActivated">#9DD858</item>

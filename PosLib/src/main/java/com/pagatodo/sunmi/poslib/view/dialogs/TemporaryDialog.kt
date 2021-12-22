@@ -9,6 +9,7 @@ import android.util.TypedValue
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.fragment.app.DialogFragment
 import com.pagatodo.sunmi.poslib.R
 import com.pagatodo.sunmi.poslib.requireContext
 import com.pagatodo.sunmi.poslib.util.PosResult
@@ -22,7 +23,7 @@ class TemporaryDialog private constructor(
     context: Context,
     val result: PosResult,
     val duration: Long? = SHORT_SHOW
-) : Dialog(context) {
+) : Dialog(context, R.style.TempDialogStyle) {
 
     private lateinit var doContinue: (String) -> Unit
 

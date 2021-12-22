@@ -6,13 +6,18 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
+    android:layout_marginStart="12sp"
+    android:layout_marginEnd="12sp"
+
     android:elevation="8sp"
-    app:cardCornerRadius="12sp"
+    app:cardCornerRadius="6sp"
     app:cardUseCompatPadding="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingTop="12sp"
+        android:paddingBottom="12sp"
         android:layout_margin="16dp"
         android:orientation="vertical">
 
