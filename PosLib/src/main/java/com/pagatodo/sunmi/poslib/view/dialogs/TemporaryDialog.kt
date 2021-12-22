@@ -53,7 +53,7 @@ class TemporaryDialog private constructor(
             when (result) {
                 PosResult.CardPresentWait -> R.drawable.ic_alerta_i
                 PosResult.SeePhone -> R.drawable.ic_alerta_i
-                PosResult.OnlineError -> R.drawable.ic_alerta_i
+                PosResult.OnlineError -> R.drawable.ic_icon_alerta_error
                 PosResult.OnlineApproved -> R.drawable.icono_exitoso
                 PosResult.InfoPinOk -> R.drawable.icono_exitoso
                 else -> R.drawable.ic_icon_alerta_error
