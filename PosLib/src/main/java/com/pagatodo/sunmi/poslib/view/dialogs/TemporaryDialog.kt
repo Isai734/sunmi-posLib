@@ -2,6 +2,7 @@ package com.pagatodo.sunmi.poslib.view.dialogs
 
 import android.app.Dialog
 import android.content.Context
+import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -63,8 +64,11 @@ class TemporaryDialog private constructor(
             GlobalScope.launch(Dispatchers.Main) {
                 delay(duration)
                 dismiss()
-                if (this@TemporaryDialog::doContinue.isInitialized) doContinue(result.tile)
             }
+        }
+
+        setOnDismissListener {
+            if (this@TemporaryDialog::doContinue.isInitialized) doContinue(result.tile)
         }
     }
 
@@ -72,14 +76,14 @@ class TemporaryDialog private constructor(
         fun create(context: Context, result: PosResult, duration: Long? = SHORT_SHOW) =
             TemporaryDialog(context, result, duration)
 
-        const val SHORT_SHOW = 2000L
+        const val SHORT_SHOW = 4000L
         const val MID_SHOW = 3000L
-        const val LONG_SHOW = 4000L
+        const val LONG_SHOW = 12000L
     }
 
 
     init {
-        setCancelable(false)
+        setCancelable(true)
         window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
     }
 

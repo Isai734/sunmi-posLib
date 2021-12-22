@@ -17,6 +17,7 @@ import com.pagatodo.sunmi.poslib.model.*
 import com.pagatodo.sunmi.poslib.util.*
 import com.pagatodo.sunmi.poslib.view.dialogs.CidDialog
 import com.pagatodo.sunmi.poslib.view.dialogs.PinPadDialog
+import com.pagatodo.sunmi.poslib.view.dialogs.TemporaryDialog
 import com.pagatodo.sunmi.poslibimpl.databinding.ActivityMainBinding
 import com.sunmi.pay.hardware.aidl.AidlConstants
 import com.sunmi.pay.hardware.aidlv2.bean.EmvTermParamV2
@@ -45,19 +46,15 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         PosLib.createInstance(this)
         binding.btnAccept.setOnClickListener {
             if (binding.amountTxv.text.isNotEmpty() && binding.amountTxv.text.isDigitsOnly())
-                trxManager.initTransaction()
+                cidDialog()
+        //trxManager.initTransaction()
         }
     }
 
     private fun cidDialog(){
-        val dialogCuotas = CidDialog.newInstance()
-        dialogCuotas.setOkListener{
-            Toast.makeText(this@MainActivity, it.tag as String, Toast.LENGTH_LONG).show()
+        TemporaryDialog.create(this, PosResult.OnlineApproved).show{
+            Toast.makeText(this@MainActivity, "TemporaryDialog Dismiss", Toast.LENGTH_SHORT).show()
         }
-        dialogCuotas.isCancelable = false
-        dialogCuotas.setCancelListener{
-        }
-        dialogCuotas.show(supportFragmentManager, dialogCuotas.tag)
     }
 
     override fun onStart() {
