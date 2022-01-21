@@ -2,7 +2,6 @@ package com.pagatodo.sunmi.poslib.view.dialogs
 
 import android.app.Dialog
 import android.content.Context
-import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -10,7 +9,6 @@ import android.util.TypedValue
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.fragment.app.DialogFragment
 import com.pagatodo.sunmi.poslib.R
 import com.pagatodo.sunmi.poslib.requireContext
 import com.pagatodo.sunmi.poslib.util.PosResult
@@ -88,7 +86,11 @@ class TemporaryDialog private constructor(
     }
 
     private fun spToPx(sp: Float, context: Context): Float {
-        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, context.resources.displayMetrics)
+        return TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_SP,
+            sp,
+            context.resources.displayMetrics
+        )
     }
 
 }
