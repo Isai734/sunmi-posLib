@@ -574,7 +574,10 @@ abstract class SunmiTransaction {
                     posInstance().mBasicOptV2?.buzzerOnDevice(1, 2750, 200, 0)
                     loopRemoveCard(cardAbsent)
                 }
-                else -> PosLogger.e(PosLib.TAG,"Unknown status $status.")
+                else -> {
+                    loopRemoveCard(cardAbsent)
+                    PosLogger.e(PosLib.TAG,"Unknown status $status.")
+                }
             }
         } catch (e: Exception) {
             PosLogger.e(PosLib.TAG, e.message)
