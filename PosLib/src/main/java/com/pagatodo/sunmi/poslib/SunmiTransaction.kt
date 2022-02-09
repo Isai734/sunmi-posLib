@@ -563,11 +563,7 @@ abstract class SunmiTransaction {
 
     protected fun checkAndRemoveCard(cardAbsent: () -> Unit) {
         try {//Check and notify remove card
-            val status = posInstance().mReadCardOptV2?.getCardExistStatus(AidlConstants.CardType.IC.value)?.also {
-                if (it < 0) {
-                    onFailure(PosResult.ErrorCheckPresentCard); return
-                }
-            }
+            val status = posInstance().mReadCardOptV2?.getCardExistStatus(AidlConstants.CardType.IC.value)
             PosLogger.e(PosLib.TAG, "status::$status")
             when (status) {
                 AidlConstants.CardExistStatus.CARD_ABSENT -> {
@@ -578,7 +574,7 @@ abstract class SunmiTransaction {
                     posInstance().mBasicOptV2?.buzzerOnDevice(1, 2750, 200, 0)
                     loopRemoveCard(cardAbsent)
                 }
-                else -> throw IllegalArgumentException("Unknown status $status.")
+                else -> PosLogger.e(PosLib.TAG,"Unknown status $status.")
             }
         } catch (e: Exception) {
             PosLogger.e(PosLib.TAG, e.message)
