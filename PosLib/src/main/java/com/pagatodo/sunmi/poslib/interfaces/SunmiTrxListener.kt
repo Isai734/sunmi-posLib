@@ -6,6 +6,7 @@ import com.pagatodo.sunmi.poslib.model.TransactionData
 import com.pagatodo.sunmi.poslib.util.PosResult
 import com.pagatodo.sunmi.poslib.viewmodel.AbstractViewModel
 import com.pagatodo.sunmi.poslib.viewmodel.EmvViewModel
+import com.sunmi.pay.hardware.aidlv2.bean.EmvTermParamV2
 import com.sunmi.pay.hardware.aidlv2.pinpad.PinPadListenerV2
 import net.fullcarga.android.api.data.respuesta.OperacionSiguiente
 import net.fullcarga.android.api.data.respuesta.Respuesta
@@ -38,4 +39,5 @@ interface SunmiTrxListener<E : Any> {
     fun possibleCancelCheckCard(isPossible: Boolean)
     fun showRemoveCard(dataCard: DataCard?)
     fun verifyServiceCode(): Boolean
+    fun createParamV2(): EmvTermParamV2
 }

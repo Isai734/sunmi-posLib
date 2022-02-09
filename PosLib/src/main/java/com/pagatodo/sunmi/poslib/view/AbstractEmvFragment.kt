@@ -310,7 +310,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
         firmaDialogo.show(requireActivity().supportFragmentManager, firmaDialogo.tag)
     }
 
-    private fun createParamV2() = EmvTermParamV2().apply {
+    override fun createParamV2() = EmvTermParamV2().apply {
         capability = UtilCapabilities.terminalCapabilitiesCode(fullProfile)
         addCapability = UtilCapabilities.additionalTerminalCapabilitiesCode()
         currencyCode = String.format("%04d", fullProfile.perfilesEmv?.let { fullProfile.emvMonedas.codigoMoneda.toInt() } ?: 0)

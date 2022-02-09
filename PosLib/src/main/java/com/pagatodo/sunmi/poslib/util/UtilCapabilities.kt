@@ -39,7 +39,7 @@ object UtilCapabilities {
      * @return Value of TTQ
      */
     fun createTTQ(perfilesEmv: PerfilEmvApp): String {
-        var firstByte = 0x70
+        var firstByte = 0x30
         var secondByte = 0x00
         val thirdByte = 0x40
         if (perfilesEmv.perfilesEmv != null) {
