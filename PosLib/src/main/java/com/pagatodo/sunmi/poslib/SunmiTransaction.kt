@@ -121,7 +121,7 @@ abstract class SunmiTransaction {
 
     private fun transactProcess() = try {
         val bundle = Bundle()
-        bundle.putString("amount", setDecimalsAmount(getTransactionData().amount))
+        bundle.putString("amount", setDecimalsAmount(getTransactionData().totalAmount))
         bundle.putString("transType", getTransactionData().transType.type)
         bundle.putInt("flowType", AidlConstants.EMV.FlowType.TYPE_EMV_STANDARD)
         bundle.putInt("cardType", mCardType.value)
@@ -388,6 +388,12 @@ abstract class SunmiTransaction {
         val tagsPayPass = arrayOf("DF8117", "DF8118", "DF8119", "DF811F", "DF811E", "DF812C", "DF8123", "DF8124", "DF8125", "DF8126", "DF811B", "DF811D", "DF8122", "DF8120", "DF8121")
         val valuesPayPass = arrayOf("60", posCfg.cvmCapability, "08", "C8", "00", "00", posCfg.floorLimit, posCfg.termClssLmt, posCfg.termClssLmt, posCfg.cvmLmt, "B0", "02", posCfg.tACOnline, posCfg.tACDefault, posCfg.tACDenial)
         posInstance().mEMVOptV2?.setTlvList(AidlConstants.EMV.TLVOpCode.OP_PAYPASS, tagsPayPass, valuesPayPass)
+    } catch (e: RemoteException) {
+        PosLogger.e(PosLib.TAG, e.message)
+    }
+
+    private fun setUnionPay(configId: String) = try {// set PayPass(MasterCard) tlv data
+        posInstance().mEMVOptV2?.setTlv(AidlConstants.EMV.TLVOpCode.OP_NORMAL, "9F66", getTransactionData().terminalParams.TTQ)
     } catch (e: RemoteException) {
         PosLogger.e(PosLib.TAG, e.message)
     }

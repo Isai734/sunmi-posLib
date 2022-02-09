@@ -53,7 +53,7 @@ object UtilCapabilities {
                 secondByte = secondByte or 0x20
             }
         }
-        return String.format(Locale.US, "%02x%02x%02x00", firstByte, secondByte, thirdByte)
+        return String.format(Locale.US, "%02x%02x%02x80", firstByte, secondByte, thirdByte)
     }
 
     fun terminalCapabilitiesCode(perfilesEmv: PerfilEmvApp): String {
