@@ -120,7 +120,7 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         gratuity = "00"
         sigmaOperation = "V"
         tagsEmv = EmvUtil.tagsDefault.toList()
-        terminalParams = EmvTermParamV2()
+        terminalParams = createParamV2()
     }
 
     override fun pinMustBeForced(): Boolean {
@@ -226,4 +226,6 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
     }
 
     override fun getPinLength() = 4
+
+    override fun createParamV2() = EmvTermParamV2()
 }
