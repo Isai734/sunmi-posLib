@@ -124,12 +124,9 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
 
     override fun onFailureEmv(error: PosResult, todo: (String) -> Unit) {
         GlobalScope.launch(Dispatchers.Main) {
-            when (error) {
-                PosResult.SeePhone -> TemporaryDialog.create(requireContext(), error).show()
-                else -> TemporaryDialog.create(requireContext(), error).show {
-                    requireActivity().setFullScreen()
-                    todo(it)
-                }
+            TemporaryDialog.create(requireContext(), error).show {
+                requireActivity().setFullScreen()
+                todo(it)
             }
         }
     }
