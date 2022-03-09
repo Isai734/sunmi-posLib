@@ -34,6 +34,9 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
     private lateinit var binding : ActivityMainBinding
     private val viewMPci by lazy { ViewModelProvider(this)[ViewModelPci::class.java] }
     private val trxManager by lazy { SunmiTrxWrapper(this, test = true) }
+    private val dlgo by lazy {
+        com.pagatodo.sunmi.poslib.view.dialogs.DialogProgress(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +52,9 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
     }
 
     private fun cidDialog(){
-        TemporaryDialog.create(this, PosResult.ErrorEmptySing).show()
+        TemporaryDialog.create(this, PosResult.OnlineApproved, duration = TemporaryDialog.LONG_SHOW).show{
+            Toast.makeText(this@MainActivity, "TemporaryDialog Dismiss", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onStart() {
@@ -115,7 +120,7 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         gratuity = "00"
         sigmaOperation = "V"
         tagsEmv = EmvUtil.tagsDefault.toList()
-        terminalParams = EmvTermParamV2()
+        terminalParams = createParamV2()
     }
 
     override fun pinMustBeForced(): Boolean {
@@ -221,4 +226,6 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
     }
 
     override fun getPinLength() = 4
+
+    override fun createParamV2() = EmvTermParamV2()
 }

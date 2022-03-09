@@ -52,7 +52,7 @@ class TemporaryDialog private constructor(
             when (result) {
                 PosResult.CardPresentWait -> R.drawable.ic_alerta_i
                 PosResult.SeePhone -> R.drawable.ic_alerta_i
-                PosResult.OnlineError -> R.drawable.ic_alerta_i
+                PosResult.OnlineError -> R.drawable.ic_icon_alerta_error
                 PosResult.OnlineApproved -> R.drawable.icono_exitoso
                 PosResult.InfoPinOk -> R.drawable.icono_exitoso
                 else -> R.drawable.ic_icon_alerta_error
@@ -63,8 +63,11 @@ class TemporaryDialog private constructor(
             GlobalScope.launch(Dispatchers.Main) {
                 delay(duration)
                 dismiss()
-                if (this@TemporaryDialog::doContinue.isInitialized) doContinue(result.tile)
             }
+        }
+
+        setOnDismissListener {
+            if (this@TemporaryDialog::doContinue.isInitialized) doContinue(result.tile)
         }
     }
 
@@ -72,19 +75,23 @@ class TemporaryDialog private constructor(
         fun create(context: Context, result: PosResult, duration: Long? = SHORT_SHOW) =
             TemporaryDialog(context, result, duration)
 
-        const val SHORT_SHOW = 2000L
+        const val SHORT_SHOW = 4000L
         const val MID_SHOW = 3000L
-        const val LONG_SHOW = 4000L
+        const val LONG_SHOW = 12000L
     }
 
 
     init {
-        setCancelable(false)
+        setCancelable(true)
         window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
     }
 
     private fun spToPx(sp: Float, context: Context): Float {
-        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, context.resources.displayMetrics)
+        return TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_SP,
+            sp,
+            context.resources.displayMetrics
+        )
     }
 
 }

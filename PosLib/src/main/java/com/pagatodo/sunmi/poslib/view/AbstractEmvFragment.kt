@@ -14,6 +14,7 @@ import com.pagatodo.sunmi.poslib.SunmiTrxWrapper
 import com.pagatodo.sunmi.poslib.config.PinPadConfigV3
 import com.pagatodo.sunmi.poslib.interfaces.SunmiTrxListener
 import com.pagatodo.sunmi.poslib.model.DataCard
+import com.pagatodo.sunmi.poslib.model.Sync
 import com.pagatodo.sunmi.poslib.model.TransactionData
 import com.pagatodo.sunmi.poslib.setFullScreen
 import com.pagatodo.sunmi.poslib.util.*
@@ -123,12 +124,9 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
 
     override fun onFailureEmv(error: PosResult, todo: (String) -> Unit) {
         GlobalScope.launch(Dispatchers.Main) {
-            when (error) {
-                PosResult.SeePhone -> TemporaryDialog.create(requireContext(), error).show()
-                else -> TemporaryDialog.create(requireContext(), error).show {
-                    requireActivity().setFullScreen()
-                    todo(it)
-                }
+            TemporaryDialog.create(requireContext(), error).show {
+                requireActivity().setFullScreen()
+                todo(it)
             }
         }
     }
@@ -182,9 +180,11 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
         if (PciUtils.haveCuotas(fullProfile.perfilesEmv, dataCard.cardNo)) {
             val dialogCuotas = DialogPayments.newInstance(fullProfile.perfilesEmv)
             dialogCuotas.setCuotasListener{
-                onDialogProcessOnline(dataCard = dataCard)
-                dataCard.monthlyPayments = it.tag as Int
-                viewModelPci.executeEmvOpr(PciUtils.getOperation(operacion), producto.codigo, PciUtils.fillFields(params, form), createDataOpTarjeta(dataCard))
+                onPreSaveTrx(getDataSync(dataCard)) {
+                    onDialogProcessOnline(dataCard = dataCard)
+                    dataCard.monthlyPayments = it.tag as Int
+                    viewModelPci.executeEmvOpr(PciUtils.getOperation(operacion), producto.codigo, PciUtils.fillFields(params, form), createDataOpTarjeta(dataCard))
+                }
             }
             dialogCuotas.isCancelable = false
             dialogCuotas.setCancelListener {
@@ -192,8 +192,10 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
             }
             dialogCuotas.show(requireActivity().supportFragmentManager, dialogCuotas.tag)
         } else {
-            onDialogProcessOnline(dataCard = dataCard)
-            viewModelPci.executeEmvOpr(PciUtils.getOperation(operacion), producto.codigo, PciUtils.fillFields(params, form), createDataOpTarjeta(dataCard))
+            onPreSaveTrx(getDataSync(dataCard)) {
+                onDialogProcessOnline(dataCard = dataCard)
+                viewModelPci.executeEmvOpr(PciUtils.getOperation(operacion), producto.codigo, PciUtils.fillFields(params, form), createDataOpTarjeta(dataCard))
+            }
         }
     }
 
@@ -276,13 +278,13 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
             this.totalAmount = PciUtils.roundAmount(totalAmt.toString())
             this.transType = if ((operacion.operacion ?: "") == TipoOperacion.PCI_VENTA.tipo) Constants.TransType.PURCHASE else Constants.TransType.REFUND
             this.cashBackAmount = ApiData.APIDATA.datosSesion.datosTPV.rellenarImporte(inRetiroEfectivo.toString())
-            this.decimals = fullProfile?.emvMonedas?.decimales ?: 0
+            this.decimals = fullProfile.emvMonedas?.decimales ?: 0
             this.amount = ApiData.APIDATA.datosSesion.datosTPV.rellenarImporte(inImporte.toString())
             this.gratuity = ApiData.APIDATA.datosSesion.datosTPV.rellenarImporte(inPropina.toString())
             this.taxes = ApiData.APIDATA.datosSesion.datosTPV.rellenarImporte(inImpuesto.toString())
             this.comisions = ApiData.APIDATA.datosSesion.datosTPV.rellenarImporte(inCosto.toString())
             this.sigmaOperation = operacion.operacion
-            this.tagsEmv = producto?.perfilEmv?.let { PciUtils.orderTags(EmvManager.getTagsPerfil(it)) } ?: LinkedList()
+            this.tagsEmv = producto.perfilEmv?.let { PciUtils.orderTags(EmvManager.getTagsPerfil(it)) } ?: LinkedList()
             this.terminalParams = createParamV2()
             this.cashBackLector = PciUtils.roundAmount(cashBackAmtLector.toString())
         }
@@ -305,7 +307,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
         firmaDialogo.show(requireActivity().supportFragmentManager, firmaDialogo.tag)
     }
 
-    private fun createParamV2() = EmvTermParamV2().apply {
+    override fun createParamV2() = EmvTermParamV2().apply {
         capability = UtilCapabilities.terminalCapabilitiesCode(fullProfile)
         addCapability = UtilCapabilities.additionalTerminalCapabilitiesCode()
         currencyCode = String.format("%04d", fullProfile.perfilesEmv?.let { fullProfile.emvMonedas.codigoMoneda.toInt() } ?: 0)
@@ -333,6 +335,11 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
                 createDataOpTarjeta(dataCard), ApiData.APIDATA.datosSesion.datosTPV.stanProvider.ultimo)
         }
     }
+
+    private fun getDataSync(dataCard: DataCard) = Sync(
+        producto.codigo, PciUtils.fillFields(params, form),
+        dataCard, ApiData.APIDATA.datosSesion.datosTPV.stanProvider.ultimo
+    )
 
     override fun pinMustBeForced() = operacion.pin == 2
 
@@ -376,6 +383,8 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
     }
 
     abstract fun createDataInit(): DataInitPci
+
+    abstract fun onPreSaveTrx(syncData: Sync, doContinue: () -> Unit)
 
     data class DataInitPci(val producto: Productos, val operacion :Operaciones, val form : Formulario?)
 }

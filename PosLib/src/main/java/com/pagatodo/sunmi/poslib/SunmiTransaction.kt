@@ -77,7 +77,7 @@ abstract class SunmiTransaction {
         if ((mCardType == AidlConstants.CardType.MAGNETIC || sendOnlineWithError) && tlvResponse.status == 0)
             onSuccessOnline()
         else if (mCardType == AidlConstants.CardType.MAGNETIC || sendOnlineWithError)
-            onFailure(getPosResult(AidlConstants.CardType.MAGNETIC.value, customMessage))
+            onFailure(getPosResult(PosResult.OnlineError.code, customMessage))
         else {
             val out = ByteArray(1024)
             val len = posInstance().mEMVOptV2?.importOnlineProcStatus(tlvResponse.status, tags.toTypedArray(), values.toTypedArray(), out)
@@ -121,7 +121,7 @@ abstract class SunmiTransaction {
 
     private fun transactProcess() = try {
         val bundle = Bundle()
-        bundle.putString("amount", setDecimalsAmount(getTransactionData().amount))
+        bundle.putString("amount", setDecimalsAmount(getTransactionData().totalAmount))
         bundle.putString("transType", getTransactionData().transType.type)
         bundle.putInt("flowType", AidlConstants.EMV.FlowType.TYPE_EMV_STANDARD)
         bundle.putInt("cardType", mCardType.value)
@@ -392,6 +392,12 @@ abstract class SunmiTransaction {
         PosLogger.e(PosLib.TAG, e.message)
     }
 
+    private fun setUnionPay(configId: String) = try {// set PayPass(MasterCard) tlv data
+        posInstance().mEMVOptV2?.setTlv(AidlConstants.EMV.TLVOpCode.OP_NORMAL, "9F66", getTransactionData().terminalParams.TTQ)
+    } catch (e: RemoteException) {
+        PosLogger.e(PosLib.TAG, e.message)
+    }
+
     private fun setAmexConfig(aid: String) = try {
         // set AMEX(AmericanExpress) tlv data
         val aidAmex = posInstance().posConfig.aids.find { it.aid.startsWith(aid.substring(0,12), true)}
@@ -563,11 +569,7 @@ abstract class SunmiTransaction {
 
     protected fun checkAndRemoveCard(cardAbsent: () -> Unit) {
         try {//Check and notify remove card
-            val status = posInstance().mReadCardOptV2?.getCardExistStatus(AidlConstants.CardType.IC.value)?.also {
-                if (it < 0) {
-                    onFailure(PosResult.ErrorCheckPresentCard); return
-                }
-            }
+            val status = posInstance().mReadCardOptV2?.getCardExistStatus(AidlConstants.CardType.IC.value)
             PosLogger.e(PosLib.TAG, "status::$status")
             when (status) {
                 AidlConstants.CardExistStatus.CARD_ABSENT -> {
@@ -578,7 +580,10 @@ abstract class SunmiTransaction {
                     posInstance().mBasicOptV2?.buzzerOnDevice(1, 2750, 200, 0)
                     loopRemoveCard(cardAbsent)
                 }
-                else -> throw IllegalArgumentException("Unknown status $status.")
+                else -> {
+                    loopRemoveCard(cardAbsent)
+                    PosLogger.e(PosLib.TAG,"Unknown status $status.")
+                }
             }
         } catch (e: Exception) {
             PosLogger.e(PosLib.TAG, e.message)
