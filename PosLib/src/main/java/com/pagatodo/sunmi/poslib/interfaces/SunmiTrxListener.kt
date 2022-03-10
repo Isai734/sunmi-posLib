@@ -40,4 +40,5 @@ interface SunmiTrxListener<E : Any> {
     fun showRemoveCard(dataCard: DataCard?)
     fun verifyServiceCode(): Boolean
     fun createParamV2(): EmvTermParamV2
+    fun isPmx(): Boolean
 }

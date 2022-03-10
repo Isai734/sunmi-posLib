@@ -204,7 +204,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
     private fun requestCardDialog(message: String?, formatedAmount: String, cardTypes: Int = 0, showAmount:Boolean = true) {
         requestCardDialog.mensaje = message
         requestCardDialog.amount = formatedAmount
-        requestCardDialog.isPmx = operacion.producto == "PEMEX001"
+        requestCardDialog.isPmx = isPmx()
         requestCardDialog.showRfReading = (cardTypes >= AidlConstants.CardType.NFC.value)
         requestCardDialog.showAmt = showAmount
         requestCardDialog.setOnDismissListener {

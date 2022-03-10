@@ -228,4 +228,7 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
     override fun getPinLength() = 4
 
     override fun createParamV2() = EmvTermParamV2()
+    override fun isPmx(): Boolean {
+        return false
+    }
 }
