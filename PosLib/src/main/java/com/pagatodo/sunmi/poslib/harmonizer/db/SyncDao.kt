@@ -19,6 +19,9 @@ interface SyncDao {
     @Query("DELETE FROM Sync")
     suspend fun deleteSyncData()
 
+    @Query("DELETE FROM Sync WHERE dateTime == :date")
+    suspend fun deleteByDate(date: Date)
+
     @Query("SELECT * FROM Sync WHERE dateTime == :date")
     fun getByDate(date: Date): LiveData<Sync>
 }

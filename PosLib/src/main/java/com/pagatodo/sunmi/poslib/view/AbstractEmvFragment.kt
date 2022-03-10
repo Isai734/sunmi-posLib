@@ -1,20 +1,25 @@
 package com.pagatodo.sunmi.poslib.view
 
+import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProvider
+import androidx.work.*
 import com.pagatodo.sigmalib.ApiData
 import com.pagatodo.sigmalib.EmvManager
 import com.pagatodo.sigmalib.SigmaBdManager
 import com.pagatodo.sigmalib.emv.CamposPCI
 import com.pagatodo.sigmalib.emv.PerfilEmvApp
 import com.pagatodo.sigmalib.listeners.OnFailureListener
+import com.pagatodo.sunmi.poslib.PosLib
 import com.pagatodo.sunmi.poslib.R
 import com.pagatodo.sunmi.poslib.SunmiTrxWrapper
 import com.pagatodo.sunmi.poslib.config.PinPadConfigV3
+import com.pagatodo.sunmi.poslib.harmonizer.SyncService
 import com.pagatodo.sunmi.poslib.harmonizer.db.Sync
 import com.pagatodo.sunmi.poslib.interfaces.SunmiTrxListener
 import com.pagatodo.sunmi.poslib.model.DataCard
+import com.pagatodo.sunmi.poslib.model.Results
 import com.pagatodo.sunmi.poslib.model.SyncData
 import com.pagatodo.sunmi.poslib.model.TransactionData
 import com.pagatodo.sunmi.poslib.setFullScreen
@@ -36,6 +41,7 @@ import net.fullcarga.android.api.bd.sigma.generated.tables.pojos.Productos
 import net.fullcarga.android.api.data.DataOpTarjeta
 import net.fullcarga.android.api.data.respuesta.AbstractRespuesta
 import net.fullcarga.android.api.data.respuesta.OperacionSiguiente
+import net.fullcarga.android.api.data.respuesta.RespuestaTrxCierreTurno
 import net.fullcarga.android.api.formulario.Formulario
 import net.fullcarga.android.api.formulario.Parametro
 import net.fullcarga.android.api.oper.TipoOperacion
@@ -339,9 +345,32 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
     }
 
     override fun onSync(dataCard: DataCard) {
-        GlobalScope.launch(Dispatchers.Main) {
+        /*GlobalScope.launch(Dispatchers.Main) {
             viewModelPci.executeSync(producto.codigo, PciUtils.fillFields(params, form),
                 createDataOpTarjeta(dataCard), ApiData.APIDATA.datosSesion.datosTPV.stanProvider.ultimo)
+        }*/
+
+        val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+        val syncWorker: WorkRequest = OneTimeWorkRequestBuilder<SyncService>().setConstraints(constraints).build()
+        val workManager = WorkManager.getInstance(requireContext())
+
+        workManager.enqueue(syncWorker)
+
+        workManager.getWorkInfoByIdLiveData(syncWorker.id).observe(requireActivity()) { info ->
+            when (info.state){
+                WorkInfo.State.SUCCEEDED -> {
+                    PosLogger.d(PosLib.TAG, "Success")
+                    onDismissRequestOnline()
+                    sunmiTransaction.onFailure(PosResult.SyncOperationSuccess)
+                }
+                WorkInfo.State.FAILED -> {
+                    if(info.outputData.getString(SyncService.KEY_MESSAGE) == "La operacion esta anulada")
+                        sunmiTransaction.onFailure(PosResult.SyncOperationSuccess)
+                    else
+                        sunmiTransaction.onFailure(PosResult.SyncOperationFailed)
+                }
+                else -> {sunmiTransaction.onFailure(PosResult.SyncOperationFailed)}
+            }
         }
     }
 
