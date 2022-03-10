@@ -12,14 +12,17 @@ import com.pagatodo.sigmalib.listeners.OnFailureListener
 import com.pagatodo.sunmi.poslib.R
 import com.pagatodo.sunmi.poslib.SunmiTrxWrapper
 import com.pagatodo.sunmi.poslib.config.PinPadConfigV3
+import com.pagatodo.sunmi.poslib.harmonizer.db.Sync
 import com.pagatodo.sunmi.poslib.interfaces.SunmiTrxListener
 import com.pagatodo.sunmi.poslib.model.DataCard
-import com.pagatodo.sunmi.poslib.model.Sync
+import com.pagatodo.sunmi.poslib.model.SyncData
 import com.pagatodo.sunmi.poslib.model.TransactionData
 import com.pagatodo.sunmi.poslib.setFullScreen
 import com.pagatodo.sunmi.poslib.util.*
 import com.pagatodo.sunmi.poslib.view.dialogs.*
 import com.pagatodo.sunmi.poslib.viewmodel.EmvViewModel
+import com.pagatodo.sunmi.poslib.viewmodel.SyncViewModel
+import com.squareup.moshi.Moshi
 import com.sunmi.pay.hardware.aidl.AidlConstants
 import com.sunmi.pay.hardware.aidlv2.bean.EmvTermParamV2
 import com.sunmi.pay.hardware.aidlv2.pinpad.PinPadListenerV2
@@ -43,6 +46,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
     private val requestCardDialog by lazy { RequestCardDialog(requireContext()) }
     private val progressDialog by lazy { DialogProgress(requireContext()) }
     private val viewModelPci by lazy { ViewModelProvider(this)[EmvViewModel::class.java] }
+    private val serviceBd by lazy { ViewModelProvider(this)[SyncViewModel::class.java] }
     private val sunmiTransaction by lazy { SunmiTrxWrapper(this) }
     protected lateinit var fullProfile: PerfilEmvApp
     protected lateinit var operacion: Operaciones
@@ -180,7 +184,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
         if (PciUtils.haveCuotas(fullProfile.perfilesEmv, dataCard.cardNo)) {
             val dialogCuotas = DialogPayments.newInstance(fullProfile.perfilesEmv)
             dialogCuotas.setCuotasListener{
-                onPreSaveTrx(getDataSync(dataCard)) {
+                saveTmpDataSync(getDataSync(dataCard)) {
                     onDialogProcessOnline(dataCard = dataCard)
                     dataCard.monthlyPayments = it.tag as Int
                     viewModelPci.executeEmvOpr(PciUtils.getOperation(operacion), producto.codigo, PciUtils.fillFields(params, form), createDataOpTarjeta(dataCard))
@@ -192,11 +196,16 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
             }
             dialogCuotas.show(requireActivity().supportFragmentManager, dialogCuotas.tag)
         } else {
-            onPreSaveTrx(getDataSync(dataCard)) {
+            saveTmpDataSync(getDataSync(dataCard)) {
                 onDialogProcessOnline(dataCard = dataCard)
                 viewModelPci.executeEmvOpr(PciUtils.getOperation(operacion), producto.codigo, PciUtils.fillFields(params, form), createDataOpTarjeta(dataCard))
             }
         }
+    }
+    private fun saveTmpDataSync(syncData: SyncData, doContinue: () -> Unit){
+        val moshi = Moshi.Builder().build()
+        serviceBd.insertSyncData(Sync(dateTime= Date(), status = StatusTrx.PROGRESS.name, data = moshi.adapter(SyncData::class.java).toJson(syncData)))
+        doContinue()
     }
 
     override fun getVmodelPCI() = viewModelPci
@@ -336,9 +345,9 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
         }
     }
 
-    private fun getDataSync(dataCard: DataCard) = Sync(
+    private fun getDataSync(dataCard: DataCard) = SyncData(
         producto.codigo, PciUtils.fillFields(params, form),
-        dataCard, ApiData.APIDATA.datosSesion.datosTPV.stanProvider.ultimo
+        createDataOpTarjeta(dataCard), ApiData.APIDATA.datosSesion.datosTPV.stanProvider.ultimo
     )
 
     override fun pinMustBeForced() = operacion.pin == 2
@@ -384,7 +393,9 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
 
     abstract fun createDataInit(): DataInitPci
 
-    abstract fun onPreSaveTrx(syncData: Sync, doContinue: () -> Unit)
+    protected fun onUpdateSyncData() {
+        serviceBd.deleteAll()
+    }
 
     data class DataInitPci(val producto: Productos, val operacion :Operaciones, val form : Formulario?)
 }

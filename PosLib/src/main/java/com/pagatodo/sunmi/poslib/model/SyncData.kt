@@ -1,8 +1,10 @@
 package com.pagatodo.sunmi.poslib.model
 
-data class Sync(
+import net.fullcarga.android.api.data.DataOpTarjeta
+
+data class SyncData(
     val product: String,
     val params: List<String>,
-    val dataCard: DataCard,
+    val dataCard: DataOpTarjeta,
     val stan: Long
 )

@@ -61,3 +61,8 @@ enum class PinTypes(val pinValue: Int){
     PIN_OFFLINE(1),
     PIN_ONLINE(0)
 }
+
+enum class StatusTrx {
+    PROGRESS,
+    COMPLETED,
+}

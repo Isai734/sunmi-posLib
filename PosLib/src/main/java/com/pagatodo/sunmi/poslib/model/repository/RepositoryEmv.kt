@@ -10,7 +10,8 @@ import net.fullcarga.android.api.oper.TipoOperacion
 
 object RepositoryEmv {
 
-    fun execOperationEmv(operation: TipoOperacion, product: String, fields: List<String>, dataOpTarjeta: DataOpTarjeta, stan: Long = 0L, result: (Results<AbstractRespuesta>) -> Unit) {
+    fun execOperationEmv(operation: TipoOperacion, product: String, fields: List<String>,
+                         dataOpTarjeta: DataOpTarjeta, stan: Long = 0L, result: (Results<AbstractRespuesta>) -> Unit) {
         TransaccionFactory.crearTransacion<AbstractTransaccion>(operation, { response ->
             if (response.isCorrecta || response.operacionSiguiente.mtiNext != null)
                 result(Results.Success(response))
