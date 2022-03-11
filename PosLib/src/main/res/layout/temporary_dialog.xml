@@ -21,6 +21,31 @@
         android:layout_margin="16dp"
         android:orientation="vertical">
 
+        <TextView
+            android:id="@+id/txtTituloConsulta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:gravity="center_horizontal"
+            android:text="Consulta"
+            android:textColor="@color/color_inputs"
+            android:textSize="26sp"
+            android:textStyle="normal"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/txtSubtituloConsulta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:layout_marginBottom="50dp"
+            android:gravity="center_horizontal"
+            android:text="Litros Disponibles para Consumo"
+            android:textColor="@color/color_inputs"
+            android:textSize="18sp"
+            android:textStyle="normal"
+            android:visibility="gone"/>
+
         <ImageView
             android:id="@+id/imageVerifyCard"
             android:layout_width="90dp"
@@ -59,6 +84,19 @@
             android:textSize="18sp"
             android:textStyle="normal"
             tools:text="hola" />
+
+        <Button
+            android:id="@+id/btnCerrar"
+            android:layout_width="120dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="18dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:background="@color/colorGrey"
+            android:text="Cerrar"
+            android:textColor="@color/colorBlueLightButton"
+            android:visibility="gone"/>
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>
