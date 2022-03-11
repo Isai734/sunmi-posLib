@@ -8,6 +8,9 @@ import com.pagatodo.sunmi.poslib.viewmodel.AbstractViewModel
 import com.pagatodo.sunmi.poslib.viewmodel.EmvViewModel
 import com.sunmi.pay.hardware.aidlv2.bean.EmvTermParamV2
 import com.sunmi.pay.hardware.aidlv2.pinpad.PinPadListenerV2
+import net.fullcarga.android.api.bd.sigma.generated.tables.pojos.Menu
+import net.fullcarga.android.api.bd.sigma.generated.tables.pojos.Operaciones
+import net.fullcarga.android.api.bd.sigma.generated.tables.pojos.Productos
 import net.fullcarga.android.api.data.respuesta.OperacionSiguiente
 import net.fullcarga.android.api.data.respuesta.Respuesta
 
@@ -23,7 +26,7 @@ interface SunmiTrxListener<E : Any> {
     fun requireSignature(dataCard: DataCard): Boolean
     fun isPossibleFallback(): Boolean
     fun checkCardTypes(): Int
-    fun onShowTicketDialog(responseTrx: Respuesta?, dataCard: DataCard, singBytes: ByteArray? = null)
+    fun onShowTicketDialog(singBytes: ByteArray? = null, responseTrx: Respuesta?, dataCard: DataCard, onShowed: (operation: Operaciones, product: Productos, menu: Menu) -> Unit)
     fun onSuccessOnline(doContinue: () -> Unit)
     fun onShowDniDialog(dataCard: DataCard)
     fun onShowZipDialog(dataCard: DataCard)
@@ -40,4 +43,6 @@ interface SunmiTrxListener<E : Any> {
     fun showRemoveCard(dataCard: DataCard?)
     fun verifyServiceCode(): Boolean
     fun createParamV2(): EmvTermParamV2
+    fun sendTicketSever(responseTrx: Respuesta, dataCard: DataCard, doContinue: (Boolean) -> Unit)
+    fun onSaveTransaction(operation: Operaciones, product: Productos, menu: Menu, responseTrx: Respuesta)
 }

@@ -12,6 +12,7 @@ import com.pagatodo.sunmi.poslib.util.*
 import com.sunmi.pay.hardware.aidl.AidlConstants
 import com.sunmi.pay.hardware.aidlv2.pinpad.PinPadListenerV2
 import net.fullcarga.android.api.data.respuesta.OperacionSiguiente
+import net.fullcarga.android.api.data.respuesta.RespuestaTrx
 import net.fullcarga.android.api.data.respuesta.RespuestaTrxCierreTurno
 import net.fullcarga.android.api.exc.SincronizacionRequeridaException
 import java.nio.charset.Charset
@@ -116,15 +117,30 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
     }
 
     override fun onSuccessOnline() {
-        sunmiListener.onDismissRequestOnline()
-        sunmiListener.onSuccessOnline {
-            checkAndRemoveCard {
-                if (isRequestSignature || PciUtils.emvRequestSignature(dataCard.tlvData) || sunmiListener.requireSignature(dataCard))
-                    sunmiListener.onShowSingDialog(requestTransaction?.camposCierreTurno?.refLocal ?: "") { sign ->
-                        sunmiListener.onShowTicketDialog(requestTransaction, dataCard, sign)
+        sunmiListener.sendTicketSever(requestTransaction!!, dataCard) { success ->
+            if (success){
+                sunmiListener.onDismissRequestOnline()
+                sunmiListener.onSuccessOnline {
+                    try {
+                        checkAndRemoveCard {
+                            if (isRequestSignature || PciUtils.emvRequestSignature(dataCard.tlvData) || sunmiListener.requireSignature(dataCard))
+                                sunmiListener.onShowSingDialog(requestTransaction?.camposCierreTurno?.refLocal ?: "") { sign ->
+                                    sunmiListener.onShowTicketDialog(sign , requestTransaction, dataCard ) { operation, product, menu ->
+                                        sunmiListener.onSaveTransaction(operation, product, menu, requestTransaction as RespuestaTrx)
+                                    }
+                                }
+                            else
+                                sunmiListener.onShowTicketDialog(null, requestTransaction, dataCard) { operation, product, menu ->
+                                    sunmiListener.onSaveTransaction(operation, product, menu, requestTransaction as RespuestaTrx)
+                                }
+                        }
+                    } catch (e: Exception){
+                        onFailure(PosResult.DoSyncOperation)
                     }
-                else
-                    sunmiListener.onShowTicketDialog(requestTransaction, dataCard)
+                }
+            } else {
+                abortFullTransaction()
+                onFailure(PosResult.DoSyncOperation)
             }
         }
     }

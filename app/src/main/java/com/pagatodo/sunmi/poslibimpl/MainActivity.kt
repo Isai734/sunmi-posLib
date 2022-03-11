@@ -26,6 +26,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import net.fullcarga.android.api.bd.sigma.generated.tables.pojos.Menu
+import net.fullcarga.android.api.bd.sigma.generated.tables.pojos.Operaciones
+import net.fullcarga.android.api.bd.sigma.generated.tables.pojos.Productos
 import net.fullcarga.android.api.data.respuesta.OperacionSiguiente
 import net.fullcarga.android.api.data.respuesta.Respuesta
 
@@ -131,12 +134,6 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         return AidlConstants.CardType.MAGNETIC.value or AidlConstants.CardType.IC.value or AidlConstants.CardType.NFC.value
     }
 
-    override fun onShowTicketDialog(responseTrx: Respuesta?, dataCard: DataCard, singBytes: ByteArray?) {
-        GlobalScope.launch(Dispatchers.Main) {
-            Toast.makeText(this@MainActivity, "Mostrar dialogo de ticket", Toast.LENGTH_LONG).show()
-        }
-    }
-
     override fun onShowPinPadDialog(pinPadListener: PinPadListenerV2.Stub, pinPadConfig: PinPadConfigV3) {
         val pinPadDialog = PinPadDialog.createInstance(pinPadConfig)
         pinPadDialog.setPasswordLength(getPinLength())
@@ -228,4 +225,29 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
     override fun getPinLength() = 4
 
     override fun createParamV2() = EmvTermParamV2()
+    override fun onShowTicketDialog(
+        singBytes: ByteArray?,
+        responseTrx: Respuesta?,
+        dataCard: DataCard,
+        onShowed: (operation: Operaciones, product: Productos, menu: Menu) -> Unit
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun sendTicketSever(
+        responseTrx: Respuesta,
+        dataCard: DataCard,
+        doContinue: (Boolean) -> Unit
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onSaveTransaction(
+        operation: Operaciones,
+        product: Productos,
+        menu: Menu,
+        responseTrx: Respuesta
+    ) {
+        TODO("Not yet implemented")
+    }
 }

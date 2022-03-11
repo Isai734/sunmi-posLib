@@ -119,6 +119,12 @@ abstract class SunmiTransaction {
         PosLogger.e(PosLib.TAG, exe.message)
     }
 
+    protected fun abortFullTransaction() = try {
+        posInstance().mEMVOptV2?.abortTransactProcess()
+    } catch (exe: Exception) {
+        PosLogger.e(PosLib.TAG, exe.message)
+    }
+
     private fun transactProcess() = try {
         val bundle = Bundle()
         bundle.putString("amount", setDecimalsAmount(getTransactionData().totalAmount))
