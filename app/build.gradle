@@ -46,7 +46,7 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0'
 
     //Android
-    implementation 'net.fullcarga.android:ApiAndroid:1.10.7661'
+    implementation 'net.fullcarga.android:ApiAndroid:1.12.328'
 
     //moshi
     implementation 'com.squareup.retrofit2:converter-moshi:2.9.0'
