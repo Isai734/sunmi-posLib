@@ -27,7 +27,10 @@ import com.pagatodo.sunmi.poslib.util.*
 import com.pagatodo.sunmi.poslib.view.dialogs.*
 import com.pagatodo.sunmi.poslib.viewmodel.EmvViewModel
 import com.pagatodo.sunmi.poslib.viewmodel.SyncViewModel
+import com.squareup.moshi.FromJson
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.ToJson
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.sunmi.pay.hardware.aidl.AidlConstants
 import com.sunmi.pay.hardware.aidlv2.bean.EmvTermParamV2
 import com.sunmi.pay.hardware.aidlv2.pinpad.PinPadListenerV2
@@ -45,6 +48,7 @@ import net.fullcarga.android.api.data.respuesta.RespuestaTrxCierreTurno
 import net.fullcarga.android.api.formulario.Formulario
 import net.fullcarga.android.api.formulario.Parametro
 import net.fullcarga.android.api.oper.TipoOperacion
+import java.math.BigDecimal
 import java.util.*
 
 abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespuesta> , OnFailureListener{
@@ -209,7 +213,10 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
         }
     }
     private fun saveTmpDataSync(syncData: SyncData, doContinue: () -> Unit){
-        val moshi = Moshi.Builder().build()
+        val moshi = Moshi.Builder()
+            .add(BigDecimalAdapter)
+            .add(KotlinJsonAdapterFactory())
+            .build()
         serviceBd.insertSyncData(Sync(dateTime= Date(), status = StatusTrx.PROGRESS.name, data = moshi.adapter(SyncData::class.java).toJson(syncData)))
         doContinue()
     }
@@ -427,4 +434,12 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
     }
 
     data class DataInitPci(val producto: Productos, val operacion :Operaciones, val form : Formulario?)
+}
+
+object BigDecimalAdapter {
+    @FromJson
+    fun fromJson(string: String) = BigDecimal(string)
+
+    @ToJson
+    fun toJson(value: BigDecimal) = value.toString()
 }
