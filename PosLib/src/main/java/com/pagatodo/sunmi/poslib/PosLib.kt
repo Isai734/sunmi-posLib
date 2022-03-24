@@ -101,7 +101,6 @@ fun Fragment.validateSync(observer: Observer<WorkInfo>){
 
 fun AppCompatActivity.validateSync(observer: Observer<WorkInfo>){
     val serviceBd by lazy { ViewModelProvider(this)[SyncViewModel::class.java] }
-    serviceBd.getByStatus(StatusTrx.PROGRESS.name)
     serviceBd.syncLiveData?.observe(this){
         Log.d(PosLib.TAG, "find sync ${it.size}")
         for (sync in it){
@@ -118,6 +117,7 @@ fun AppCompatActivity.validateSync(observer: Observer<WorkInfo>){
             workManager.getWorkInfoByIdLiveData(syncWorker.id).observe(this, observer)
         }
     }
+    serviceBd.getByStatus(StatusTrx.PROGRESS.name)
 }
 
 
