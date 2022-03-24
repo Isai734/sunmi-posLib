@@ -3,6 +3,7 @@ package com.pagatodo.sunmi.poslib
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -79,6 +80,25 @@ fun Activity.setFullScreen(){
 }
 
 fun Fragment.validateSync(observer: Observer<WorkInfo>){
+    val serviceBd by lazy { ViewModelProvider(this)[SyncViewModel::class.java] }
+    serviceBd.getByStatus(StatusTrx.PROGRESS.name)
+    serviceBd.syncLiveData?.observe(this){
+        for (sync in it){
+            val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+            val syncWorker: WorkRequest = OneTimeWorkRequestBuilder<SyncService>()
+                .setInputData(workDataOf(
+                    SyncService.KEY_INPUT_TIME to sync.dateTime?.time
+                ))
+                .setConstraints(constraints)
+                .build()
+            val workManager = WorkManager.getInstance(requireContext())
+            workManager.enqueue(syncWorker)
+            workManager.getWorkInfoByIdLiveData(syncWorker.id).observe(this, observer)
+        }
+    }
+}
+
+fun AppCompatActivity.validateSync(observer: Observer<WorkInfo>){
     val serviceBd by lazy { ViewModelProvider(this)[SyncViewModel::class.java] }
     serviceBd.getByStatus(StatusTrx.PROGRESS.name)
     serviceBd.syncLiveData?.observe(this){
