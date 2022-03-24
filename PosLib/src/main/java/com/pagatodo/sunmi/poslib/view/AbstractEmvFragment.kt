@@ -38,12 +38,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import net.fullcarga.android.api.bd.sigma.generated.tables.pojos.Menu
 import net.fullcarga.android.api.bd.sigma.generated.tables.pojos.Operaciones
 import net.fullcarga.android.api.bd.sigma.generated.tables.pojos.PerfilesEmv
 import net.fullcarga.android.api.bd.sigma.generated.tables.pojos.Productos
 import net.fullcarga.android.api.data.DataOpTarjeta
 import net.fullcarga.android.api.data.respuesta.AbstractRespuesta
 import net.fullcarga.android.api.data.respuesta.OperacionSiguiente
+import net.fullcarga.android.api.data.respuesta.Respuesta
 import net.fullcarga.android.api.data.respuesta.RespuestaTrxCierreTurno
 import net.fullcarga.android.api.formulario.Formulario
 import net.fullcarga.android.api.formulario.Parametro
@@ -429,7 +431,8 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
 
     abstract fun createDataInit(): DataInitPci
 
-    protected fun onUpdateSyncData() {
+
+    override fun onSaveTransaction(operation: Operaciones, product: Productos, menu: Menu, responseTrx: Respuesta) {
         serviceBd.deleteAll()
     }
 

@@ -17,7 +17,9 @@ import com.pagatodo.sunmi.poslib.harmonizer.db.SyncDatabase
 import com.pagatodo.sunmi.poslib.model.SyncData
 import com.pagatodo.sunmi.poslib.posInstance
 import com.pagatodo.sunmi.poslib.util.StatusTrx
+import com.pagatodo.sunmi.poslib.view.BigDecimalAdapter
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import net.fullcarga.android.api.oper.TipoOperacion
 import java.util.*
 
@@ -30,6 +32,7 @@ class SyncService(appContext: Context, workerParams: WorkerParameters) :
     private val TAG = "SaleWmanager.LOG"
     override suspend fun doWork(): Result {
         val datetime = inputData.getLong(KEY_INPUT_TIME, 0)
+        Log.d(TAG, "datetime $datetime")
         var result: Result = Result.success()
         return try {
             setForeground(createForegroundInfo())
@@ -40,7 +43,7 @@ class SyncService(appContext: Context, workerParams: WorkerParameters) :
                 if(result == Result.success()) syncDao.deleteByDate(Date(datetime))
                 result
             } else {
-                Result.success(workDataOf(KEY_MESSAGE to "Estado de Transacción Incorrecto"))
+                Result.success(workDataOf(KEY_MESSAGE to "Estado de Transacción $status"))
             }
         } catch (e: Exception) {
             Log.d(TAG, e.message!!)
@@ -52,20 +55,24 @@ class SyncService(appContext: Context, workerParams: WorkerParameters) :
 
         try {
             sync ?: result(Result.failure(workDataOf(KEY_MESSAGE to "Operación Sincronización no encontrada.")))
-            val syncData =
-                Moshi.Builder().build().adapter(SyncData::class.java).fromJson(sync?.data!!)
+            val syncData = Moshi.Builder()
+                .add(BigDecimalAdapter)
+                .add(KotlinJsonAdapterFactory())
+                .build().adapter(SyncData::class.java).fromJson(sync?.data!!)
             syncData ?: result(Result.failure(workDataOf(KEY_MESSAGE to "No se puede parsear datos de objeto Sync.")))
-
+            Log.d(TAG, "syncData $syncData")
             TransaccionFactory.crearTransacion<AbstractTransaccion>(
                 TipoOperacion.PCI_SINCRONIZACION,
                 { response ->
                     if (response.isCorrecta || response.operacionSiguiente.mtiNext != null) {
                         createStaticNotification("Venta Cancelada")
+                        Log.d(TAG, "response.isCorrecta ${response.isCorrecta}")
                         result(Result.success(workDataOf(KEY_MESSAGE to "Transacción Cancelada")))
                     } else
                         result(Result.failure(workDataOf(KEY_MESSAGE to response.msjError)))
                 },
                 { error ->
+                    Log.d(TAG, "error ${error.message}")
                     result(Result.failure(workDataOf(KEY_MESSAGE to error.message)))
                 }
             ).withProcod(syncData?.product)
@@ -76,6 +83,7 @@ class SyncService(appContext: Context, workerParams: WorkerParameters) :
                 .realizarOperacion()
 
         } catch (e: Exception) {
+            Log.d(TAG, "catch Exception ${e.message}")
             result(Result.failure(workDataOf(KEY_MESSAGE to e.message)))
         }
     }

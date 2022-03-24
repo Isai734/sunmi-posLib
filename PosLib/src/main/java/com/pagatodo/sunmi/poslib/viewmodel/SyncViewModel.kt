@@ -11,8 +11,8 @@ import kotlinx.coroutines.launch
 
 class SyncViewModel(application: Application) : AndroidViewModel(application) {
 
-    var syncDao: SyncDao = SyncDatabase.getDatabase(application).databaseDao()
-    private var syncLiveData: LiveData<List<Sync>>? = null
+    private var syncDao: SyncDao = SyncDatabase.getDatabase(application).databaseDao()
+     var syncLiveData: LiveData<List<Sync>>? = null
 
     fun insertSyncData(sync: Sync){
         viewModelScope.launch { syncDao.insert(sync) }
