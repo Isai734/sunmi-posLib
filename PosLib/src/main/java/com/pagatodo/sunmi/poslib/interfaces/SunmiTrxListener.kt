@@ -44,5 +44,6 @@ interface SunmiTrxListener<E : Any> {
     fun verifyServiceCode(): Boolean
     fun createParamV2(): EmvTermParamV2
     fun sendTicketSever(responseTrx: Respuesta, dataCard: DataCard, doContinue: (Boolean) -> Unit)
-    fun onSaveTransaction(operation: Operaciones, product: Productos, menu: Menu, responseTrx: Respuesta)
+    fun onSaveTransaction(operation: Operaciones, product: Productos, menu: Menu, responseTrx: Respuesta, doContinue: (Long) -> Unit)
+    fun eraseDb(long: Long)
 }

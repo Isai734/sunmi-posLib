@@ -246,8 +246,13 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         operation: Operaciones,
         product: Productos,
         menu: Menu,
-        responseTrx: Respuesta
+        responseTrx: Respuesta,
+        doContinue: (Long) -> Unit
     ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun eraseDb(long: Long) {
         TODO("Not yet implemented")
     }
 }

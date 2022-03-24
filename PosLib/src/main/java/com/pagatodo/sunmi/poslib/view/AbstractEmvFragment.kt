@@ -431,8 +431,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
 
     abstract fun createDataInit(): DataInitPci
 
-
-    override fun onSaveTransaction(operation: Operaciones, product: Productos, menu: Menu, responseTrx: Respuesta) {
+    override fun eraseDb(long: Long) {
         serviceBd.deleteAll()
     }
 

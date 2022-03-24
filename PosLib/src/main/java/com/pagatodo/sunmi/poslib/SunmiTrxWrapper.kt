@@ -130,12 +130,16 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
                             if (isRequestSignature || PciUtils.emvRequestSignature(dataCard.tlvData) || sunmiListener.requireSignature(dataCard))
                                 sunmiListener.onShowSingDialog(requestTransaction?.camposCierreTurno?.refLocal ?: "") { sign ->
                                     sunmiListener.onShowTicketDialog(sign , requestTransaction, dataCard ) { operation, product, menu ->
-                                        sunmiListener.onSaveTransaction(operation, product, menu, requestTransaction as RespuestaTrx)
+                                        sunmiListener.onSaveTransaction(operation, product, menu, requestTransaction as RespuestaTrx){
+                                            sunmiListener.eraseDb(it)
+                                        }
                                     }
                                 }
                             else
                                 sunmiListener.onShowTicketDialog(null, requestTransaction, dataCard) { operation, product, menu ->
-                                    sunmiListener.onSaveTransaction(operation, product, menu, requestTransaction as RespuestaTrx)
+                                    sunmiListener.onSaveTransaction(operation, product, menu, requestTransaction as RespuestaTrx){
+                                        sunmiListener.eraseDb(it)
+                                    }
                                 }
                         }
                     } catch (e: Exception){

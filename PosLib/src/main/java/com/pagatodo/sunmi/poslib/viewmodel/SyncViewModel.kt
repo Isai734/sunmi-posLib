@@ -18,9 +18,7 @@ class SyncViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch { syncDao.insert(sync) }
     }
 
-    fun getByStatus(status: String) {
-        syncLiveData = syncDao.selectByStatus(status)
-    }
+    fun getByStatus(status: String) = syncDao.selectByStatus(status)
 
     fun deleteAll() {
         viewModelScope.launch { syncDao.deleteSyncData() }
