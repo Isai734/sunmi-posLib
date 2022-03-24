@@ -11,7 +11,7 @@ interface SyncDao {
     fun selectByStatus(status: String): LiveData<List<Sync>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(sync: Sync)
+    suspend fun insert(sync: Sync): Long
 
     @Update
     suspend fun update(sync: Sync)

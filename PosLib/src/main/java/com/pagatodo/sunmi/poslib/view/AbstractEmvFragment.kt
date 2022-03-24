@@ -214,13 +214,24 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
             }
         }
     }
+
     private fun saveTmpDataSync(syncData: SyncData, doContinue: () -> Unit){
-        val moshi = Moshi.Builder()
-            .add(BigDecimalAdapter)
-            .add(KotlinJsonAdapterFactory())
-            .build()
-        serviceBd.insertSyncData(Sync(dateTime= Date(), status = StatusTrx.PROGRESS.name, data = moshi.adapter(SyncData::class.java).toJson(syncData)))
-        doContinue()
+        GlobalScope.launch {
+            try {
+                val moshi = Moshi.Builder()
+                    .add(BigDecimalAdapter)
+                    .add(KotlinJsonAdapterFactory())
+                    .build()
+                serviceBd.insertSyncData(Sync(dateTime= Date(), status = StatusTrx.PROGRESS.name,
+                    data = moshi.adapter(SyncData::class.java).toJson(syncData))).apply {
+                    Log.d(PosLib.TAG, "inserted with id $this")
+                    if (this > 0) doContinue()
+                }
+            } catch (e:Exception){
+                e.printStackTrace()
+                sunmiTransaction.abortFullTransaction()
+            }
+        }
     }
 
     override fun getVmodelPCI() = viewModelPci

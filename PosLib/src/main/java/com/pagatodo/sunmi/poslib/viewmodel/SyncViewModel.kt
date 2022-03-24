@@ -14,9 +14,7 @@ class SyncViewModel(application: Application) : AndroidViewModel(application) {
     private var syncDao: SyncDao = SyncDatabase.getDatabase(application).databaseDao()
      var syncLiveData: LiveData<List<Sync>>? = null
 
-    fun insertSyncData(sync: Sync){
-        viewModelScope.launch { syncDao.insert(sync) }
-    }
+    suspend fun insertSyncData(sync: Sync) = syncDao.insert(sync)
 
     fun getByStatus(status: String) = syncDao.selectByStatus(status)
 

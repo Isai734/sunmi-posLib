@@ -119,7 +119,7 @@ abstract class SunmiTransaction {
         PosLogger.e(PosLib.TAG, exe.message)
     }
 
-    protected fun abortFullTransaction() = try {
+    public fun abortFullTransaction() = try {
         posInstance().mEMVOptV2?.abortTransactProcess()
     } catch (exe: Exception) {
         PosLogger.e(PosLib.TAG, exe.message)
