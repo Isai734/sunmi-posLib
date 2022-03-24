@@ -2,6 +2,7 @@ package com.pagatodo.sunmi.poslib
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -102,7 +103,9 @@ fun AppCompatActivity.validateSync(observer: Observer<WorkInfo>){
     val serviceBd by lazy { ViewModelProvider(this)[SyncViewModel::class.java] }
     serviceBd.getByStatus(StatusTrx.PROGRESS.name)
     serviceBd.syncLiveData?.observe(this){
+        Log.d(PosLib.TAG, "find sync ${it.size}")
         for (sync in it){
+            Log.d(PosLib.TAG, "find sync $sync")
             val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
             val syncWorker: WorkRequest = OneTimeWorkRequestBuilder<SyncService>()
                 .setInputData(workDataOf(
