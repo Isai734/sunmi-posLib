@@ -19,6 +19,7 @@ import com.pagatodo.sunmi.poslib.harmonizer.db.SyncDatabase
 import com.pagatodo.sunmi.poslib.model.SyncData
 import com.pagatodo.sunmi.poslib.posInstance
 import com.pagatodo.sunmi.poslib.util.StatusTrx
+import com.pagatodo.sunmi.poslib.view.AbstractEmvFragment
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.delay
 import net.fullcarga.android.api.oper.TipoOperacion
@@ -78,7 +79,7 @@ class HarmonizerService(appContext: Context, workerParams: WorkerParameters) :
             ).withProcod(syncData?.product)
                 .withFields(syncData?.params)
                 .withStan(syncData?.stan)
-                .withDatosOpTarjeta(syncData?.dataCard)
+                .withDatosOpTarjeta(AbstractEmvFragment.createDataOpTarjeta(syncData?.dataCard, syncData?.transactionData))
                 .withUser(posInstance().user)
                 .realizarOperacion()
 

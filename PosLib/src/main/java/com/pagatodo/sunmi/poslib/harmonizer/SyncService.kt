@@ -18,6 +18,7 @@ import com.pagatodo.sunmi.poslib.model.SyncData
 import com.pagatodo.sunmi.poslib.posInstance
 import com.pagatodo.sunmi.poslib.util.MoshiInstance
 import com.pagatodo.sunmi.poslib.util.StatusTrx
+import com.pagatodo.sunmi.poslib.view.AbstractEmvFragment
 import com.pagatodo.sunmi.poslib.view.BigDecimalAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -77,7 +78,7 @@ class SyncService(appContext: Context, workerParams: WorkerParameters) :
             ).withProcod(syncData?.product)
                 .withFields(syncData?.params)
                 .withStan(syncData?.stan)
-                .withDatosOpTarjeta(syncData?.dataCard)
+                .withDatosOpTarjeta(AbstractEmvFragment.createDataOpTarjeta(syncData?.dataCard, syncData?.transactionData))
                 .withUser(posInstance().user)
                 .realizarOperacion()
 

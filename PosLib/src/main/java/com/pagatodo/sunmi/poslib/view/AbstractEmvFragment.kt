@@ -201,7 +201,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
                 saveTmpDataSync(getDataSync(dataCard)) {
                     onDialogProcessOnline(dataCard = dataCard)
                     dataCard.monthlyPayments = it.tag as Int
-                    viewModelPci.executeEmvOpr(PciUtils.getOperation(operacion), producto.codigo, PciUtils.fillFields(params, form), createDataOpTarjeta(dataCard))
+                    viewModelPci.executeEmvOpr(PciUtils.getOperation(operacion), producto.codigo, PciUtils.fillFields(params, form), createDataOpTarjeta(dataCard, createTransactionData()))
                 }
             }
             dialogCuotas.isCancelable = false
@@ -212,7 +212,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
         } else {
             saveTmpDataSync(getDataSync(dataCard)) {
                 onDialogProcessOnline(dataCard = dataCard)
-                viewModelPci.executeEmvOpr(PciUtils.getOperation(operacion), producto.codigo, PciUtils.fillFields(params, form), createDataOpTarjeta(dataCard))
+                viewModelPci.executeEmvOpr(PciUtils.getOperation(operacion), producto.codigo, PciUtils.fillFields(params, form), createDataOpTarjeta(dataCard, createTransactionData()))
             }
         }
     }
@@ -271,31 +271,6 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
                 ?: run { AidlConstants.CardType.NFC.value }
         return cardType
             ?: run { throw RuntimeException("No se han agregado operaciones para pais.") }
-    }
-
-    fun createDataOpTarjeta(dataCard: DataCard): DataOpTarjeta {
-        return DataOpTarjeta(
-            dataCard.panEncrypt,
-            dataCard.track1Encrypt,
-            dataCard.track2Encrypt,
-            dataCard.track3Encrypt,
-            dataCard.icDataEncrypt,
-            dataCard.pinEncrypt,
-            dataCard.entryMode,
-            ApiData.APIDATA.datosSesion.datosTPV.convertirImporte(createTransactionData().totalAmount),
-            ApiData.APIDATA.datosSesion.datosTPV.convertirImporte(createTransactionData().cashBackLector),
-            createTransactionData().terminalParams.currencyCode,
-            createTransactionData().decimals,
-            ApiData.APIDATA.datosSesion.datosTPV.convertirImporte(createTransactionData().amount),
-            ApiData.APIDATA.datosSesion.datosTPV.convertirImporte(createTransactionData().cashBackAmount),
-            ApiData.APIDATA.datosSesion.datosTPV.convertirImporte(createTransactionData().gratuity),
-            ApiData.APIDATA.datosSesion.datosTPV.convertirImporte(createTransactionData().taxes),
-            ApiData.APIDATA.datosSesion.datosTPV.convertirImporte(createTransactionData().comisions),
-            dataCard.monthlyPayments,
-            dataCard.daysDeferred,
-            createTransactionData().zipCode,
-            dataCard.cvv
-        )
     }
 
     override fun createTransactionData(): TransactionData {
@@ -400,7 +375,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
 
     private fun getDataSync(dataCard: DataCard) = SyncData(
         producto.codigo, PciUtils.fillFields(params, form),
-        createDataOpTarjeta(dataCard), ApiData.APIDATA.datosSesion.datosTPV.stanProvider.ultimo
+        dataCard, createTransactionData(), ApiData.APIDATA.datosSesion.datosTPV.stanProvider.ultimo
     )
 
     override fun pinMustBeForced() = operacion.pin == 2
@@ -451,6 +426,33 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
     }
 
     data class DataInitPci(val producto: Productos, val operacion :Operaciones, val form : Formulario?)
+
+    companion object{
+        fun createDataOpTarjeta(dataCard: DataCard?, transactionData: TransactionData?): DataOpTarjeta {
+            return DataOpTarjeta(
+                dataCard?.panEncrypt,
+                dataCard?.track1Encrypt,
+                dataCard?.track2Encrypt,
+                dataCard?.track3Encrypt,
+                dataCard?.icDataEncrypt,
+                dataCard?.pinEncrypt,
+                dataCard?.entryMode,
+                ApiData.APIDATA.datosSesion.datosTPV.convertirImporte(transactionData?.totalAmount),
+                ApiData.APIDATA.datosSesion.datosTPV.convertirImporte(transactionData?.cashBackLector),
+                transactionData?.terminalParams?.currencyCode,
+                transactionData?.decimals,
+                ApiData.APIDATA.datosSesion.datosTPV.convertirImporte(transactionData?.amount),
+                ApiData.APIDATA.datosSesion.datosTPV.convertirImporte(transactionData?.cashBackAmount),
+                ApiData.APIDATA.datosSesion.datosTPV.convertirImporte(transactionData?.gratuity),
+                ApiData.APIDATA.datosSesion.datosTPV.convertirImporte(transactionData?.taxes),
+                ApiData.APIDATA.datosSesion.datosTPV.convertirImporte(transactionData?.comisions),
+                dataCard?.monthlyPayments,
+                dataCard?.daysDeferred,
+                transactionData?.zipCode,
+                dataCard?.cvv
+            )
+        }
+    }
 }
 
 object BigDecimalAdapter {
