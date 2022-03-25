@@ -52,6 +52,7 @@ import net.fullcarga.android.api.formulario.Formulario
 import net.fullcarga.android.api.formulario.Parametro
 import net.fullcarga.android.api.oper.TipoOperacion
 import java.math.BigDecimal
+import java.text.SimpleDateFormat
 import java.util.*
 
 abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespuesta> , OnFailureListener{
@@ -219,10 +220,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
     private fun saveTmpDataSync(syncData: SyncData, doContinue: () -> Unit){
         GlobalScope.launch {
             try {
-                val moshi = Moshi.Builder()
-                    .add(BigDecimalAdapter)
-                    .add(KotlinJsonAdapterFactory())
-                    .build()
+                val moshi = MoshiInstance.create()
                 serviceBd.insertSyncData(Sync(dateTime= Date(), status = StatusTrx.PROGRESS.name,
                     data = moshi.adapter(SyncData::class.java).toJson(syncData))).apply {
                     Log.d(PosLib.TAG, "inserted with id $this")
@@ -368,11 +366,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
     override fun onSync(dataCard: DataCard) {
         val liveData = MutableLiveData<List<Sync>>()
         liveData.observe(this){
-            val moshi = Moshi.Builder()
-                .add(BigDecimalAdapter)
-                .add(KotlinJsonAdapterFactory())
-                .build()
-
+            val moshi = MoshiInstance.create()
             val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
             val syncWorker: WorkRequest = OneTimeWorkRequestBuilder<SyncService>()
                 .setInputData(workDataOf(
@@ -465,4 +459,13 @@ object BigDecimalAdapter {
 
     @ToJson
     fun toJson(value: BigDecimal) = value.toString()
+}
+
+object DateAdapter {
+
+    @FromJson
+    fun fromJson(date: String) = Date(date.toLong())
+
+    @ToJson
+    fun toJson(value: Date?) = value?.time.toString()
 }

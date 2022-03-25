@@ -16,6 +16,7 @@ import com.pagatodo.sunmi.poslib.harmonizer.db.SyncDao
 import com.pagatodo.sunmi.poslib.harmonizer.db.SyncDatabase
 import com.pagatodo.sunmi.poslib.model.SyncData
 import com.pagatodo.sunmi.poslib.posInstance
+import com.pagatodo.sunmi.poslib.util.MoshiInstance
 import com.pagatodo.sunmi.poslib.util.StatusTrx
 import com.pagatodo.sunmi.poslib.view.BigDecimalAdapter
 import com.squareup.moshi.Moshi
@@ -33,10 +34,7 @@ class SyncService(appContext: Context, workerParams: WorkerParameters) :
     override suspend fun doWork(): Result {
         val sync = inputData.getString(KEY_INPUT_DATA) ?: ""
         Log.d(TAG, "sync $sync")
-        val syncObject = Moshi.Builder()
-            .add(BigDecimalAdapter)
-            .add(KotlinJsonAdapterFactory())
-            .build().adapter(Sync::class.java).fromJson(sync)
+        val syncObject = MoshiInstance.create().adapter(Sync::class.java).fromJson(sync)
         Log.d(TAG, "syncObject $syncObject")
         var result: Result = Result.success()
         return try {
@@ -59,10 +57,7 @@ class SyncService(appContext: Context, workerParams: WorkerParameters) :
 
         try {
             sync ?: result(Result.failure(workDataOf(KEY_MESSAGE to "Operación Sincronización no encontrada.")))
-            val syncData = Moshi.Builder()
-                .add(BigDecimalAdapter)
-                .add(KotlinJsonAdapterFactory())
-                .build().adapter(SyncData::class.java).fromJson(sync?.data!!)
+            val syncData = MoshiInstance.create().adapter(SyncData::class.java).fromJson(sync?.data!!)
             syncData ?: result(Result.failure(workDataOf(KEY_MESSAGE to "No se puede parsear datos de objeto Sync.")))
             Log.d(TAG, "syncData $syncData")
             TransaccionFactory.crearTransacion<AbstractTransaccion>(

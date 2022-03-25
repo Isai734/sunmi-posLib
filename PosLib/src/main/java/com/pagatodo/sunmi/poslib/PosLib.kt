@@ -5,8 +5,6 @@ import android.app.Activity
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -16,13 +14,9 @@ import com.pagatodo.sunmi.poslib.harmonizer.SyncService
 import com.pagatodo.sunmi.poslib.harmonizer.db.Sync
 import com.pagatodo.sunmi.poslib.keychain.CryptUtil
 import com.pagatodo.sunmi.poslib.util.EmvUtil
-import com.pagatodo.sunmi.poslib.util.PosLogger
-import com.pagatodo.sunmi.poslib.util.PosResult
+import com.pagatodo.sunmi.poslib.util.MoshiInstance
 import com.pagatodo.sunmi.poslib.util.StatusTrx
-import com.pagatodo.sunmi.poslib.view.BigDecimalAdapter
 import com.pagatodo.sunmi.poslib.viewmodel.SyncViewModel
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 
 class PosLib private constructor(val activity: Activity) : SunmiServiceWrapper() {
 
@@ -89,10 +83,7 @@ fun Activity.setFullScreen(){
 fun AppCompatActivity.validateSync(observer: Observer<WorkInfo>){
     val serviceBd by lazy { ViewModelProvider(this)[SyncViewModel::class.java] }
     val liveData = MutableLiveData<List<Sync>>()
-    val moshi = Moshi.Builder()
-        .add(BigDecimalAdapter)
-        .add(KotlinJsonAdapterFactory())
-        .build()
+    val moshi = MoshiInstance.create()
     liveData.observe(this){
         Log.d(PosLib.TAG, "find sync ${it.size}")
         for (sync in it){
