@@ -8,7 +8,7 @@ import java.util.*
 interface SyncDao {
 
     @Query("SELECT * FROM Sync WHERE status == :status")
-    fun selectByStatus(status: String): LiveData<List<Sync>>
+    fun selectByStatus(status: String): List<Sync>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(sync: Sync): Long
@@ -20,8 +20,8 @@ interface SyncDao {
     suspend fun deleteSyncData()
 
     @Query("DELETE FROM Sync WHERE dateTime == :date")
-    suspend fun deleteByDate(date: Date)
+    suspend fun deleteByDate(date: Date?)
 
     @Query("SELECT * FROM Sync WHERE dateTime == :date")
-    fun getByDate(date: Date): LiveData<Sync>
+    fun getByDate(date: Date): Sync
 }

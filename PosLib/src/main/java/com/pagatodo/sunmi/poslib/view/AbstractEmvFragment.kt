@@ -3,6 +3,7 @@ package com.pagatodo.sunmi.poslib.view
 import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.work.*
 import com.pagatodo.sigmalib.ApiData
@@ -365,33 +366,42 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
     }
 
     override fun onSync(dataCard: DataCard) {
-        /*GlobalScope.launch(Dispatchers.Main) {
-            viewModelPci.executeSync(producto.codigo, PciUtils.fillFields(params, form),
-                createDataOpTarjeta(dataCard), ApiData.APIDATA.datosSesion.datosTPV.stanProvider.ultimo)
-        }*/
+        val liveData = MutableLiveData<List<Sync>>()
+        liveData.observe(this){
+            val moshi = Moshi.Builder()
+                .add(BigDecimalAdapter)
+                .add(KotlinJsonAdapterFactory())
+                .build()
 
-        val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
-        val syncWorker: WorkRequest = OneTimeWorkRequestBuilder<SyncService>().setConstraints(constraints).build()
-        val workManager = WorkManager.getInstance(requireContext())
+            val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+            val syncWorker: WorkRequest = OneTimeWorkRequestBuilder<SyncService>()
+                .setInputData(workDataOf(
+                    SyncService.KEY_INPUT_DATA to moshi.adapter(Sync::class.java).toJson(it.first())
+                ))
+                .setConstraints(constraints).build()
+            val workManager = WorkManager.getInstance(requireContext())
 
-        workManager.enqueue(syncWorker)
+            workManager.enqueue(syncWorker)
 
-        workManager.getWorkInfoByIdLiveData(syncWorker.id).observe(requireActivity()) { info ->
-            when (info.state){
-                WorkInfo.State.SUCCEEDED -> {
-                    PosLogger.d(PosLib.TAG, "Success")
-                    onDismissRequestOnline()
-                    sunmiTransaction.onFailure(PosResult.SyncOperationSuccess)
-                }
-                WorkInfo.State.FAILED -> {
-                    if(info.outputData.getString(SyncService.KEY_MESSAGE) == "La operacion esta anulada")
+            workManager.getWorkInfoByIdLiveData(syncWorker.id).observe(requireActivity()) { info ->
+                when (info.state){
+                    WorkInfo.State.SUCCEEDED -> {
+                        PosLogger.d(PosLib.TAG, "Success")
+                        onDismissRequestOnline()
                         sunmiTransaction.onFailure(PosResult.SyncOperationSuccess)
-                    else
-                        sunmiTransaction.onFailure(PosResult.SyncOperationFailed)
+                    }
+                    WorkInfo.State.FAILED -> {
+                        if(info.outputData.getString(SyncService.KEY_MESSAGE) == "La operacion esta anulada")
+                            sunmiTransaction.onFailure(PosResult.SyncOperationSuccess)
+                        else
+                            sunmiTransaction.onFailure(PosResult.SyncOperationFailed)
+                    }
+                    else -> {sunmiTransaction.onFailure(PosResult.SyncOperationFailed)}
                 }
-                else -> {sunmiTransaction.onFailure(PosResult.SyncOperationFailed)}
             }
         }
+
+        serviceBd.getByStatus(StatusTrx.PROGRESS.name, liveData)
     }
 
     private fun getDataSync(dataCard: DataCard) = SyncData(

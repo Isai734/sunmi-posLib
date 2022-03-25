@@ -34,11 +34,12 @@ class HarmonizerService(appContext: Context, workerParams: WorkerParameters) :
     private val TAG = "SaleWmanager.LOG"
     override suspend fun doWork(): Result {
         val datetime = inputData.getLong(KEY_INPUT_TIME, 0)
+        val dataSync = inputData.getString(KEY_INPUT_TIME)
         var result: Result = Result.success()
         return try {
             setForeground(createForegroundInfo())
-            val sync = syncDao.getByDate(Date(datetime)).value
-            val status = sync?.status ?: StatusTrx.PROGRESS.name
+            val sync = syncDao.getByDate(Date(datetime))
+            val status = sync.status ?: StatusTrx.PROGRESS.name
             while (status == StatusTrx.PROGRESS.name && Date().time.minus(datetime) < waitTime)
                 delay(2000L)// 1 Segundo
             if (status == StatusTrx.PROGRESS.name) {
@@ -134,5 +135,6 @@ class HarmonizerService(appContext: Context, workerParams: WorkerParameters) :
 
     companion object {
         const val KEY_INPUT_TIME = "KEY_INPUT_TIME"
+        const val KEY_INPUT_DATA = "KEY_INPUT_DATA"
     }
 }

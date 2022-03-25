@@ -29,18 +29,22 @@ class SyncService(appContext: Context, workerParams: WorkerParameters) :
     private val NOTIFICATION_ID = 102
     var syncDao: SyncDao = SyncDatabase.getDatabase(appContext).databaseDao()
 
-    private val TAG = "SaleWmanager.LOG"
+    private val TAG = "SyncService.LOG"
     override suspend fun doWork(): Result {
-        val datetime = inputData.getLong(KEY_INPUT_TIME, 0)
-        Log.d(TAG, "datetime $datetime")
+        val sync = inputData.getString(KEY_INPUT_DATA) ?: ""
+        Log.d(TAG, "sync $sync")
+        val syncObject = Moshi.Builder()
+            .add(BigDecimalAdapter)
+            .add(KotlinJsonAdapterFactory())
+            .build().adapter(Sync::class.java).fromJson(sync)
+        Log.d(TAG, "syncObject $syncObject")
         var result: Result = Result.success()
         return try {
             setForeground(createForegroundInfo())
-            val sync = syncDao.getByDate(Date(datetime)).value
-            val status = sync?.status ?: StatusTrx.PROGRESS.name
+            val status = syncObject?.status ?: StatusTrx.PROGRESS.name
             if (status == StatusTrx.PROGRESS.name) {
-                doSync(sync) { result = Result.success() }
-                if(result == Result.success()) syncDao.deleteByDate(Date(datetime))
+                doSync(syncObject) { result = it }
+                if(result == Result.success()) syncDao.deleteByDate(syncObject?.dateTime)
                 result
             } else {
                 Result.success(workDataOf(KEY_MESSAGE to "Estado de Transacción $status"))
@@ -82,7 +86,7 @@ class SyncService(appContext: Context, workerParams: WorkerParameters) :
                 .withUser(posInstance().user)
                 .realizarOperacion()
 
-        } catch (e: Exception) {
+        } catch (e: Exception) { e.printStackTrace()
             Log.d(TAG, "catch Exception ${e.message}")
             result(Result.failure(workDataOf(KEY_MESSAGE to e.message)))
         }
@@ -141,5 +145,6 @@ class SyncService(appContext: Context, workerParams: WorkerParameters) :
     companion object {
         const val KEY_INPUT_TIME = "KEY_INPUT_TIME"
         const val KEY_MESSAGE = "KEY_MESSAGE"
+        const val KEY_INPUT_DATA = "KEY_INPUT_DATA"
     }
 }

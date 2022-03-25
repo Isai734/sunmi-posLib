@@ -3,6 +3,7 @@ package com.pagatodo.sunmi.poslib.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.pagatodo.sunmi.poslib.harmonizer.db.Sync
 import com.pagatodo.sunmi.poslib.harmonizer.db.SyncDao
@@ -16,7 +17,11 @@ class SyncViewModel(application: Application) : AndroidViewModel(application) {
 
     suspend fun insertSyncData(sync: Sync) = syncDao.insert(sync)
 
-    fun getByStatus(status: String) = syncDao.selectByStatus(status)
+    fun getByStatus(status: String, liveData: MutableLiveData<List<Sync>>){
+        liveData.postValue(
+             syncDao.selectByStatus(status)
+        )
+    }
 
     fun deleteAll() {
         viewModelScope.launch { syncDao.deleteSyncData() }

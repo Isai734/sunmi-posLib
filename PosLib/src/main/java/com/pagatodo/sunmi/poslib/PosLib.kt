@@ -6,17 +6,23 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.work.*
 import com.pagatodo.sunmi.poslib.config.PosConfig
 import com.pagatodo.sunmi.poslib.harmonizer.SyncService
+import com.pagatodo.sunmi.poslib.harmonizer.db.Sync
 import com.pagatodo.sunmi.poslib.keychain.CryptUtil
 import com.pagatodo.sunmi.poslib.util.EmvUtil
 import com.pagatodo.sunmi.poslib.util.PosLogger
 import com.pagatodo.sunmi.poslib.util.PosResult
 import com.pagatodo.sunmi.poslib.util.StatusTrx
+import com.pagatodo.sunmi.poslib.view.BigDecimalAdapter
 import com.pagatodo.sunmi.poslib.viewmodel.SyncViewModel
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 
 class PosLib private constructor(val activity: Activity) : SunmiServiceWrapper() {
 
@@ -80,36 +86,21 @@ fun Activity.setFullScreen(){
             or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
 }
 
-fun Fragment.validateSync(observer: Observer<WorkInfo>){
-    val serviceBd by lazy { ViewModelProvider(this)[SyncViewModel::class.java] }
-    serviceBd.getByStatus(StatusTrx.PROGRESS.name).observe(this) {
-        Log.d(PosLib.TAG, "find sync ${it.size}")
-        for (sync in it){
-            Log.d(PosLib.TAG, "find sync $sync")
-            val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
-            val syncWorker: WorkRequest = OneTimeWorkRequestBuilder<SyncService>()
-                .setInputData(workDataOf(
-                    SyncService.KEY_INPUT_TIME to sync.dateTime?.time
-                ))
-                .setConstraints(constraints)
-                .build()
-            val workManager = WorkManager.getInstance(requireContext())
-            workManager.enqueue(syncWorker)
-            workManager.getWorkInfoByIdLiveData(syncWorker.id).observe(this, observer)
-        }
-    }
-}
-
 fun AppCompatActivity.validateSync(observer: Observer<WorkInfo>){
     val serviceBd by lazy { ViewModelProvider(this)[SyncViewModel::class.java] }
-    serviceBd.getByStatus(StatusTrx.PROGRESS.name).observe(this) {
+    val liveData = MutableLiveData<List<Sync>>()
+    val moshi = Moshi.Builder()
+        .add(BigDecimalAdapter)
+        .add(KotlinJsonAdapterFactory())
+        .build()
+    liveData.observe(this){
         Log.d(PosLib.TAG, "find sync ${it.size}")
         for (sync in it){
             Log.d(PosLib.TAG, "find sync $sync")
             val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
             val syncWorker: WorkRequest = OneTimeWorkRequestBuilder<SyncService>()
                 .setInputData(workDataOf(
-                    SyncService.KEY_INPUT_TIME to sync.dateTime?.time
+                    SyncService.KEY_INPUT_DATA to moshi.adapter(Sync::class.java).toJson(sync)
                 ))
                 .setConstraints(constraints)
                 .build()
@@ -118,6 +109,7 @@ fun AppCompatActivity.validateSync(observer: Observer<WorkInfo>){
             workManager.getWorkInfoByIdLiveData(syncWorker.id).observe(this, observer)
         }
     }
+    serviceBd.getByStatus(StatusTrx.PROGRESS.name, liveData)
 }
 
 
