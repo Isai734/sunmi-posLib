@@ -8,6 +8,7 @@ import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.work.*
+import com.pagatodo.sigmalib.ApiData
 import com.pagatodo.sigmalib.transacciones.AbstractTransaccion
 import com.pagatodo.sigmalib.transacciones.TransaccionFactory
 import com.pagatodo.sunmi.poslib.R
@@ -77,7 +78,7 @@ class SyncService(appContext: Context, workerParams: WorkerParameters) :
                 }
             ).withProcod(syncData?.product)
                 .withFields(syncData?.params)
-                .withStan(syncData?.stan)
+                .withStan(ApiData.APIDATA.datosSesion.datosTPV.stanProvider.ultimo)
                 .withDatosOpTarjeta(AbstractEmvFragment.createDataOpTarjeta(syncData?.dataCard, syncData?.transactionData))
                 .withUser(posInstance().user)
                 .realizarOperacion()
