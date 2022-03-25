@@ -78,7 +78,7 @@ class SyncService(appContext: Context, workerParams: WorkerParameters) :
                 }
             ).withProcod(syncData?.product)
                 .withFields(syncData?.params)
-                .withStan(ApiData.APIDATA.datosSesion.datosTPV.stanProvider.ultimo)
+                .withStan(syncData?.stan)
                 .withDatosOpTarjeta(AbstractEmvFragment.createDataOpTarjeta(syncData?.dataCard, syncData?.transactionData))
                 .withUser(posInstance().user)
                 .realizarOperacion()
