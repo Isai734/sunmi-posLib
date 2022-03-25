@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.pagatodo.sunmi.poslib.harmonizer.db.Sync
 import com.pagatodo.sunmi.poslib.harmonizer.db.SyncDao
 import com.pagatodo.sunmi.poslib.harmonizer.db.SyncDatabase
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class SyncViewModel(application: Application) : AndroidViewModel(application) {
@@ -18,9 +19,11 @@ class SyncViewModel(application: Application) : AndroidViewModel(application) {
     suspend fun insertSyncData(sync: Sync) = syncDao.insert(sync)
 
     fun getByStatus(status: String, liveData: MutableLiveData<List<Sync>>){
-        liveData.postValue(
-             syncDao.selectByStatus(status)
-        )
+        viewModelScope.launch(Dispatchers.IO) {
+            liveData.postValue(
+                syncDao.selectByStatus(status)
+            )
+        }
     }
 
     fun deleteAll() {
