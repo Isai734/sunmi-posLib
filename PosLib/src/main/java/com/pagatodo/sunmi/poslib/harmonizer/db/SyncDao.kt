@@ -1,6 +1,5 @@
 package com.pagatodo.sunmi.poslib.harmonizer.db
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import java.util.*
 

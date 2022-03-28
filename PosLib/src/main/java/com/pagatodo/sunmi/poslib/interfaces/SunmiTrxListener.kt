@@ -46,4 +46,6 @@ interface SunmiTrxListener<E : Any> {
     fun sendTicketSever(responseTrx: Respuesta, dataCard: DataCard, doContinue: (Boolean) -> Unit)
     fun onSaveTransaction(operation: Operaciones, product: Productos, menu: Menu, responseTrx: Respuesta, doContinue: (Long) -> Unit)
     fun eraseDb(long: Long)
+    fun haveMSI(): Boolean
+    fun showDialogMsi(cardNo: String, doContinue: (Boolean) -> Unit)
 }

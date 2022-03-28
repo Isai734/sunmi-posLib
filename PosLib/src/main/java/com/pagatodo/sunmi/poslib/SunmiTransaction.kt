@@ -277,7 +277,15 @@ abstract class SunmiTransaction {
             PosLogger.e(PosLib.TAG, cardNo)
             if(mCardType == AidlConstants.CardType.NFC) readingCard()
             mCardNo = cardNo
-            posInstance().mEMVOptV2?.importCardNoStatus(0)
+            if(isMsi())
+                showDialogMsi(cardNo) {
+                    if(it)
+                        posInstance().mEMVOptV2?.importCardNoStatus(0)
+                    else
+                        abortFullTransaction()
+                }
+            else
+                posInstance().mEMVOptV2?.importCardNoStatus(0)
         }
 
         @Throws(RemoteException::class)
@@ -622,4 +630,8 @@ abstract class SunmiTransaction {
     abstract fun getTransactionData(): TransactionData
 
     abstract fun onRemoveCard()
+
+    abstract fun isMsi(): Boolean
+
+    abstract fun showDialogMsi(cardNo: String, doContinue: (Boolean) -> Unit)
 }

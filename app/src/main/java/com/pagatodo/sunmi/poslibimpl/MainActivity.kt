@@ -268,4 +268,10 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
     override fun eraseDb(long: Long) {
         TODO("Not yet implemented")
     }
+
+    override fun haveMSI() = true
+
+    override fun showDialogMsi(cardNo: String, doContinue: (Boolean) -> Unit) {
+        MsiDialog()
+    }
 }

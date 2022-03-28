@@ -190,18 +190,17 @@ object PciUtils {
         return false
     }
 
-    fun haveMsi(perfilesEmv: PerfilesEmv?, pan: String): Boolean {
-        perfilesEmv ?: return false
-        val rangoCuotas = EmvManager.getRangoCuotas(perfilesEmv.lstCuotasMes)
-
-        if (rangoCuotas.isNotEmpty()) {
-            for (cuota in rangoCuotas) {
-                if (pan.substring(0, 6).toInt() >= cuota.minbin.toInt() && pan.substring(0, 6).toInt() <= cuota.maxbin.toInt()) {
-                    return cuota.cuotasmax > 0 && cuota.cuotasinc > 0
+    fun haveMsi(pan: String): List<Int> {
+        val rangeMsi = EmvManager.getRangosBinMsi()
+        val months = LinkedList<Int>()
+        if (rangeMsi.isNotEmpty()) {
+            for (msi in rangeMsi) {
+                if (pan.substring(0, 6).toInt() >= msi.minbin.toInt() && pan.substring(0, 6).toInt() <= msi.maxbin.toInt()) {
+                    months.add(msi.meses)
                 }
             }
         }
-        return false
+        return months
     }
 
     @Throws(EmvException::class)

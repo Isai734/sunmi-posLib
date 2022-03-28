@@ -180,6 +180,10 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
 
     override fun onRemoveCard() = sunmiListener.showRemoveCard(if(this::dataCard.isInitialized) dataCard else null)
 
+    override fun isMsi() = sunmiListener.haveMSI()
+
+    override fun showDialogMsi(cardNo: String, doContinue: (Boolean) -> Unit) = sunmiListener.showDialogMsi(cardNo,doContinue)
+
     private fun doNxtOperation(response: RespuestaTrxCierreTurno){
         nextOperation = response.operacionSiguiente
         sunmiListener.doOperationNext(response.operacionSiguiente, response.campo60.first()) { message -> doNextOperation(message) }

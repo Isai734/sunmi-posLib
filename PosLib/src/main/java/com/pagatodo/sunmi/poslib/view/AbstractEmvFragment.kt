@@ -454,6 +454,21 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
         }
     }
 
+    override fun showDialogMsi(cardNo: String, doContinue: (Boolean) -> Unit) {
+        val msiList = PciUtils.haveMsi(cardNo)
+        if (msiList.isNotEmpty()) {
+            MsiDialog() //TODO cregir dialog.
+            /**
+             * se debe hacer algo como
+             * MsiDialog.create(createTransactionData().totalAmount, msiList) { msi ->
+             *      this.params.add(Parametro(msi)) // Esto lo tendría que definir Julio si es que debe ir en los fields.
+             *      doContinue(true)
+             * }
+             */
+        } else
+            doContinue(false)
+    }
+
     abstract fun getStanProvider(): StanProviderNext
 }
 

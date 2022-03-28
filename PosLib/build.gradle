@@ -75,7 +75,7 @@ dependencies {
     //Pagatodo
     implementation 'net.fullcarga.android:ApiAndroid:1.12.328'
     implementation 'com.pagatodo.sunmi:PayLib:1.4.49'
-    implementation 'com.pagatodo.android:sigmaLib:1.3.1'
+    implementation 'com.pagatodo.android:sigmaLib:1.3.33'
 }
 
 
