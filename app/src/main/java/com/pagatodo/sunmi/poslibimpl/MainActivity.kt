@@ -16,6 +16,7 @@ import com.pagatodo.sunmi.poslib.interfaces.SunmiTrxListener
 import com.pagatodo.sunmi.poslib.model.*
 import com.pagatodo.sunmi.poslib.util.*
 import com.pagatodo.sunmi.poslib.view.dialogs.CidDialog
+import com.pagatodo.sunmi.poslib.view.dialogs.MsiDialog
 import com.pagatodo.sunmi.poslib.view.dialogs.PinPadDialog
 import com.pagatodo.sunmi.poslib.view.dialogs.TemporaryDialog
 import com.pagatodo.sunmi.poslibimpl.databinding.ActivityMainBinding
@@ -48,10 +49,22 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         setSupportActionBar(findViewById(R.id.toolbar))
         PosLib.createInstance(this)
         binding.btnAccept.setOnClickListener {
-            if (binding.amountTxv.text.isNotEmpty() && binding.amountTxv.text.isDigitsOnly())
-                cidDialog()
+            if (binding.amountTxv.text.isNotEmpty() && binding.amountTxv.text.isDigitsOnly()) {
+                var valueAmount = binding.amountTxv.text.toString()
+                msiDialog(valueAmount)
+                //cidDialog()
+            }
         //trxManager.initTransaction()
         }
+    }
+
+    private fun msiDialog(amountToCollect: String) {
+        val bundle = Bundle()
+        bundle.putString("amount",amountToCollect)
+
+        var dialog = MsiDialog()
+        dialog.arguments = bundle
+        dialog.show(supportFragmentManager,"msiDialog")
     }
 
     private fun cidDialog(){

@@ -9,4 +9,11 @@
     <color name="slate">#46606a</color>
 
 
+    <color name="colorBlueLight">#23D1EF</color>
+    <color name="colorGreyLigth">#C1C6C8</color>
+    <color name="colorLetterButtonGreyLight">#51504E</color>
+    <color name="colorLetterMsi">#B6B6B6</color>
+    <color name="colorLetterAmount">#436267</color>
+
+
 </resources>

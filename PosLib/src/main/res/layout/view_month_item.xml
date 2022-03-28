@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/base_unchecked"
+    android:layout_margin="5dp">
+
+    <TextView
+        android:id="@+id/month_button"
+        android:layout_width="135dp"
+        android:layout_height="75dp"
+        android:padding="16dp"
+        android:textSize="16sp"
+        android:layout_marginEnd="3dp"
+        android:gravity="center"
+        android:textColor="@color/colorLetterButtonGreyLight"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        tools:text="3 X" />
+</LinearLayout>
