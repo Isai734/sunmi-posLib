@@ -198,8 +198,8 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
         if (PciUtils.haveCuotas(fullProfile.perfilesEmv, dataCard.cardNo)) {
             val dialogCuotas = DialogPayments.newInstance(fullProfile.perfilesEmv)
             dialogCuotas.setCuotasListener{
+                onDialogProcessOnline(dataCard = dataCard)
                 saveTmpDataSync(getDataSync(dataCard)) {
-                    onDialogProcessOnline(dataCard = dataCard)
                     dataCard.monthlyPayments = it.tag as Int
                     viewModelPci.executeEmvOpr(PciUtils.getOperation(operacion), producto.codigo, PciUtils.fillFields(params, form), createDataOpTarjeta(dataCard, createTransactionData()))
                 }
@@ -375,7 +375,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
 
     private fun getDataSync(dataCard: DataCard) = SyncData(
         producto.codigo, PciUtils.fillFields(params, form),
-        dataCard, createTransactionData(), ApiData.APIDATA.datosSesion.datosTPV.stanProvider.ultimo
+        dataCard, createTransactionData(), getStanProvider().createNext() //!Important
     )
 
     override fun pinMustBeForced() = operacion.pin == 2
@@ -453,6 +453,8 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
             )
         }
     }
+
+    abstract fun getStanProvider(): StanProviderNext
 }
 
 object BigDecimalAdapter {
