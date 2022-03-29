@@ -19,11 +19,6 @@ class DialogProgress(context: Context) :
         setContentView(R.layout.dialog_progress_show)
     }
 
-    override fun onStart() {
-        super.onStart()
-        //window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-    }
-
     override fun show() {
         super.show()
         findViewById<TextView>(R.id.titleProgressDialog).text = title

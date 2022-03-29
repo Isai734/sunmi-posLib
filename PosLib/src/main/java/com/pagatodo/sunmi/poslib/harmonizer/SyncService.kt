@@ -8,7 +8,6 @@ import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.work.*
-import com.pagatodo.sigmalib.ApiData
 import com.pagatodo.sigmalib.transacciones.AbstractTransaccion
 import com.pagatodo.sigmalib.transacciones.TransaccionFactory
 import com.pagatodo.sunmi.poslib.R
@@ -20,11 +19,10 @@ import com.pagatodo.sunmi.poslib.posInstance
 import com.pagatodo.sunmi.poslib.util.MoshiInstance
 import com.pagatodo.sunmi.poslib.util.StatusTrx
 import com.pagatodo.sunmi.poslib.view.AbstractEmvFragment
-import com.pagatodo.sunmi.poslib.view.BigDecimalAdapter
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
 import net.fullcarga.android.api.oper.TipoOperacion
-import java.util.*
 
 class SyncService(appContext: Context, workerParams: WorkerParameters) :
     CoroutineWorker(appContext, workerParams) {
@@ -38,12 +36,11 @@ class SyncService(appContext: Context, workerParams: WorkerParameters) :
         Log.d(TAG, "sync $sync")
         val syncObject = MoshiInstance.create().adapter(Sync::class.java).fromJson(sync)
         Log.d(TAG, "syncObject $syncObject")
-        var result: Result = Result.success()
         return try {
             setForeground(createForegroundInfo())
             val status = syncObject?.status ?: StatusTrx.PROGRESS.name
             if (status == StatusTrx.PROGRESS.name) {
-                doSync(syncObject) { result = it }
+                val result = doSyncIO(syncObject)
                 if(result == Result.success()) syncDao.deleteByDate(syncObject?.dateTime)
                 result
             } else {
@@ -86,6 +83,37 @@ class SyncService(appContext: Context, workerParams: WorkerParameters) :
         } catch (e: Exception) { e.printStackTrace()
             Log.d(TAG, "catch Exception ${e.message}")
             result(Result.failure(workDataOf(KEY_MESSAGE to e.message)))
+        }
+    }
+
+    private suspend fun doSyncIO(sync: Sync?): Result {
+        var result = Result.failure()
+        return withContext(Dispatchers.IO){
+            sync ?: run { result = Result.failure(workDataOf(KEY_MESSAGE to "Operación Sincronización no encontrada.")) }
+            val syncData = MoshiInstance.create().adapter(SyncData::class.java).fromJson(sync?.data!!)
+            syncData ?: run { result = Result.failure(workDataOf(KEY_MESSAGE to "No se puede parsear datos de objeto Sync.")) }
+            Log.d(TAG, "syncData $syncData")
+            TransaccionFactory.crearTransacion<AbstractTransaccion>(
+                TipoOperacion.PCI_SINCRONIZACION,
+                { response ->
+                    result = if (response.isCorrecta || response.operacionSiguiente.mtiNext != null) {
+                        createStaticNotification("Venta Cancelada")
+                        Log.d(TAG, "response.isCorrecta ${response.isCorrecta}")
+                        Result.success(workDataOf(KEY_MESSAGE to "Transacción Cancelada"))
+                    } else
+                        Result.failure(workDataOf(KEY_MESSAGE to response.msjError))
+                },
+                { error ->
+                    Log.d(TAG, "error ${error.message}")
+                    result = Result.failure(workDataOf(KEY_MESSAGE to error.message))
+                }
+            ).withProcod(syncData?.product)
+                .withFields(syncData?.params)
+                .withStan(syncData?.stan)
+                .withDatosOpTarjeta(AbstractEmvFragment.createDataOpTarjeta(syncData?.dataCard, syncData?.transactionData))
+                .withUser(posInstance().user)
+                .realizarOperacion()
+            result
         }
     }
 
