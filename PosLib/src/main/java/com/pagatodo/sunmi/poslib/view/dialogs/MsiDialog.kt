@@ -62,13 +62,14 @@ class MsiDialog: DialogFragment(R.layout.fragment_msi_dialog) {
     }
 
     companion object{
-        fun create(totalAmount: String, msiList: List<Int>){
+        fun create(totalAmount: String, msiList: List<Int>): MsiDialog{
             val args = Bundle()
             args.putString("amount",totalAmount)
             args.putStringArray("msilist",msiList.map { it.toString() }.toTypedArray())
 
             var msiDialog = MsiDialog()
             msiDialog.arguments = args
+            return msiDialog
             //msiDialog.show(supportFragmentManager,"msiDialog")
         }
     }
