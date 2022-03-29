@@ -8,6 +8,7 @@ import com.pagatodo.sunmi.poslib.R
 import com.pagatodo.sunmi.poslib.databinding.FragmentMsiDialogBinding
 import com.pagatodo.sunmi.poslib.model.Msi
 import com.pagatodo.sunmi.poslib.view.adapter.MsiAdapter
+import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
 
@@ -59,4 +60,17 @@ class MsiDialog: DialogFragment(R.layout.fragment_msi_dialog) {
         }
         return listMonth
     }
+
+    companion object{
+        fun create(totalAmount: String, msiList: List<Int>){
+            val args = Bundle()
+            args.putString("amount",totalAmount)
+            args.putStringArray("msilist",msiList.map { it.toString() }.toTypedArray())
+
+            var msiDialog = MsiDialog()
+            msiDialog.arguments = args
+            //msiDialog.show(supportFragmentManager,"msiDialog")
+        }
+    }
+
 }
