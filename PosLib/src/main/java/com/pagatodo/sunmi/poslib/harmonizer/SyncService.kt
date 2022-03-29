@@ -22,6 +22,7 @@ import com.pagatodo.sunmi.poslib.view.AbstractEmvFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
+import net.fullcarga.android.api.data.respuesta.AbstractRespuesta
 import net.fullcarga.android.api.oper.TipoOperacion
 
 class SyncService(appContext: Context, workerParams: WorkerParameters) :
@@ -99,7 +100,8 @@ class SyncService(appContext: Context, workerParams: WorkerParameters) :
                     result = if (response.isCorrecta || response.operacionSiguiente.mtiNext != null) {
                         createStaticNotification("Venta Cancelada")
                         Log.d(TAG, "response.isCorrecta ${response.isCorrecta}")
-                        Result.success(workDataOf(KEY_MESSAGE to "Transacción Cancelada"))
+                        val resp = MoshiInstance.create().adapter(AbstractRespuesta::class.java).toJson(response)
+                        Result.success(workDataOf(KEY_MESSAGE to resp))
                     } else
                         Result.failure(workDataOf(KEY_MESSAGE to response.msjError))
                 },
