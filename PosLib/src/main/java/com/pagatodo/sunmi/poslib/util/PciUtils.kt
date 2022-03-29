@@ -191,20 +191,6 @@ object PciUtils {
         return false
     }
 
-    fun haveMsi(perfilesEmv: PerfilesEmv?, pan: String): Boolean {
-        perfilesEmv ?: return false
-        val rangoCuotas = EmvManager(perfilesEmv.lstCuotasMes)
-
-        if (rangoCuotas.isNotEmpty()) {
-            for (cuota in rangoCuotas) {
-                if (pan.substring(0, 6).toInt() >= cuota.minbin.toInt() && pan.substring(0, 6).toInt() <= cuota.maxbin.toInt()) {
-                    return cuota.cuotasmax > 0 && cuota.cuotasinc > 0
-                }
-            }
-        }
-        return false
-    }
-
     @Throws(EmvException::class)
     fun validateDateOfExpiry(perfilesEmv: PerfilesEmv?, expireDate: String) {
         var expireDate = expireDate
