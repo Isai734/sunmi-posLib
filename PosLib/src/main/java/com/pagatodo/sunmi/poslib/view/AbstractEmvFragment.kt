@@ -20,7 +20,6 @@ import com.pagatodo.sunmi.poslib.harmonizer.SyncService
 import com.pagatodo.sunmi.poslib.harmonizer.db.Sync
 import com.pagatodo.sunmi.poslib.interfaces.SunmiTrxListener
 import com.pagatodo.sunmi.poslib.model.DataCard
-import com.pagatodo.sunmi.poslib.model.Results
 import com.pagatodo.sunmi.poslib.model.SyncData
 import com.pagatodo.sunmi.poslib.model.TransactionData
 import com.pagatodo.sunmi.poslib.setFullScreen
@@ -29,9 +28,7 @@ import com.pagatodo.sunmi.poslib.view.dialogs.*
 import com.pagatodo.sunmi.poslib.viewmodel.EmvViewModel
 import com.pagatodo.sunmi.poslib.viewmodel.SyncViewModel
 import com.squareup.moshi.FromJson
-import com.squareup.moshi.Moshi
 import com.squareup.moshi.ToJson
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.sunmi.pay.hardware.aidl.AidlConstants
 import com.sunmi.pay.hardware.aidlv2.bean.EmvTermParamV2
 import com.sunmi.pay.hardware.aidlv2.pinpad.PinPadListenerV2
@@ -46,13 +43,10 @@ import net.fullcarga.android.api.bd.sigma.generated.tables.pojos.Productos
 import net.fullcarga.android.api.data.DataOpTarjeta
 import net.fullcarga.android.api.data.respuesta.AbstractRespuesta
 import net.fullcarga.android.api.data.respuesta.OperacionSiguiente
-import net.fullcarga.android.api.data.respuesta.Respuesta
-import net.fullcarga.android.api.data.respuesta.RespuestaTrxCierreTurno
 import net.fullcarga.android.api.formulario.Formulario
 import net.fullcarga.android.api.formulario.Parametro
 import net.fullcarga.android.api.oper.TipoOperacion
 import java.math.BigDecimal
-import java.text.SimpleDateFormat
 import java.util.*
 
 abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespuesta> , OnFailureListener{
@@ -66,6 +60,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
     protected lateinit var operacion: Operaciones
     protected lateinit var producto: Productos
     protected var form: Formulario? = null
+    protected lateinit var menu: Menu
     private var params = LinkedList<Parametro>()
     private var forceCheckCardType: Int = -1
     private var isAllowCancelEmvProcess = true
@@ -79,6 +74,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
         operacion = dataInitPci.operacion
         producto = dataInitPci.producto
         form = dataInitPci.form
+        menu = dataInitPci.menu
         fullProfile = EmvManager.getFullPerfil(producto.perfilEmv ?: 0, this)
     }
 
@@ -374,7 +370,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
     }
 
     private fun getDataSync(dataCard: DataCard) = SyncData(
-        producto.codigo, PciUtils.fillFields(params, form),
+        producto.codigo, menu, PciUtils.fillFields(params, form),
         dataCard, createTransactionData(), getStanProvider().createNext() //!Important
     )
 
@@ -425,7 +421,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
         serviceBd.deleteAll()
     }
 
-    data class DataInitPci(val producto: Productos, val operacion :Operaciones, val form : Formulario?)
+    data class DataInitPci(val producto: Productos, val operacion :Operaciones, val form : Formulario?, val menu: Menu)
 
     companion object{
         fun createDataOpTarjeta(dataCard: DataCard?, transactionData: TransactionData?): DataOpTarjeta {
