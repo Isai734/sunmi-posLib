@@ -95,9 +95,9 @@ fun AppCompatActivity.validateSync(observer: Observer<WorkInfo>){
                 ))
                 .setConstraints(constraints)
                 .build()
-            val workManager = WorkManager.getInstance(requireContext())
-            workManager.enqueue(syncWorker)
-            workManager.getWorkInfoByIdLiveData(syncWorker.id).observe(this, observer)
+            WorkManager.getInstance(requireContext()).enqueue(syncWorker)
+            WorkManager.getInstance(requireContext())
+                .getWorkInfoByIdLiveData(syncWorker.id).observe(this, observer)
         }
     }
     serviceBd.getByStatus(StatusTrx.PROGRESS.name, liveData)
