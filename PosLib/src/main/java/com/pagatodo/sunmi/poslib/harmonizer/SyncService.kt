@@ -63,22 +63,21 @@ class SyncService(appContext: Context, workerParams: WorkerParameters) :
             Log.d(TAG, "syncData $syncData")
             TransaccionFactory.crearTransacion<AbstractTransaccion>( TipoOperacion.PCI_SINCRONIZACION,
                 { response ->
-                    result = if (response.isCorrecta) {
-                        createStaticNotification("Venta Cancelada")
-                        syncDao.deleteByDate(sync.dateTime)
-                        if (response is RespuestaTrxCierreTurno) {
+                    result = when {
+                        response is RespuestaTrxCierreTurno -> {
+                            createStaticNotification("Venta Cancelada")
+                            syncDao.deleteByDate(sync.dateTime)
                             PosLogger.d(TAG, "response.isCorrecta ${response.isCorrecta}")
                             val resp = MoshiInstance.create().adapter(SyncData::class.java).toJson(syncData)
                             LazyStore.response = response
                             Result.success(workDataOf(KEY_MESSAGE to SyncState.WithTrx.name, KEY_RESPONSE_MSG to resp))
-                        } else {
-                            Result.success(workDataOf(KEY_MESSAGE to SyncState.SuccessEmpty.name, KEY_RESPONSE_MSG to response.msjError))
                         }
-                    } else  if(response.msjError.trim() == "La operacion esta anulada") {
-                        syncDao.deleteByDate(sync.dateTime)
-                        Result.failure(workDataOf(KEY_MESSAGE to response.msjError))
-                    } else
-                        Result.failure(workDataOf(KEY_MESSAGE to response.msjError))
+                        response.msjError.trim() == "La operacion esta anulada" -> {
+                            syncDao.deleteByDate(sync.dateTime)
+                            Result.failure(workDataOf(KEY_MESSAGE to response.msjError))
+                        }
+                        else -> Result.failure(workDataOf(KEY_MESSAGE to response.msjError))
+                    }
                 },
                 { error ->
                     Log.d(TAG, "error ${error.message}")
