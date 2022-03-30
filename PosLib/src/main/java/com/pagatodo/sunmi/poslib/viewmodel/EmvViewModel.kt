@@ -23,14 +23,4 @@ open class EmvViewModel : AbstractViewModel<AbstractRespuesta>() {
             }
         }
     }
-
-    fun executeSync(product: String, fields: List<String>, dataOpTarjeta: DataOpTarjeta, stan: Long) {
-        viewModelScope.launch(Dispatchers.Main) {
-            try {
-                RepositoryEmv.execOperationEmv(TipoOperacion.PCI_SINCRONIZACION, product, fields, dataOpTarjeta, stan) { syncViewModel.postValue(it) }
-            } catch (e: Exception) {
-                syncViewModel.value = Results.Failure(e)
-            }
-        }
-    }
 }

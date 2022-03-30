@@ -64,6 +64,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
     private var params = LinkedList<Parametro>()
     private var forceCheckCardType: Int = -1
     private var isAllowCancelEmvProcess = true
+    private var dataCard: DataCard? = null
 
     override fun possibleCancelCheckCard(isPossible: Boolean) {
         isAllowCancelEmvProcess = isPossible
@@ -76,6 +77,12 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
         form = dataInitPci.form
         menu = dataInitPci.menu
         fullProfile = EmvManager.getFullPerfil(producto.perfilEmv ?: 0, this)
+
+        getStanProvider().setCallback(object : OnSaveFromLong{
+            override fun onSaveWithStan(stan: Long) {
+                saveTmpDataSync(getDataSync(stan, dataCard!! )){}
+            }
+        })
     }
 
     protected fun initEmvProcess(params: LinkedList<Parametro>){
@@ -87,6 +94,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
     }
 
     override fun onPurchase(dataCard: DataCard) {
+        this.dataCard = dataCard
         if (validateCard(fullProfile.perfilesEmv, dataCard)) {
             if ((dataCard.entryMode === DataOpTarjeta.PosEntryMode.BANDA ||
                         dataCard.entryMode === DataOpTarjeta.PosEntryMode.FALLBACK) &&
@@ -103,7 +111,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
             forwardPymtsDialog(dataCard)
         }
         dialogCuotas.isCancelable = false
-        dialogCuotas.setCancelListener{
+        dialogCuotas.setCancelListener {
             sunmiTransaction.cancelProcess()
         }
         dialogCuotas.show(requireActivity().supportFragmentManager, dialogCuotas.tag)
@@ -195,10 +203,9 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
             val dialogCuotas = DialogPayments.newInstance(fullProfile.perfilesEmv)
             dialogCuotas.setCuotasListener{
                 onDialogProcessOnline(dataCard = dataCard)
-                saveTmpDataSync(getDataSync(dataCard)) {
                     dataCard.monthlyPayments = it.tag as Int
                     viewModelPci.executeEmvOpr(PciUtils.getOperation(operacion), producto.codigo, PciUtils.fillFields(params, form), createDataOpTarjeta(dataCard, createTransactionData()))
-                }
+
             }
             dialogCuotas.isCancelable = false
             dialogCuotas.setCancelListener {
@@ -206,17 +213,14 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
             }
             dialogCuotas.show(requireActivity().supportFragmentManager, dialogCuotas.tag)
         } else {
-            saveTmpDataSync(getDataSync(dataCard)) {
                 onDialogProcessOnline(dataCard = dataCard)
                 viewModelPci.executeEmvOpr(PciUtils.getOperation(operacion), producto.codigo, PciUtils.fillFields(params, form), createDataOpTarjeta(dataCard, createTransactionData()))
-            }
         }
     }
 
     private fun saveTmpDataSync(syncData: SyncData, doContinue: () -> Unit){
         GlobalScope.launch {
             try {
-                getStanProvider().createNext()
                 val moshi = MoshiInstance.create()
                 serviceBd.insertSyncData(Sync(dateTime= Date(), status = StatusTrx.PROGRESS.name,
                     data = moshi.adapter(SyncData::class.java).toJson(syncData))).apply {
@@ -370,9 +374,9 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
         serviceBd.getByStatus(StatusTrx.PROGRESS.name, liveData)
     }
 
-    private fun getDataSync(dataCard: DataCard) = SyncData(
+    private fun getDataSync(stan: Long, dataCard: DataCard) = SyncData(
         producto.codigo, menu, PciUtils.fillFields(params, form),
-        dataCard, createTransactionData(), getStanProvider().createNext(), operacion //!Important
+        dataCard, createTransactionData(), stan, operacion //!Important
     )
 
     override fun pinMustBeForced() = operacion.pin == 2

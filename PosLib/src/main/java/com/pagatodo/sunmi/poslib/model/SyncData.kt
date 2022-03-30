@@ -11,6 +11,6 @@ data class SyncData(
     val params: List<String>,
     val dataCard: DataCard,
     val transactionData: TransactionData,
-    val stan: Long,
+    var stan: Long,
     val operation: Operaciones
 )
