@@ -51,10 +51,10 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         binding.btnAccept.setOnClickListener {
             if (binding.amountTxv.text.isNotEmpty() && binding.amountTxv.text.isDigitsOnly()) {
                 var valueAmount = binding.amountTxv.text.toString()
-                msiDialog(valueAmount)
+                //msiDialog(valueAmount)
                 //cidDialog()
             }
-        //trxManager.initTransaction()
+        trxManager.initTransaction()
         }
     }
 

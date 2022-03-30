@@ -459,8 +459,11 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
         if (msiList.isNotEmpty()) {
             //MsiDialog()
 
-                MsiDialog.create(createTransactionData().totalAmount,msiList)
-                doContinue(true)
+                MsiDialog.create(createTransactionData().totalAmount,msiList) {
+                    //this.params.add(Parametro())
+                    doContinue(true)
+                }
+
 
             /**
              * se debe hacer algo como
@@ -470,7 +473,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
              * }
              */
         } else
-            doContinue(false)
+            doContinue(true)
         Log.d("DialogMsi", "Tiene MSI pero la lista está vacía")
     }
 

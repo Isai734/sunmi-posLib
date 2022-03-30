@@ -62,7 +62,7 @@ class MsiDialog: DialogFragment(R.layout.fragment_msi_dialog) {
     }
 
     companion object{
-        fun create(totalAmount: String, msiList: List<Int>): MsiDialog{
+        fun create(totalAmount: String, msiList: List<Int>,doContinue: (Boolean) -> Unit): MsiDialog{
             val args = Bundle()
             args.putString("amount",totalAmount)
             args.putStringArray("msilist",msiList.map { it.toString() }.toTypedArray())
