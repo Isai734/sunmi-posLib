@@ -455,7 +455,9 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
     }
 
     override fun showDialogMsi(cardNo: String, doContinue: (Boolean) -> Unit) {
-        val msiList = PciUtils.haveMsi(cardNo)
+        //val msiList = PciUtils.haveMsi(cardNo)
+        var msiList = listOf<Int>(3,6,9,12,18,24)
+
         if (msiList.isNotEmpty()) {
             //MsiDialog()
 
@@ -473,7 +475,10 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
              * }
              */
         } else
-            doContinue(true)
+            MsiDialog.create(createTransactionData().totalAmount,msiList) {
+                //this.params.add(Parametro())
+                doContinue(true)
+            }
         Log.d("DialogMsi", "Tiene MSI pero la lista está vacía")
     }
 
