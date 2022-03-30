@@ -1,5 +1,6 @@
 package com.pagatodo.sunmi.poslib.view
 
+import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
@@ -460,10 +461,11 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
         Log.d("msiList", "Lista $msiList")
 
 
-        MsiDialog.create(createTransactionData().totalAmount,msiList) {
+        val dialogMsi = MsiDialog.create(createTransactionData().totalAmount,msiList) {
             //this.params.add(Parametro())
             doContinue(true)
         }
+        dialogMsi.show(requireActivity().supportFragmentManager, dialogMsi.tag)
 
         /*
         if (msiList.isNotEmpty()) {
