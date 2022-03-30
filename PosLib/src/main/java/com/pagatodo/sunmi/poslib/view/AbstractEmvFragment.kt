@@ -452,20 +452,3 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
 
     abstract fun getStanProvider(): StanProviderNext
 }
-
-object BigDecimalAdapter {
-    @FromJson
-    fun fromJson(string: String) = BigDecimal(string)
-
-    @ToJson
-    fun toJson(value: BigDecimal) = value.toString()
-}
-
-object DateAdapter {
-
-    @FromJson
-    fun fromJson(date: String) = Date(date.toLong())
-
-    @ToJson
-    fun toJson(value: Date?) = value?.time.toString()
-}

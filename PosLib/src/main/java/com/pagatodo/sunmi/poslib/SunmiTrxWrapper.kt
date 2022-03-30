@@ -143,6 +143,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
                                 }
                         }
                     } catch (e: Exception){
+                        abortFullTransaction()
                         onFailure(PosResult.DoSyncOperation)
                     }
                 }

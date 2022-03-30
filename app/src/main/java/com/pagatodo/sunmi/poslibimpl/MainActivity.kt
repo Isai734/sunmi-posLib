@@ -30,6 +30,7 @@ import kotlinx.coroutines.launch
 import net.fullcarga.android.api.bd.sigma.generated.tables.pojos.Menu
 import net.fullcarga.android.api.bd.sigma.generated.tables.pojos.Operaciones
 import net.fullcarga.android.api.bd.sigma.generated.tables.pojos.Productos
+import net.fullcarga.android.api.data.respuesta.AbstractRespuesta
 import net.fullcarga.android.api.data.respuesta.OperacionSiguiente
 import net.fullcarga.android.api.data.respuesta.Respuesta
 
@@ -52,6 +53,7 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
             if (binding.amountTxv.text.isNotEmpty() && binding.amountTxv.text.isDigitsOnly()) {
                 var valueAmount = binding.amountTxv.text.toString()
                 msiDialog(valueAmount)
+
                 //cidDialog()
             }
         //trxManager.initTransaction()

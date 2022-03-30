@@ -19,11 +19,13 @@ import com.pagatodo.sunmi.poslib.harmonizer.db.SyncDao
 import com.pagatodo.sunmi.poslib.harmonizer.db.SyncDatabase
 import com.pagatodo.sunmi.poslib.model.SyncData
 import com.pagatodo.sunmi.poslib.posInstance
+import com.pagatodo.sunmi.poslib.util.LazyStore
 import com.pagatodo.sunmi.poslib.util.MoshiInstance
 import com.pagatodo.sunmi.poslib.util.StatusTrx
 import com.pagatodo.sunmi.poslib.view.AbstractEmvFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import net.fullcarga.android.api.data.respuesta.RespuestaTrxCierreTurno
 import net.fullcarga.android.api.oper.TipoOperacion
 
 class SyncService(appContext: Context, workerParams: WorkerParameters) :
@@ -54,40 +56,6 @@ class SyncService(appContext: Context, workerParams: WorkerParameters) :
         }
     }
 
-    private fun doSync(sync: Sync?, result: (Result) -> Unit) {
-
-        try {
-            sync ?: result(Result.failure(workDataOf(KEY_MESSAGE to "Operación Sincronización no encontrada.")))
-            val syncData = MoshiInstance.create().adapter(SyncData::class.java).fromJson(sync?.data!!)
-            syncData ?: result(Result.failure(workDataOf(KEY_MESSAGE to "No se puede parsear datos de objeto Sync.")))
-            Log.d(TAG, "syncData $syncData")
-            TransaccionFactory.crearTransacion<AbstractTransaccion>(
-                TipoOperacion.PCI_SINCRONIZACION,
-                { response ->
-                    if (response.isCorrecta || response.operacionSiguiente.mtiNext != null) {
-                        createStaticNotification("Venta Cancelada")
-                        Log.d(TAG, "response.isCorrecta ${response.isCorrecta}")
-                        result(Result.success(workDataOf(KEY_MESSAGE to "Transacción Cancelada")))
-                    } else
-                        result(Result.failure(workDataOf(KEY_MESSAGE to response.msjError)))
-                },
-                { error ->
-                    Log.d(TAG, "error ${error.message}")
-                    result(Result.failure(workDataOf(KEY_MESSAGE to error.message)))
-                }
-            ).withProcod(syncData?.product)
-                .withFields(syncData?.params)
-                .withStan(syncData?.stan)
-                .withDatosOpTarjeta(AbstractEmvFragment.createDataOpTarjeta(syncData?.dataCard, syncData?.transactionData))
-                .withUser(posInstance().user)
-                .realizarOperacion()
-
-        } catch (e: Exception) { e.printStackTrace()
-            Log.d(TAG, "catch Exception ${e.message}")
-            result(Result.failure(workDataOf(KEY_MESSAGE to e.message)))
-        }
-    }
-
     private suspend fun doSyncIO(sync: Sync?): Result {
         var result = Result.failure()
         return withContext(Dispatchers.IO){
@@ -101,8 +69,8 @@ class SyncService(appContext: Context, workerParams: WorkerParameters) :
                     result = if (response.isCorrecta || response.operacionSiguiente.mtiNext != null) {
                         createStaticNotification("Venta Cancelada")
                         Log.d(TAG, "response.isCorrecta ${response.isCorrecta}")
-                        syncData?.response = response
                         val resp = MoshiInstance.create().adapter(SyncData::class.java).toJson(syncData)
+                        LazyStore.response = response as RespuestaTrxCierreTurno
                         Result.success(workDataOf(KEY_MESSAGE to resp))
                     } else
                         Result.failure(workDataOf(KEY_MESSAGE to response.msjError))
@@ -172,7 +140,7 @@ class SyncService(appContext: Context, workerParams: WorkerParameters) :
     }
 
     companion object {
-        const val KEY_INPUT_TIME = "KEY_INPUT_TIME"
+        const val KEY_RESPONSE_MSG = "KEY_RESPONSE_MSG"
         const val KEY_MESSAGE = "KEY_MESSAGE"
         const val KEY_INPUT_DATA = "KEY_INPUT_DATA"
     }
