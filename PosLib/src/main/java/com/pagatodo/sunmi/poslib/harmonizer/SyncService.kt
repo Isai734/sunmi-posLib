@@ -7,7 +7,10 @@ import android.content.Context
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import androidx.work.*
+import androidx.work.CoroutineWorker
+import androidx.work.ForegroundInfo
+import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import com.pagatodo.sigmalib.transacciones.AbstractTransaccion
 import com.pagatodo.sigmalib.transacciones.TransaccionFactory
 import com.pagatodo.sunmi.poslib.R
@@ -20,9 +23,7 @@ import com.pagatodo.sunmi.poslib.util.MoshiInstance
 import com.pagatodo.sunmi.poslib.util.StatusTrx
 import com.pagatodo.sunmi.poslib.view.AbstractEmvFragment
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
-import net.fullcarga.android.api.data.respuesta.AbstractRespuesta
 import net.fullcarga.android.api.oper.TipoOperacion
 
 class SyncService(appContext: Context, workerParams: WorkerParameters) :

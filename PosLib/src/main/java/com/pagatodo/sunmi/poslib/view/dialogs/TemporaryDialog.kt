@@ -9,7 +9,6 @@ import android.util.TypedValue
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.fragment.app.DialogFragment
 import com.pagatodo.sunmi.poslib.R
 import com.pagatodo.sunmi.poslib.requireContext
 import com.pagatodo.sunmi.poslib.util.PosResult

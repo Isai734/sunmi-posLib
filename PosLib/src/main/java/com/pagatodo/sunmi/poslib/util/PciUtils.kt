@@ -10,7 +10,6 @@ import com.pagatodo.sunmi.poslib.model.DataCard
 import net.fullcarga.android.api.bd.sigma.generated.tables.pojos.Operaciones
 import net.fullcarga.android.api.bd.sigma.generated.tables.pojos.PerfilesEmv
 import net.fullcarga.android.api.bd.sigma.generated.tables.pojos.Productos
-import net.fullcarga.android.api.bd.sigma.manager.BdEmvSigmaManager
 import net.fullcarga.android.api.data.DataOpTarjeta
 import net.fullcarga.android.api.formulario.*
 import net.fullcarga.android.api.oper.TipoOperacion
@@ -19,7 +18,6 @@ import java.math.RoundingMode
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 object PciUtils {
 

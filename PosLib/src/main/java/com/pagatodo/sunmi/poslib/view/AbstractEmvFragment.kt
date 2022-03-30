@@ -371,7 +371,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
 
     private fun getDataSync(dataCard: DataCard) = SyncData(
         producto.codigo, menu, PciUtils.fillFields(params, form),
-        dataCard, createTransactionData(), getStanProvider().createNext() //!Important
+        dataCard, createTransactionData(), getStanProvider().createNext(), operacion //!Important
     )
 
     override fun pinMustBeForced() = operacion.pin == 2
