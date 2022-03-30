@@ -13,17 +13,17 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.pagatodo.sigmalib.transacciones.AbstractTransaccion
 import com.pagatodo.sigmalib.transacciones.TransaccionFactory
+import com.pagatodo.sunmi.poslib.PosLib
 import com.pagatodo.sunmi.poslib.R
 import com.pagatodo.sunmi.poslib.harmonizer.db.Sync
 import com.pagatodo.sunmi.poslib.harmonizer.db.SyncDao
 import com.pagatodo.sunmi.poslib.harmonizer.db.SyncDatabase
 import com.pagatodo.sunmi.poslib.model.SyncData
 import com.pagatodo.sunmi.poslib.posInstance
-import com.pagatodo.sunmi.poslib.util.LazyStore
-import com.pagatodo.sunmi.poslib.util.MoshiInstance
-import com.pagatodo.sunmi.poslib.util.StatusTrx
+import com.pagatodo.sunmi.poslib.util.*
 import com.pagatodo.sunmi.poslib.view.AbstractEmvFragment
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import net.fullcarga.android.api.data.respuesta.RespuestaTrxCierreTurno
 import net.fullcarga.android.api.oper.TipoOperacion
@@ -44,9 +44,7 @@ class SyncService(appContext: Context, workerParams: WorkerParameters) :
             setForeground(createForegroundInfo())
             val status = syncObject?.status ?: StatusTrx.PROGRESS.name
             if (status == StatusTrx.PROGRESS.name) {
-                val result = doSyncIO(syncObject)
-                if(result == Result.success()) syncDao.deleteByDate(syncObject?.dateTime)
-                result
+                doSyncIO(syncObject)
             } else {
                 Result.success(workDataOf(KEY_MESSAGE to "Estado de Transacción $status"))
             }
@@ -63,15 +61,22 @@ class SyncService(appContext: Context, workerParams: WorkerParameters) :
             val syncData = MoshiInstance.create().adapter(SyncData::class.java).fromJson(sync?.data!!)
             syncData ?: run { result = Result.failure(workDataOf(KEY_MESSAGE to "No se puede parsear datos de objeto Sync.")) }
             Log.d(TAG, "syncData $syncData")
-            TransaccionFactory.crearTransacion<AbstractTransaccion>(
-                TipoOperacion.PCI_SINCRONIZACION,
+            TransaccionFactory.crearTransacion<AbstractTransaccion>( TipoOperacion.PCI_SINCRONIZACION,
                 { response ->
-                    result = if (response.isCorrecta || response.operacionSiguiente.mtiNext != null) {
+                    result = if (response.isCorrecta) {
                         createStaticNotification("Venta Cancelada")
-                        Log.d(TAG, "response.isCorrecta ${response.isCorrecta}")
-                        val resp = MoshiInstance.create().adapter(SyncData::class.java).toJson(syncData)
-                        LazyStore.response = response as RespuestaTrxCierreTurno
-                        Result.success(workDataOf(KEY_MESSAGE to resp))
+                        syncDao.deleteByDate(sync.dateTime)
+                        if (response is RespuestaTrxCierreTurno) {
+                            PosLogger.d(TAG, "response.isCorrecta ${response.isCorrecta}")
+                            val resp = MoshiInstance.create().adapter(SyncData::class.java).toJson(syncData)
+                            LazyStore.response = response
+                            Result.success(workDataOf(KEY_MESSAGE to SyncState.WithTrx.name, KEY_RESPONSE_MSG to resp))
+                        } else {
+                            Result.success(workDataOf(KEY_MESSAGE to SyncState.SuccessEmpty.name, KEY_RESPONSE_MSG to response.msjError))
+                        }
+                    } else  if(response.msjError.trim() == "La operacion esta anulada") {
+                        syncDao.deleteByDate(sync.dateTime)
+                        Result.failure(workDataOf(KEY_MESSAGE to response.msjError))
                     } else
                         Result.failure(workDataOf(KEY_MESSAGE to response.msjError))
                 },
@@ -144,4 +149,10 @@ class SyncService(appContext: Context, workerParams: WorkerParameters) :
         const val KEY_MESSAGE = "KEY_MESSAGE"
         const val KEY_INPUT_DATA = "KEY_INPUT_DATA"
     }
+}
+
+enum class SyncState{
+    WithTrx,
+    SuccessEmpty,
+    Error
 }
