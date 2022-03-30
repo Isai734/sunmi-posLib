@@ -216,6 +216,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
     private fun saveTmpDataSync(syncData: SyncData, doContinue: () -> Unit){
         GlobalScope.launch {
             try {
+                getStanProvider().createNext()
                 val moshi = MoshiInstance.create()
                 serviceBd.insertSyncData(Sync(dateTime= Date(), status = StatusTrx.PROGRESS.name,
                     data = moshi.adapter(SyncData::class.java).toJson(syncData))).apply {
