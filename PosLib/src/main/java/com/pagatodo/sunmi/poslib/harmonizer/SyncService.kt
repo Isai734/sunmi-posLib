@@ -100,7 +100,8 @@ class SyncService(appContext: Context, workerParams: WorkerParameters) :
                     result = if (response.isCorrecta || response.operacionSiguiente.mtiNext != null) {
                         createStaticNotification("Venta Cancelada")
                         Log.d(TAG, "response.isCorrecta ${response.isCorrecta}")
-                        val resp = MoshiInstance.create().adapter(AbstractRespuesta::class.java).toJson(response)
+                        syncData?.response = response
+                        val resp = MoshiInstance.create().adapter(SyncData::class.java).toJson(syncData)
                         Result.success(workDataOf(KEY_MESSAGE to resp))
                     } else
                         Result.failure(workDataOf(KEY_MESSAGE to response.msjError))
