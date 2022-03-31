@@ -50,6 +50,8 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         setSupportActionBar(findViewById(R.id.toolbar))
         PosLib.createInstance(this)
         binding.btnAccept.setOnClickListener {
+            val hashMap = hashMapOf("name" to "Isai")
+            MoshiInstance.create().adapter<HashMap<String, String>>(MoshiInstance.type).toJson(hashMap)
             if (binding.amountTxv.text.isNotEmpty() && binding.amountTxv.text.isDigitsOnly()) {
                 var valueAmount = binding.amountTxv.text.toString()
                 msiDialog(valueAmount)

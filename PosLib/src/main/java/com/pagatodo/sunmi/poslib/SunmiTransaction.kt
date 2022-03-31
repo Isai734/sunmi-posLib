@@ -24,6 +24,7 @@ import kotlin.collections.HashMap
 abstract class SunmiTransaction {
     private var hexStrPin: ByteArray = ByteArray(0)
     protected var isRequestPin = false
+    private var hasError = false
     private var mAppSelect = 0
     private var customMessage: String? = null
     protected var isRequestSignature = false
@@ -83,7 +84,7 @@ abstract class SunmiTransaction {
             val len = posInstance().mEMVOptV2?.importOnlineProcStatus(tlvResponse.status, tags.toTypedArray(), values.toTypedArray(), out)
             PosLogger.e(PosLib.TAG, "card update status code::$len")
             len?.also {  //Validar si esto aplica para MTIP 2.60 Refund
-                if ((it == PosResult.DoSyncOperation.code || it == PosResult.TransRefused.code) && tlvResponse.status == 0) {
+                if ((it == PosResult.DoSyncOperation.code || it == PosResult.TransRefused.code || hasError) && tlvResponse.status == 0) {
                     onFailure(PosResult.DoSyncOperation)
                     customMessage = PosResult.DoSyncOperation.tile
                 }
@@ -189,8 +190,10 @@ abstract class SunmiTransaction {
                     cancelProcessEmv()
                 } else if (pinMustBeForced() || (EmvUtil.requiredNip(dataCard.serviceCode) && verifyServiceCode()))
                     initPinPad(dataCard)
-                else
+                else {
+                    hasError = false
                     goOnlineProcess(dataCard)
+                }
             } catch (e: Exception) {
                 PosLogger.e(PosLib.TAG, e.toString())
                 GlobalScope.launch(Dispatchers.Main) { onFailure(PosResult.ErrorCheckCard) }
@@ -301,13 +304,16 @@ abstract class SunmiTransaction {
         @Throws(RemoteException::class)
         override fun onOnlineProc() {
             PosLogger.e(PosLib.TAG, "::")
+            hasError = false
             val mapTags = tlvData
             emvTags = tagsTlvToTagsString(mapTags)
             val dataCard = getDataCard(mapTags)
             if (!isRequestPin && pinMustBeForced())
                 initPinPad(dataCard)
-            else
+            else {
+                hasError = false
                 goOnlineProcess(dataCard)
+            }
         }
 
         override fun onCertVerify(p0: Int, p1: String?) {
@@ -326,15 +332,20 @@ abstract class SunmiTransaction {
             if (getTransactionData().transType == Constants.TransType.REFUND && code == PosResult.TransTerminate.code) {//transResult does not matter when transaction is a refund
                 onOnlineProc()
                 sendOnlineWithError = true
-            } else if (code == PosResult.OnlineApproved.code)
+            } else if (code == PosResult.OnlineApproved.code) {
                 onSuccessOnline()
-            else{
+            }else{
                 customMessage?.apply {
                     if(isOperNext)
                         onFailure(PosResult.NextOperation.also { it.tile = this })
-                    else if (this != PosResult.DoSyncOperation.tile)
+                    else if (this != PosResult.DoSyncOperation.tile){
+                        hasError = true
                         onFailure(getPosResult(code, this))
-                } ?: onFailure(getPosResult(code, desc))
+                    }
+                } ?: run {
+                    hasError = true
+                    onFailure(getPosResult(code, desc))
+                }
             }
         }
 
@@ -534,6 +545,7 @@ abstract class SunmiTransaction {
                             dataCard?.apply {
                                 this.pinBlock = if(mPinType == PinTypes.PIN_ONLINE.pinValue) ByteUtil.bytes2HexStr(hexStrPin) else null
                                 goOnlineProcess(this@apply)
+                                hasError = false
                             } ?: posInstance().mEMVOptV2?.importPinInputStatus(mPinType, 0)
                         } ?: run {
                             initPinPad(dataCard, PosResult.ErrorEmptyPin.tile)

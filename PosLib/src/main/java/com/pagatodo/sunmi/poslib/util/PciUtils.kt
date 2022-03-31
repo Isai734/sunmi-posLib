@@ -103,10 +103,15 @@ object PciUtils {
             Pair("encTrack2", dataCard.track2Encrypt.toString()),
             Pair("encTrack3", dataCard.track3Encrypt.toString())
         )
-        val mapTagsEmv = dataCard.mapTags.apply {
-            this as HashMap
-            if (!containsKey("9B"))
-                this.put("9B", "0000")
+
+        val mapTagsEmv = try {
+            dataCard.mapTags.apply {
+                this as HashMap
+                if (!containsKey("9B"))
+                    this.put("9B", "0000")
+            }
+        } catch (e:Exception){
+            dataCard.mapTags
         }
         return DecodeData(data, mapTagsEmv)
     }

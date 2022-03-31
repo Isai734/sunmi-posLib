@@ -7,7 +7,7 @@ import net.fullcarga.android.api.data.DataOpTarjeta
 import net.fullcarga.android.api.util.HexUtil
 import java.nio.charset.Charset
 
-class DataCard(var tlvData: String = "", var holderName: String = "", var pinBlock: String? = null, var entryMode: DataOpTarjeta.PosEntryMode? = null, var mapTags: HashMap<String, String> = HashMap(), var monthlyPayments: Int = 0, var daysDeferred: Int = 0, var cvv: Int? = null) : CardInfo() {
+class DataCard(var tlvData: String = "", var holderName: String = "", var pinBlock: String? = null, var entryMode: DataOpTarjeta.PosEntryMode? = null, var mapTags: Map<String, String> = HashMap(), var monthlyPayments: Int = 0, var daysDeferred: Int = 0, var cvv: Int? = null) : CardInfo() {
 
     val panEncrypt: ByteArray?
         get() {
