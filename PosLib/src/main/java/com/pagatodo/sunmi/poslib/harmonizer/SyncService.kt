@@ -1,87 +1,81 @@
 package com.pagatodo.sunmi.poslib.harmonizer
 
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
-import android.util.Log
 import androidx.core.app.NotificationCompat
-import androidx.work.CoroutineWorker
-import androidx.work.ForegroundInfo
+import androidx.work.RxWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.pagatodo.sigmalib.transacciones.AbstractTransaccion
 import com.pagatodo.sigmalib.transacciones.TransaccionFactory
-import com.pagatodo.sunmi.poslib.PosLib
 import com.pagatodo.sunmi.poslib.R
 import com.pagatodo.sunmi.poslib.harmonizer.db.Sync
 import com.pagatodo.sunmi.poslib.harmonizer.db.SyncDao
 import com.pagatodo.sunmi.poslib.harmonizer.db.SyncDatabase
 import com.pagatodo.sunmi.poslib.model.SyncData
 import com.pagatodo.sunmi.poslib.posInstance
-import com.pagatodo.sunmi.poslib.util.*
+import com.pagatodo.sunmi.poslib.util.LazyStore
+import com.pagatodo.sunmi.poslib.util.MoshiInstance
+import com.pagatodo.sunmi.poslib.util.PosLogger
 import com.pagatodo.sunmi.poslib.view.AbstractEmvFragment
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.withContext
+import io.reactivex.Observable
+import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 import net.fullcarga.android.api.data.respuesta.RespuestaTrxCierreTurno
 import net.fullcarga.android.api.oper.TipoOperacion
 
 class SyncService(appContext: Context, workerParams: WorkerParameters) :
-    CoroutineWorker(appContext, workerParams) {
+    RxWorker(appContext, workerParams) {
 
     private val NOTIFICATION_ID = 102
     var syncDao: SyncDao = SyncDatabase.getDatabase(appContext).databaseDao()
 
     private val TAG = "SyncService.LOG"
-    override suspend fun doWork(): Result {
+    override fun createWork(): Single<Result> {
         val sync = inputData.getString(KEY_INPUT_DATA) ?: ""
-        PosLogger.d(TAG, "sync $sync")
-        val syncObject = MoshiInstance.create().adapter(Sync::class.java).fromJson(sync)
-        PosLogger.d(TAG, "syncObject $syncObject")
-        return try {
-            setForeground(createForegroundInfo())
-            val status = syncObject?.status ?: StatusTrx.PROGRESS.name
-            if (status == StatusTrx.PROGRESS.name) {
-                doSyncIO(syncObject)
-            } else {
-                Result.success(workDataOf(KEY_MESSAGE to "Estado de Transacción $status"))
+        return doSyncIO(sync)
+            .subscribeOn(Schedulers.io())
+            .observeOn(Schedulers.single())
+            .toList()
+            .map {
+               it.first()
             }
-        } catch (e: Exception) {
-            PosLogger.e(TAG, e.message!!)
-            Result.failure()
-        }
     }
 
-    private suspend fun doSyncIO(sync: Sync?): Result {
-        var result = Result.failure()
-        return withContext(Dispatchers.IO){
-            sync ?: run { result = Result.failure(workDataOf(KEY_MESSAGE to "Operación Sincronización no encontrada.")) }
-            val syncData = MoshiInstance.create().adapter(SyncData::class.java).fromJson(sync?.data!!)
-            syncData ?: run { result = Result.failure(workDataOf(KEY_MESSAGE to "No se puede parsear datos de objeto Sync.")) }
-            PosLogger.d(TAG, "syncData $syncData")
-            TransaccionFactory.crearTransacion<AbstractTransaccion>( TipoOperacion.PCI_SINCRONIZACION,
+    private fun doSyncIO(syncString: String) = Observable.create<Result> { emitter ->
+        try {
+            PosLogger.d(TAG, "sync $syncString")
+            val syncObject = MoshiInstance.create().adapter(Sync::class.java).fromJson(syncString)
+            PosLogger.d(TAG, "syncData ${syncObject?.data}")
+            val syncData = MoshiInstance.create().adapter(SyncData::class.java).fromJson(syncObject?.data!!)
+            TransaccionFactory.crearTransacion<AbstractTransaccion>(TipoOperacion.PCI_SINCRONIZACION,
                 { response ->
-                    result = when {
+                    LazyStore.response = response
+                    syncDao.deleteByDate(syncObject.dateTime)
+                    when {
                         response is RespuestaTrxCierreTurno -> {
                             createStaticNotification("Venta Cancelada")
-                            syncDao.deleteByDate(sync.dateTime)
                             PosLogger.d(TAG, "response.isCorrecta ${response.isCorrecta}")
-                            val resp = MoshiInstance.create().adapter(SyncData::class.java).toJson(syncData)
-                            LazyStore.response = response
-                            Result.success(workDataOf(KEY_MESSAGE to SyncState.WithTrx.name, KEY_RESPONSE_MSG to resp))
+                            emitter.onNext(Result.success(workDataOf(KEY_MESSAGE to SyncState.WithTrx.name, KEY_RESPONSE_MSG to syncObject.data!!)))
+                            emitter.onComplete()
                         }
                         response.msjError.trim() == "La operacion esta anulada" -> {
-                            syncDao.deleteByDate(sync.dateTime)
-                            Result.failure(workDataOf(KEY_MESSAGE to response.msjError))
+                            emitter.onNext(Result.success(workDataOf(KEY_MESSAGE to SyncState.SuccessEmpty.name, KEY_RESPONSE_MSG to syncObject.data!!)))
+                            emitter.onComplete()
                         }
-                        else -> Result.failure(workDataOf(KEY_MESSAGE to response.msjError))
+                        else -> {
+                            emitter.onNext(Result.failure(workDataOf(KEY_MESSAGE to SyncState.ErrorWithResponse.name, KEY_RESPONSE_MSG to syncObject.data!!)))
+                            emitter.onComplete()
+                        }
                     }
                 },
                 { error ->
                     PosLogger.d(TAG, "error ${error.message}")
-                    result = Result.failure(workDataOf(KEY_MESSAGE to error.message))
+                    syncDao.deleteByDate(syncObject.dateTime)
+                    emitter.onNext(Result.failure(workDataOf(KEY_MESSAGE to error.message, KEY_RESPONSE_MSG to syncObject.data!!)))
+                    emitter.onComplete()
                 }
             ).withProcod(syncData?.product)
                 .withFields(syncData?.params)
@@ -89,34 +83,10 @@ class SyncService(appContext: Context, workerParams: WorkerParameters) :
                 .withDatosOpTarjeta(AbstractEmvFragment.createDataOpTarjeta(syncData?.dataCard, syncData?.transactionData))
                 .withUser(posInstance().user)
                 .realizarOperacion()
-            result
+        } catch (e: Exception) {
+            emitter.onNext(Result.failure(workDataOf(KEY_MESSAGE to e.message)))
+            emitter.onComplete()
         }
-    }
-
-    private fun createForegroundInfo(): ForegroundInfo {
-        return ForegroundInfo(
-            NOTIFICATION_ID,
-            createServiceNotification("Venta", "Se está cancelando la venta.")
-        )
-    }
-
-    private fun createServiceNotification(title: String, description: String): Notification {
-
-        val notificationManager =
-            applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationChannel =
-                NotificationChannel("101", "channel", NotificationManager.IMPORTANCE_DEFAULT)
-            notificationManager.createNotificationChannel(notificationChannel)
-        }
-
-        return NotificationCompat.Builder(applicationContext, "101")
-            .setContentTitle(title)
-            .setContentText(description)
-            .setSmallIcon(R.drawable.icono_exitoso)
-            .setProgress(0, 0, true)
-            .build()
     }
 
     private fun createStaticNotification(message: String) {
@@ -150,8 +120,9 @@ class SyncService(appContext: Context, workerParams: WorkerParameters) :
     }
 }
 
-enum class SyncState{
+enum class SyncState {
     WithTrx,
     SuccessEmpty,
-    Error
+    Error,
+    ErrorWithResponse
 }
