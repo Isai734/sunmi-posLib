@@ -1,6 +1,7 @@
 package com.pagatodo.sunmi.poslib.view.dialogs
 
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
@@ -11,6 +12,7 @@ import com.pagatodo.sunmi.poslib.view.adapter.MsiAdapter
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
+import java.util.ArrayList
 
 class MsiDialog: DialogFragment(R.layout.fragment_msi_dialog) {
 
@@ -66,12 +68,12 @@ class MsiDialog: DialogFragment(R.layout.fragment_msi_dialog) {
         fun create(totalAmount: String, msiList: List<Int>,doContinue: (Boolean) -> Unit): MsiDialog{
             val args = Bundle()
             args.putString("amount",totalAmount)
-            args.putStringArray("msilist",msiList.map { it.toString() }.toTypedArray())
+            //args.putStringArray("msilist",msiList.map { it.toString() }.toTypedArray())
+            args.putParcelableArrayList("msilist", msiList as ArrayList<out Parcelable>)
 
             var msiDialog = MsiDialog()
             msiDialog.arguments = args
             return msiDialog
-            //msiDialog.show(supportFragmentManager,"msiDialog")
         }
     }
 
