@@ -71,18 +71,13 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
     }
 
     protected fun setDataInit() {
+        getStanProvider().isLogin = false
         val dataInitPci = createDataInit()
         operacion = dataInitPci.operacion
         producto = dataInitPci.producto
         form = dataInitPci.form
         menu = dataInitPci.menu
         fullProfile = EmvManager.getFullPerfil(producto.perfilEmv ?: 0, this)
-
-        getStanProvider().setCallback(object : OnSaveFromLong{
-            override fun onSaveWithStan(stan: Long) {
-                saveTmpDataSync(getDataSync(stan, dataCard!! )){}
-            }
-        })
     }
 
     protected fun initEmvProcess(params: LinkedList<Parametro>){
@@ -203,9 +198,10 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
             val dialogCuotas = DialogPayments.newInstance(fullProfile.perfilesEmv)
             dialogCuotas.setCuotasListener{
                 onDialogProcessOnline(dataCard = dataCard)
+                saveTmpDataSync(getDataSync(dataCard)) {
                     dataCard.monthlyPayments = it.tag as Int
                     viewModelPci.executeEmvOpr(PciUtils.getOperation(operacion), producto.codigo, PciUtils.fillFields(params, form), createDataOpTarjeta(dataCard, createTransactionData()))
-
+                }
             }
             dialogCuotas.isCancelable = false
             dialogCuotas.setCancelListener {
@@ -213,8 +209,10 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
             }
             dialogCuotas.show(requireActivity().supportFragmentManager, dialogCuotas.tag)
         } else {
+            saveTmpDataSync(getDataSync(dataCard)) {
                 onDialogProcessOnline(dataCard = dataCard)
                 viewModelPci.executeEmvOpr(PciUtils.getOperation(operacion), producto.codigo, PciUtils.fillFields(params, form), createDataOpTarjeta(dataCard, createTransactionData()))
+            }
         }
     }
 
@@ -228,7 +226,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
                     if (this > 0) doContinue()
                 }
             } catch (e:Exception){
-                e.printStackTrace()
+                PosLogger.d(PosLib.TAG, "error on inserted ${e.message}")
                 sunmiTransaction.abortFullTransaction()
             }
         }
@@ -341,7 +339,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
 
     override fun onSync(dataCard: DataCard) {
         val liveData = MutableLiveData<List<Sync>>()
-        liveData.observe(this){
+        liveData.observe(this) {
             val moshi = MoshiInstance.create()
             val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
             val syncWorker: WorkRequest = OneTimeWorkRequestBuilder<SyncService>()
@@ -374,9 +372,10 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
         serviceBd.getByStatus(StatusTrx.PROGRESS.name, liveData)
     }
 
-    private fun getDataSync(stan: Long, dataCard: DataCard) = SyncData(
+    private fun getDataSync(dataCard: DataCard) = SyncData(
         producto.codigo, menu, PciUtils.fillFields(params, form),
-        dataCard, createTransactionData(), stan, operacion //!Important
+        dataCard, createTransactionData(), getStanProvider().createNext() //!Important
+        ,operacion
     )
 
     override fun pinMustBeForced() = operacion.pin == 2

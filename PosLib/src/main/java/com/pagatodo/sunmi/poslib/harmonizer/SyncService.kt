@@ -55,10 +55,13 @@ class SyncService(appContext: Context, workerParams: WorkerParameters) :
                     LazyStore.response = response
                     syncDao.deleteByDate(syncObject.dateTime)
                     when {
-                        response is RespuestaTrxCierreTurno -> {
+                        response.isCorrecta -> {
                             createStaticNotification("Venta Cancelada")
                             PosLogger.d(TAG, "response.isCorrecta ${response.isCorrecta}")
-                            emitter.onNext(Result.success(workDataOf(KEY_MESSAGE to SyncState.WithTrx.name, KEY_RESPONSE_MSG to syncObject.data!!)))
+                            if(response is RespuestaTrxCierreTurno)
+                                emitter.onNext(Result.success(workDataOf(KEY_MESSAGE to SyncState.WithTrx.name, KEY_RESPONSE_MSG to syncObject.data!!)))
+                            else
+                                emitter.onNext(Result.success(workDataOf(KEY_MESSAGE to SyncState.SuccessEmpty.name, KEY_RESPONSE_MSG to syncObject.data!!)))
                             emitter.onComplete()
                         }
                         response.msjError.trim() == "La operacion esta anulada" -> {

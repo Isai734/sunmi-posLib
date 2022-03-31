@@ -4,18 +4,8 @@ import net.fullcarga.android.api.data.StanProvider
 
 abstract class StanProviderNext: StanProvider {
 
-    var onSaveFromLong: OnSaveFromLong? = null
+    var isLogin = true
 
-    fun setCallback(onSaveFromLong: OnSaveFromLong){
-        this.onSaveFromLong = onSaveFromLong
-    }
+    abstract fun createNext():Long
 
-    fun onCalculateNext(stan: Long) {
-        onSaveFromLong?.onSaveWithStan(stan)
-        onSaveFromLong = null
-    }
-}
-
-interface OnSaveFromLong {
-    fun onSaveWithStan(stan: Long)
 }
