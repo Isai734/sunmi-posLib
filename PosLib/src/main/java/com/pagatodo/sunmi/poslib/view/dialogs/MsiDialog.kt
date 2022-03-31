@@ -32,8 +32,8 @@ class MsiDialog: DialogFragment(R.layout.fragment_msi_dialog) {
         val amount1: String = inputDataAmount.toString()
         val amount: Double = amount1.toDouble()
 
-        //val firstArray = arrayOf(3,6,9,12,18,24,32)
-        val finalListMonth = generateMonthList(inputMsiList as List<Int>,amount)
+        val firstArray = arrayOf(3,6,9,12,18,24,32)
+        val finalListMonth = generateMonthList(firstArray,amount)
 
         binding.recycler.adapter = MsiAdapter(
             finalListMonth
@@ -52,16 +52,15 @@ class MsiDialog: DialogFragment(R.layout.fragment_msi_dialog) {
 
     }
 
-    private fun generateMonthList(msiList: List<Int>, amount: Double): List<Msi> {
-        Log.d("msiList", "generateMonthList $msiList")
-        var arraySize = msiList.size
+    private fun generateMonthList(arrayMonth: Array<Int>, amount: Double): List<Msi> {
+        var arraySize = arrayMonth.size
         val listMonth = mutableListOf<Msi>()
         for(i in 0 until arraySize) {
             var  decimalRoundingFormat = DecimalFormat("#")
             decimalRoundingFormat.roundingMode = RoundingMode.CEILING
 
-            var finalAmount =  (amount/msiList[i])
-            listMonth.add(i,Msi(msiList[i],decimalRoundingFormat.format(finalAmount)))
+            var finalAmount =  (amount/arrayMonth[i])
+            listMonth.add(i,Msi(arrayMonth[i],decimalRoundingFormat.format(finalAmount)))
         }
         return listMonth
     }
@@ -70,8 +69,8 @@ class MsiDialog: DialogFragment(R.layout.fragment_msi_dialog) {
         fun create(totalAmount: String, msiList: List<Int>,doContinue: (Boolean) -> Unit): MsiDialog{
             val args = Bundle()
             args.putString("amount",totalAmount)
-            //args.putStringArray("msilist",msiList.map { it.toString() }.toTypedArray())
-            args.putParcelableArrayList("msilist", msiList as ArrayList<out Parcelable>)
+            args.putStringArray("msilist",msiList.map { it.toString() }.toTypedArray())
+            //args.putParcelableArrayList("msilist", msiList as ArrayList<out Parcelable>)
             Log.d("msiList", "create $msiList")
             var msiDialog = MsiDialog()
             msiDialog.arguments = args
