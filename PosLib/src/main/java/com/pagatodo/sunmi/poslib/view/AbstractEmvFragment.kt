@@ -458,7 +458,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
     override fun showDialogMsi(cardNo: String, doContinue: (Boolean) -> Unit) {
         //val msiList = PciUtils.haveMsi(cardNo)
 
-        var msiList = listOf<Int>(3,6,9,12,18,24,32,48)
+        var msiList = listOf<Int>(3,6,9,12,18)
         Log.d("msiList", "Lista $msiList")
 
 

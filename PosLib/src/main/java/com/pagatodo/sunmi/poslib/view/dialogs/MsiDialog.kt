@@ -23,13 +23,14 @@ class MsiDialog: DialogFragment(R.layout.fragment_msi_dialog) {
         binding = FragmentMsiDialogBinding.bind(view)
         val args = this.arguments
         val inputDataAmount = args?.get("amount")
+        val inputMsiList = args?.get("msilist")
 
         binding.tvAmount.text = inputDataAmount.toString()
         val amount1: String = inputDataAmount.toString()
         val amount: Double = amount1.toDouble()
 
-        val firstArray = arrayOf(3,6,9,12,18,24,32)
-        val finalListMonth = generateMonthList(firstArray,amount)
+        //val firstArray = arrayOf(3,6,9,12,18,24,32)
+        val finalListMonth = generateMonthList(inputMsiList as List<Int>,amount)
 
         binding.recycler.adapter = MsiAdapter(
             finalListMonth
@@ -48,15 +49,15 @@ class MsiDialog: DialogFragment(R.layout.fragment_msi_dialog) {
 
     }
 
-    private fun generateMonthList(arrayMonth: Array<Int>, amount: Double): List<Msi> {
-        var arraySize = arrayMonth.size
+    private fun generateMonthList(msiList: List<Int>, amount: Double): List<Msi> {
+        var arraySize = msiList.size
         val listMonth = mutableListOf<Msi>()
         for(i in 0 until arraySize) {
             var  decimalRoundingFormat = DecimalFormat("#")
             decimalRoundingFormat.roundingMode = RoundingMode.CEILING
 
-            var finalAmount =  (amount/arrayMonth[i])
-            listMonth.add(i,Msi(arrayMonth[i],decimalRoundingFormat.format(finalAmount)))
+            var finalAmount =  (amount/msiList[i])
+            listMonth.add(i,Msi(msiList[i],decimalRoundingFormat.format(finalAmount)))
         }
         return listMonth
     }
