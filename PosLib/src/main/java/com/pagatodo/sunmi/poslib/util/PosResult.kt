@@ -39,6 +39,7 @@ enum class PosResult(var code: Int, var tile:String, var message: String? = null
     NoSecretWrong(15, getMessage(R.string.secret_wrong)),
     InfoPinOk(16, getMessage(R.string.pin_ok)),
     ErrorEmptySing(17, getMessage(R.string.empty_sing)),
+    DoSyncOperationRequired(18, getMessage(R.string.sync_operation)),
     Generic(100, getMessage(R.string.generic));
 }
 
