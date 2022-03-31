@@ -12,6 +12,7 @@ abstract class StanProviderNext: StanProvider {
 
     fun onCalculateNext(stan: Long) {
         onSaveFromLong?.onSaveWithStan(stan)
+        onSaveFromLong = null
     }
 }
 
