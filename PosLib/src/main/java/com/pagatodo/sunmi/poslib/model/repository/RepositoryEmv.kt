@@ -17,6 +17,6 @@ object RepositoryEmv {
                 result(Results.Success(response))
             else
                 result(Results.Failure(Exception(response.msjError)))
-        }, { error -> result(Results.Failure(Exception(error))) }).withProcod(product).withFields(fields).withStan(stan).withDatosOpTarjeta(dataOpTarjeta).withUser(posInstance().user).realizarOperacion()
+        }, { error -> result(Results.Failure(error)) }).withProcod(product).withFields(fields).withStan(stan).withDatosOpTarjeta(dataOpTarjeta).withUser(posInstance().user).realizarOperacion()
     }
 }

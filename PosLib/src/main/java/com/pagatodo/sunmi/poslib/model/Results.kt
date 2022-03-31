@@ -12,7 +12,7 @@ sealed class Results<out T : Any> {
     }
 
     data class Success<T : Any>(val data: T) : Results<T>()
-    data class Failure(val exception: Exception) : Results<Nothing>() {
+    data class Failure(val exception: Throwable) : Results<Nothing>() {
         init {
             Log.e(TAG, exception.message, exception)
         }
