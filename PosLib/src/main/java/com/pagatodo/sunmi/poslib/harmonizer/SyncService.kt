@@ -37,9 +37,9 @@ class SyncService(appContext: Context, workerParams: WorkerParameters) :
     private val TAG = "SyncService.LOG"
     override suspend fun doWork(): Result {
         val sync = inputData.getString(KEY_INPUT_DATA) ?: ""
-        Log.d(TAG, "sync $sync")
+        PosLogger.d(TAG, "sync $sync")
         val syncObject = MoshiInstance.create().adapter(Sync::class.java).fromJson(sync)
-        Log.d(TAG, "syncObject $syncObject")
+        PosLogger.d(TAG, "syncObject $syncObject")
         return try {
             setForeground(createForegroundInfo())
             val status = syncObject?.status ?: StatusTrx.PROGRESS.name
@@ -49,7 +49,7 @@ class SyncService(appContext: Context, workerParams: WorkerParameters) :
                 Result.success(workDataOf(KEY_MESSAGE to "Estado de Transacción $status"))
             }
         } catch (e: Exception) {
-            Log.d(TAG, e.message!!)
+            PosLogger.e(TAG, e.message!!)
             Result.failure()
         }
     }
@@ -60,7 +60,7 @@ class SyncService(appContext: Context, workerParams: WorkerParameters) :
             sync ?: run { result = Result.failure(workDataOf(KEY_MESSAGE to "Operación Sincronización no encontrada.")) }
             val syncData = MoshiInstance.create().adapter(SyncData::class.java).fromJson(sync?.data!!)
             syncData ?: run { result = Result.failure(workDataOf(KEY_MESSAGE to "No se puede parsear datos de objeto Sync.")) }
-            Log.d(TAG, "syncData $syncData")
+            PosLogger.d(TAG, "syncData $syncData")
             TransaccionFactory.crearTransacion<AbstractTransaccion>( TipoOperacion.PCI_SINCRONIZACION,
                 { response ->
                     result = when {
@@ -80,7 +80,7 @@ class SyncService(appContext: Context, workerParams: WorkerParameters) :
                     }
                 },
                 { error ->
-                    Log.d(TAG, "error ${error.message}")
+                    PosLogger.d(TAG, "error ${error.message}")
                     result = Result.failure(workDataOf(KEY_MESSAGE to error.message))
                 }
             ).withProcod(syncData?.product)

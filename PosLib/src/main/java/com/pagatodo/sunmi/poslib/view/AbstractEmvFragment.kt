@@ -224,7 +224,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
                 val moshi = MoshiInstance.create()
                 serviceBd.insertSyncData(Sync(dateTime= Date(), status = StatusTrx.PROGRESS.name,
                     data = moshi.adapter(SyncData::class.java).toJson(syncData))).apply {
-                    Log.d(PosLib.TAG, "inserted with id $this")
+                    PosLogger.d(PosLib.TAG, "inserted with id $this")
                     if (this > 0) doContinue()
                 }
             } catch (e:Exception){
