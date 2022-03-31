@@ -2,6 +2,7 @@ package com.pagatodo.sunmi.poslib.view.dialogs
 
 import android.os.Bundle
 import android.os.Parcelable
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
@@ -52,6 +53,7 @@ class MsiDialog: DialogFragment(R.layout.fragment_msi_dialog) {
     }
 
     private fun generateMonthList(msiList: List<Int>, amount: Double): List<Msi> {
+        Log.d("msiList", "generateMonthList $msiList")
         var arraySize = msiList.size
         val listMonth = mutableListOf<Msi>()
         for(i in 0 until arraySize) {
@@ -70,7 +72,7 @@ class MsiDialog: DialogFragment(R.layout.fragment_msi_dialog) {
             args.putString("amount",totalAmount)
             //args.putStringArray("msilist",msiList.map { it.toString() }.toTypedArray())
             args.putParcelableArrayList("msilist", msiList as ArrayList<out Parcelable>)
-
+            Log.d("msiList", "create $msiList")
             var msiDialog = MsiDialog()
             msiDialog.arguments = args
             return msiDialog
