@@ -28,7 +28,7 @@ class MsiDialog: DialogFragment(R.layout.fragment_msi_dialog) {
         val amount1: String = inputDataAmount.toString()
         val amount: Double = amount1.toDouble()
 
-        val firstArray = arrayOf(3,6,9,12,18,24)
+        val firstArray = arrayOf(3,6,9,12,18,24,32)
         val finalListMonth = generateMonthList(firstArray,amount)
 
         binding.recycler.adapter = MsiAdapter(
