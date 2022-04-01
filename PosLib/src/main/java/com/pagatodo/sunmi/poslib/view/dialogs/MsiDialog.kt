@@ -14,7 +14,7 @@ import java.io.Serializable
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
-import java.util.ArrayList
+import kotlin.collections.ArrayList
 
 class MsiDialog: DialogFragment(R.layout.fragment_msi_dialog), Serializable {
 
@@ -36,7 +36,6 @@ class MsiDialog: DialogFragment(R.layout.fragment_msi_dialog), Serializable {
 
         //val firstArray = arrayOf(3,6,9,12,18,24)
         val firstArray = inputMsiListSerializable as Array<Int>
-        //val firstArray = firstArrayAux.to
         Log.d("msilist", "Serializable: $inputMsiListSerializable")
         val finalListMonth = generateMonthList(firstArray,amount)
 
