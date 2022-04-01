@@ -43,10 +43,12 @@ class MsiDialog: DialogFragment(R.layout.fragment_msi_dialog), Serializable {
         ) {month ->
             Toast.makeText(context, "${month.monthNumber}", Toast.LENGTH_SHORT).show()
             binding.recycler.adapter?.notifyDataSetChanged()
+            Log.d("msilist", "Serializable: $inputMsiListSerializable")
         }
 
         binding.singlePayment.setOnClickListener {
             Toast.makeText(context,"$singlePayment",Toast.LENGTH_SHORT).show()
+            Log.d("msilist", "Serializable: $inputMsiListSerializable")
         }
 
         binding.closeDialog.setOnClickListener {
