@@ -28,13 +28,14 @@ class MsiDialog: DialogFragment(R.layout.fragment_msi_dialog), Serializable {
         val args = this.arguments
         val inputDataAmount = args?.get("amount")
         val inputMsiList = args?.get("msilist")
-        val inputMsiListSerializable = args?.getSerializable("msilist")
+        val inputMsiListSerializable = args?.getSerializable("msilist") as Array<Int>
 
         binding.tvAmount.text = inputDataAmount.toString()
         val amount1: String = inputDataAmount.toString()
         val amount: Double = amount1.toDouble()
 
-        val firstArray = arrayOf(3,6,9,12,18,24)
+        //val firstArray = arrayOf(3,6,9,12,18,24)
+        val firstArray = inputMsiListSerializable
         Log.d("msilist", "Serializable: $inputMsiListSerializable")
         val finalListMonth = generateMonthList(firstArray,amount)
 
@@ -74,10 +75,7 @@ class MsiDialog: DialogFragment(R.layout.fragment_msi_dialog), Serializable {
         fun create(totalAmount: String, msiList: List<Int>,doContinue: (Boolean) -> Unit): MsiDialog{
             val args = Bundle()
             args.putString("amount",totalAmount)
-            //args.putStringArray("msilist",msiList.map { it.toString() }.toTypedArray())
             args.putSerializable("msilist", msiList as Serializable)
-            //args.putParcelableArrayList("msilist",msiList)
-            //args.putParcelableArrayList("msilist", ArrayList() <? extends Parcelable> msiList)
             Log.d("msiList", "create $msiList")
             var msiDialog = MsiDialog()
             msiDialog.arguments = args
