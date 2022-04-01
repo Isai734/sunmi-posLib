@@ -358,13 +358,21 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
                         onDismissRequestOnline()
                         sunmiTransaction.onFailure(PosResult.SyncOperationSuccess)
                     }
-                    WorkInfo.State.FAILED -> {
+                    WorkInfo.State.ENQUEUED -> {
+
+                    }
+                    WorkInfo.State.RUNNING -> {
+
+                    }
+                    WorkInfo.State.BLOCKED -> {
+
+                    }
+                    else -> {
                         if(info.outputData.getString(SyncService.KEY_MESSAGE) == "La operacion esta anulada")
                             sunmiTransaction.onFailure(PosResult.SyncOperationSuccess)
                         else
                             sunmiTransaction.onFailure(PosResult.SyncOperationFailed)
                     }
-                    else -> {sunmiTransaction.onFailure(PosResult.SyncOperationFailed)}
                 }
             }
         }
