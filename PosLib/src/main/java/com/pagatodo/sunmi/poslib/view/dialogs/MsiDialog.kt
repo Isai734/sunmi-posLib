@@ -35,7 +35,7 @@ class MsiDialog: DialogFragment(R.layout.fragment_msi_dialog), Serializable {
         val amount: Double = amount1.toDouble()
 
         //val firstArray = arrayOf(3,6,9,12,18,24)
-        val firstArray = inputMsiListSerializable.toList()
+        val firstArray = inputMsiListSerializable as Array<Int>
         //val firstArray = firstArrayAux.to
         Log.d("msilist", "Serializable: $inputMsiListSerializable")
         val finalListMonth = generateMonthList(firstArray,amount)
@@ -60,7 +60,7 @@ class MsiDialog: DialogFragment(R.layout.fragment_msi_dialog), Serializable {
 
     }
 
-    private fun generateMonthList(arrayMonth: List<Int>, amount: Double): List<Msi> {
+    private fun generateMonthList(arrayMonth: Array<Int>, amount: Double): List<Msi> {
         var arraySize = arrayMonth.size
         val listMonth = mutableListOf<Msi>()
         for(i in 0 until arraySize) {
