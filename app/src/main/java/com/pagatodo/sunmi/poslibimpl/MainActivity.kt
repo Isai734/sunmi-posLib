@@ -32,6 +32,7 @@ import net.fullcarga.android.api.bd.sigma.generated.tables.pojos.Operaciones
 import net.fullcarga.android.api.bd.sigma.generated.tables.pojos.Productos
 import net.fullcarga.android.api.data.respuesta.OperacionSiguiente
 import net.fullcarga.android.api.data.respuesta.Respuesta
+import java.math.BigDecimal
 
 class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
 
@@ -62,9 +63,9 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
         val bundle = Bundle()
         bundle.putString("amount",amountToCollect)
 
-        var dialog = MsiDialog()
-        dialog.arguments = bundle
-        dialog.show(supportFragmentManager,"msiDialog")
+        //var dialog = MsiDialog()
+        //dialog.arguments = bundle
+        //dialog.show(supportFragmentManager,"msiDialog")
     }
 
     private fun cidDialog(){
@@ -272,6 +273,12 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
     override fun haveMSI() = true
 
     override fun showDialogMsi(cardNo: String, doContinue: (Boolean) -> Unit) {
-        MsiDialog()
+        GlobalScope.launch (Dispatchers.Main) {
+
+            MsiDialog.create("1800", listOf(3,6,9,12)){
+                doContinue(it>=1)
+            }.show(this@MainActivity.supportFragmentManager,"msiDialog")
+
+        }
     }
 }

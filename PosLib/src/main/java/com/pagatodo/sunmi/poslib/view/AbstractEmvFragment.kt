@@ -70,6 +70,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
     private var params = LinkedList<Parametro>()
     private var forceCheckCardType: Int = -1
     private var isAllowCancelEmvProcess = true
+    private var month: Int = 0
 
     override fun possibleCancelCheckCard(isPossible: Boolean) {
         isAllowCancelEmvProcess = isPossible
@@ -80,6 +81,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
         operacion = dataInitPci.operacion
         producto = dataInitPci.producto
         form = dataInitPci.form
+        month = 0
         fullProfile = EmvManager.getFullPerfil(producto.perfilEmv ?: 0, this)
     }
 
@@ -213,6 +215,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
         } else {
             saveTmpDataSync(getDataSync(dataCard)) {
                 onDialogProcessOnline(dataCard = dataCard)
+                dataCard.monthlyPayments = month
                 viewModelPci.executeEmvOpr(PciUtils.getOperation(operacion), producto.codigo, PciUtils.fillFields(params, form), createDataOpTarjeta(dataCard, createTransactionData()))
             }
         }
@@ -456,41 +459,21 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
     }
 
     override fun showDialogMsi(cardNo: String, doContinue: (Boolean) -> Unit) {
-        //val msiList = PciUtils.haveMsi(cardNo)
+        val msiList = PciUtils.haveMsi(cardNo)
+        //var msiList = listOf<Int>(3,6,9,12,18)
+        val totalAmountInt = createTransactionData().totalAmount.toInt()
 
-        var msiList = listOf<Int>(3,6,9,12,18)
-        Log.d("msiList", "Lista $msiList")
-        Log.d("msiList show Dialog", "Total Amount: ${createTransactionData().totalAmount} ")
-        Log.d("msiList show Dialog", "Amount: ${createTransactionData().amount} ")
-
-
-        val dialogMsi = MsiDialog.create(createTransactionData().totalAmount,msiList) {
-            //this.params.add(Parametro())
+        if (msiList.isNotEmpty() && totalAmountInt > 600) {
+            val dialogMsi = MsiDialog.create(createTransactionData().totalAmount,msiList) {
+                month = it
+                doContinue(it>=1)
+            }
+            dialogMsi.show(requireActivity().supportFragmentManager, dialogMsi.tag)
+        }else {
             doContinue(true)
+            Log.d("DialogMsi", "Tiene MSI pero la lista está vacía $msiList")
         }
-        dialogMsi.show(requireActivity().supportFragmentManager, dialogMsi.tag)
 
-        /*
-        if (msiList.isNotEmpty()) {
-            //MsiDialog()
-
-                MsiDialog.create(createTransactionData().totalAmount,msiList) {
-                    //this.params.add(Parametro())
-                    doContinue(true)
-                }
-
-
-            /**
-             * se debe hacer algo como
-             * MsiDialog.create(createTransactionData().totalAmount, msiList) { msi ->
-             *      this.params.add(Parametro(msi)) // Esto lo tendría que definir Julio si es que debe ir en los fields.
-             *      doContinue(true)
-             * }
-             */
-        } else
-            doContinue(true)
-        Log.d("DialogMsi", "Tiene MSI pero la lista está vacía")
-        */
     }
 
     abstract fun getStanProvider(): StanProviderNext
