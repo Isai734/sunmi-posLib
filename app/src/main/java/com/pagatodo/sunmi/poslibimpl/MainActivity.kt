@@ -3,7 +3,6 @@ package com.pagatodo.sunmi.poslibimpl
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.text.isDigitsOnly
 import androidx.fragment.app.FragmentTransaction
@@ -15,7 +14,6 @@ import com.pagatodo.sunmi.poslib.config.PosConfig
 import com.pagatodo.sunmi.poslib.interfaces.SunmiTrxListener
 import com.pagatodo.sunmi.poslib.model.*
 import com.pagatodo.sunmi.poslib.util.*
-import com.pagatodo.sunmi.poslib.view.dialogs.CidDialog
 import com.pagatodo.sunmi.poslib.view.dialogs.MsiDialog
 import com.pagatodo.sunmi.poslib.view.dialogs.PinPadDialog
 import com.pagatodo.sunmi.poslib.view.dialogs.TemporaryDialog
@@ -30,7 +28,6 @@ import kotlinx.coroutines.launch
 import net.fullcarga.android.api.bd.sigma.generated.tables.pojos.Menu
 import net.fullcarga.android.api.bd.sigma.generated.tables.pojos.Operaciones
 import net.fullcarga.android.api.bd.sigma.generated.tables.pojos.Productos
-import net.fullcarga.android.api.data.respuesta.AbstractRespuesta
 import net.fullcarga.android.api.data.respuesta.OperacionSiguiente
 import net.fullcarga.android.api.data.respuesta.Respuesta
 
@@ -168,7 +165,7 @@ class MainActivity : AppCompatActivity(), SunmiTrxListener<String> {
     }
 
     override fun onSync(dataCard: DataCard) {
-        viewMPci.sync()
+        //viewMPci.sync()
     }
 
     override fun onFailureEmv(error: PosResult, todo: (String) -> Unit) {

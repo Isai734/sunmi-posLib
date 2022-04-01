@@ -34,7 +34,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
         else
             throw InstantiationException("Owner must be instance of SunmiTrxListener.")
         sunmiListener.getVmodelPCI().pciViewModel.observe(owner, pciObserver)
-        sunmiListener.getVmodelPCI().syncViewModel.observe(owner, syncObserver)
+        //sunmiListener.getVmodelPCI().syncViewModel.observe(owner, syncObserver)
     }
 
     fun initTransaction() {
@@ -283,7 +283,7 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
     private val mcrOnlyCheckCard: Int
         get() = AidlConstants.CardType.MAGNETIC.value
 
-    private val syncObserver
+    /*private val syncObserver
         get() = Observer<Results<Any>> {
             when (it) {
                 is Results.Success -> {
@@ -300,5 +300,5 @@ class SunmiTrxWrapper(owner: LifecycleOwner, val test: Boolean = false) :
                         onFailure(PosResult.SyncOperationFailed)
                 }
             }
-        }
+        }*/
 }
