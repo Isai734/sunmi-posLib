@@ -1,6 +1,5 @@
 package com.pagatodo.sunmi.poslib.view
 
-import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.MutableLiveData
@@ -27,8 +26,6 @@ import com.pagatodo.sunmi.poslib.util.*
 import com.pagatodo.sunmi.poslib.view.dialogs.*
 import com.pagatodo.sunmi.poslib.viewmodel.EmvViewModel
 import com.pagatodo.sunmi.poslib.viewmodel.SyncViewModel
-import com.squareup.moshi.FromJson
-import com.squareup.moshi.ToJson
 import com.sunmi.pay.hardware.aidl.AidlConstants
 import com.sunmi.pay.hardware.aidlv2.bean.EmvTermParamV2
 import com.sunmi.pay.hardware.aidlv2.pinpad.PinPadListenerV2
@@ -46,7 +43,6 @@ import net.fullcarga.android.api.data.respuesta.OperacionSiguiente
 import net.fullcarga.android.api.formulario.Formulario
 import net.fullcarga.android.api.formulario.Parametro
 import net.fullcarga.android.api.oper.TipoOperacion
-import java.math.BigDecimal
 import java.util.*
 
 abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespuesta> , OnFailureListener{
@@ -359,10 +355,12 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
                         sunmiTransaction.onFailure(PosResult.SyncOperationSuccess)
                     }
                     WorkInfo.State.ENQUEUED -> {
-
+                        progressDialog.setTitle("Esperando Conexión.")
+                        if(!progressDialog.isShowing) progressDialog.show()
                     }
                     WorkInfo.State.RUNNING -> {
-
+                        progressDialog.setTitle("Cacelando Venta.")
+                        if(!progressDialog.isShowing) progressDialog.show()
                     }
                     WorkInfo.State.BLOCKED -> {
 

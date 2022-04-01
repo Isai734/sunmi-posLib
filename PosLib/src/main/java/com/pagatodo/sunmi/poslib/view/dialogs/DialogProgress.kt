@@ -13,6 +13,7 @@ class DialogProgress(context: Context) :
     Dialog(context, R.style.AppTheme_AppCompat_Dialog_Alert_NoFloating) {
 
     private var title = "Enviando..."
+    private lateinit var viewTitle: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,10 +22,13 @@ class DialogProgress(context: Context) :
 
     override fun show() {
         super.show()
-        findViewById<TextView>(R.id.titleProgressDialog).text = title
+        viewTitle = findViewById(R.id.titleProgressDialog)
+        viewTitle.text = title
     }
 
     fun setTitle(title: String) {
+        if(this::viewTitle.isInitialized)
+            viewTitle.text = title
         this.title = title
     }
 
