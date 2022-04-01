@@ -460,6 +460,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
 
         var msiList = listOf<Int>(3,6,9,12,18)
         Log.d("msiList", "Lista $msiList")
+        Log.d("msiList show Dialog", "Total Amount: ${createTransactionData().totalAmount} ")
 
 
         val dialogMsi = MsiDialog.create(createTransactionData().totalAmount,msiList) {

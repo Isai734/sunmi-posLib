@@ -28,14 +28,15 @@ class MsiDialog: DialogFragment(R.layout.fragment_msi_dialog), Serializable {
         val args = this.arguments
         val inputDataAmount = args?.get("amount")
         val inputMsiList = args?.get("msilist")
-        val inputMsiListSerializable = args?.getSerializable("msilist") as Array<Int>
+        val inputMsiListSerializable = args?.getSerializable("msilist") as ArrayList<Int>
 
         binding.tvAmount.text = inputDataAmount.toString()
         val amount1: String = inputDataAmount.toString()
         val amount: Double = amount1.toDouble()
 
         //val firstArray = arrayOf(3,6,9,12,18,24)
-        val firstArray = inputMsiListSerializable
+        val firstArray = inputMsiListSerializable.toList()
+        //val firstArray = firstArrayAux.to
         Log.d("msilist", "Serializable: $inputMsiListSerializable")
         val finalListMonth = generateMonthList(firstArray,amount)
 
@@ -45,6 +46,7 @@ class MsiDialog: DialogFragment(R.layout.fragment_msi_dialog), Serializable {
             Toast.makeText(context, "${month.monthNumber}", Toast.LENGTH_SHORT).show()
             binding.recycler.adapter?.notifyDataSetChanged()
             Log.d("msilist", "Serializable: $inputMsiListSerializable")
+            Log.d("msiList create", "inputDataAmount: $inputDataAmount , amount1 $amount1 , amount $amount")
         }
 
         binding.singlePayment.setOnClickListener {
@@ -58,7 +60,7 @@ class MsiDialog: DialogFragment(R.layout.fragment_msi_dialog), Serializable {
 
     }
 
-    private fun generateMonthList(arrayMonth: Array<Int>, amount: Double): List<Msi> {
+    private fun generateMonthList(arrayMonth: List<Int>, amount: Double): List<Msi> {
         var arraySize = arrayMonth.size
         val listMonth = mutableListOf<Msi>()
         for(i in 0 until arraySize) {
@@ -77,6 +79,7 @@ class MsiDialog: DialogFragment(R.layout.fragment_msi_dialog), Serializable {
             args.putString("amount",totalAmount)
             args.putSerializable("msilist", msiList as Serializable)
             Log.d("msiList", "create $msiList")
+            Log.d("msiList create", "Total Amount: $totalAmount")
             var msiDialog = MsiDialog()
             msiDialog.arguments = args
             return msiDialog
