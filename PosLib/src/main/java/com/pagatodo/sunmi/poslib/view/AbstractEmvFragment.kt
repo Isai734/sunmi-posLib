@@ -55,7 +55,7 @@ abstract class AbstractEmvFragment: Fragment(), SunmiTrxListener<AbstractRespues
         isAllowCancelEmvProcess = isPossible
     }
 
-    protected fun setDataInit(){
+    protected fun setDataInit() {
         val dataInitPci = createDataInit()
         operacion = dataInitPci.operacion
         producto = dataInitPci.producto
